@@ -1,0 +1,49 @@
+[
+  {
+     "name": "Princess Mononoke",
+     "gross": "159.3",
+     "release": "1997-7-12",
+     "inCollection": "true",
+     "shortDescription": "Crazy shit happens.",
+     "longDescription": "Lots of crazy shit happens over the course of time.",
+     "guiltyPleasure": "false",
+     "cast": [
+         {"name": "Some", "character": "1"},
+         {"name": "One", "character": "1"}
+     ]
+  },
+  {
+      "name": "Mary Poppins",
+      "gross": "102.3",
+      "release": "1964-09-11",
+      "inCollection": "false",
+      "shortDescription": "A magic nanny comes to work for a cold banker's unhappy family",
+      "longDescription": "Nannies with magical powers!",
+      "guiltyPleasure": "false",
+      "cast": [
+          {"name": "Don't", "character": "1"},
+          {"name": "Know",  "character": "2"},
+          {"name": "Who's", "character": "3"},
+          {"name": "In",    "character": "4"},
+          {"name": "Here",  "character": "5"},
+          {"name": "Some",  "character": "6"}
+      ]
+  },
+  {
+    "name": "Sound of Music",
+    "gross": "163.2",
+    "release": "1965-03-29",
+    "inCollection": "true",
+    "shortDescription": "A woman leaves an Austrian convent to become a governess to the children of a Naval officer Widower.",
+    "longDescription": "A tuneful, heartwarming story, it is based on the real life story of the Von Trapp Family singers, one of the world's best-known concert groups in the era immediately preceding World War II. Julie Andrews plays the role of Maria, the tomboyish postulant at an Austrian abbey who becomes a governess in the home of a widowed naval captain with seven children, and brings a new love of life and music into the home.",
+    "guiltyPleasure": "false",
+    "cast": [
+        {"name": "Julie Andrews",       "character": "1"},
+        {"name": "Christopher Plummer", "character": "2"},
+        {"name": "Eleanor Parker",      "character": "3"},
+        {"name": "Richard Haydn",       "character": "4"},
+        {"name": "Peggy Wood",          "character": "5"},
+        {"name": "Charmian Carr",       "character": "6"}
+    ]
+}
+]
