@@ -1,52 +1,50 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="collection">
+
+<html ng-app="elam03.github.io.app">
+
     <head>
         <meta charset="UTF-8">
-        <title>Document</title>
+        <title>elam03.github.io</title>
         <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
     </head>
+
     <body>
         <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+        <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
         <script type="text/javascript" src="app.js"></script>
 
-        <div class="container" ng-controller="UserController" ng-show="true">
-            <h1>Hi, {{user.name}}.</h1>
-            <h2 class="text-{{user.status}}">Your current status: {{user.status}}</h2>
-            <h1>number! {{user.number * user.number + 17}}</h1>
-        </div>
+        <h1>Welcome to elam03.github.ui!</h1>
 
-        <div class="container" ng-controller="MovieDataLoaderController" ng-show="true">
-            <div ng-repeat="item in items">
-                <h2>
-                    <item-title></item-title>
-                </h2>
-                <h3>International Gross: {{item.gross * 1000000 | currency:'$'}}<h3>
-                <div>
-                    <p>{{item.shortDescription}}</p>
+        <div ng-controller="ProjectListController" style="width:400px;height:400px;">
+            <!-- <script type="text/ng-template" id="group-template.html">
+                <div class="panel {{panelClass || 'panel-default'}}">
+                    <div class="panel-heading">
+                        <h4 class="panel-title" style="color:#fa39c3">
+                            <a href tabindex="0" class="accordion-toggle" ng-click="toggleOpen()" uib-accordion-transclude="heading"><span ng-class="{'text-muted': isDisabled}">{{heading}}</span></a>
+                        </h4>
+                    </div>
+                    <div class="panel-collapse collapse" uib-collapse="!isOpen">
+                        <div class="panel-body" style="text-align: right" ng-transclude></div>
+                    </div>
                 </div>
-                <h3 ng-show="{{item.inCollection}}">(In your collection)</h3>
-                <item-panels></item-panels>
-            </div>
-        </div>
+            </script> -->
 
-        <div ng-controller="CollectionController as collection" ng-show="false">
-            <div ng-repeat="item in collection.items">
-                <h2>
-                    {{item.name}}
-                    <span>{{item.release | date:'mediumDate'}}</span>
-                </h2>
-                <h3>International Gross: {{item.gross * 1000000 | currency:'$'}}<h3>
-                <div>
-                    <p>{{item.shortDescription}}</p>
-                </div>
-                <h3 ng-show="{{item.inCollection}}">(In your collection)</h3>
-                <section>
-                    <ul class='nav nav-tabs'>
-                        <li><a href>Description</a></li>
-                        <li><a href>Cast</a></li>
-                    </ul>
-                </section>
-            </div>
+            <!-- <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="oneAtATime"> Open only one at a time</input>
+                </label>
+            </div> -->
+            <uib-accordion close-others="oneAtATime">
+                <uib-accordion-group heading="{{group.title}}" ng-repeat="group in groups">
+                    <div>
+                        <img src="{{preview}}" ng-repeat="preview in group.previews" alt="HTML5 Icon" style="width:128px;height:128px;"/>
+                    </div>
+                    <div>
+                        <a href="{{group.content}}">Download Link</a>
+                    </div>
+                </uib-accordion-group>
+            </uib-accordion>
         </div>
     </body>
+
 </html>
