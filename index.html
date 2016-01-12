@@ -9,6 +9,7 @@
 
     <body>
         <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="style.css" type="text/css" media="screen" />
         <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
         <script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
         <script type="text/javascript" src="bower_components/angular-touch/angular-touch.min.js"></script>
@@ -28,67 +29,36 @@
 
         <div ng-controller="TabsController">
             <uib-tabset>
-                <!-- <uib-tab heading="Projects">
-                    <div ng-controller="ProjectListController" style="width:400px;height:400px;">
-                        <uib-accordion close-others="oneAtATime">
-                            <uib-accordion-group heading="{{project.title}}" ng-repeat="project in projects">
-                                <div>
-                                    <img src="{{preview}}" ng-repeat="preview in project.previews" alt="HTML5 Icon" style="width:128px;height:128px;"/>
-                                </div>
-                                <div>
-                                    <a href="{{project.content}}">Download Link</a>
-                                </div>
-                            </uib-accordion-group>
-                        </uib-accordion>
-                    </div>
-                </uib-tab> -->
-
-                <!-- <uib-tab heading="Test tabs...">
-                    <uib-tabset vertical="true" type="tabs">
-                        <uib-tab heading="Vertical 1">Vertical content 1</uib-tab>
-                        <uib-tab heading="Vertical 2">Vertical content 2</uib-tab>
-                    </uib-tabset>
-                </uib-tab> -->
-
                 <uib-tab heading="Projects">
                     <div ng-controller="ProjectsCarouselCtrl">
                         <div>
-                            <uib-carousel interval="myInterval" no-wrap="noWrapSlides">
-                                <uib-slide ng-repeat="slide in slides" active="slide.active" style="height: 505px">
-                                    <img ng-src="{{slide.image}}" style="margin:auto;height:100%;max-height:100%">
-                                    <div class="carousel-caption">
-                                        <h4>{{slide.text}}</h4>
+                            <uib-carousel interval="myInterval" no-wrap="noWrapSlides" class="carousel-style">
+                                <uib-slide ng-repeat="slide in slides" active="slide.active" class="slide-style">
+                                    <div class="slide-caption">
+                                        <p>{{slide.text}}</p>
                                         <a href="{{slide.link}}">Download Link</a>
                                     </div>
+                                    <img ng-src="{{slide.image}}" class="slide-img">
                                 </uib-slide>
                             </uib-carousel>
                         </div>
-                        <!-- <div class="row">
-                            <div class="col-md-6">
-                                <button type="button" class="btn btn-info" ng-click="addSlideKitten()">Add Slide</button>
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" ng-model="noWrapSlides">
-                                        Disable Slide Looping
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                Interval, in milliseconds: <input type="number" class="form-control" ng-model="myInterval">
-                                <br />Enter a negative number or 0 to stop the interval.
-                            </div>
-                        </div> -->
                     </div>
                 </uib-tab>
 
-                <uib-tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disable="tab.disabled">
-                    {{tab.content}}
-                </uib-tab>
-
-                <!-- <uib-tab select="alertMe()">
-                    <uib-tab-heading><i class="glyphicon glyphicon-bell"></i> Alert!</uib-tab-heading>
-                    I've got an HTML heading, and a select callback. Pretty cool!
+                <!-- <uib-tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disable="tab.disabled">
+                    <p ng-repeat="content in tab.contents">{{content}}</p>
                 </uib-tab> -->
+
+                <uib-tab heading="Summary">
+
+                    <div ng-repeat="detail in details" class="detail-style">
+                        <h1>{{detail.title}}</h1>
+                        <ul>
+                            <li ng-repeat="content in detail.contents">{{content}}</li>
+                        </ul>
+                    </div>
+                    <!-- <p ng-repeat="content in tab.contents">{{content}}</p> -->
+                </uib-tab>
             </uib-tabset>
         </div>
     </body>

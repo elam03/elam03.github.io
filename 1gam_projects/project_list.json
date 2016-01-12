@@ -74,5 +74,11 @@
         "description": "A clone of the classic game of MissleCommand!",
         "content": "https://drive.google.com/file/d/0BwxvfZmN_TFHaFAtY1NqcFpSdEk/view?usp=sharing",
         "previews": ""
+    },
+    {
+        "title": "BeMustached",
+        "description": "Bejeweled clone for Android",
+        "content": "https://bitbucket.org/elam03/bemustached",
+        "previews": ""
     }
 ]

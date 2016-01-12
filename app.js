@@ -1,77 +1,81 @@
 (function() {
     var app = angular.module('elam03.github.io.app', ['ui.bootstrap', 'ngAnimate', 'ngTouch']);
 
-    var project_data;
-
-    app.factory('ProjectFactory', function($q, $http) {
-
-        var projectList = [];
+    app.factory('DataService', function($q, $http) {
+        var projectData = [];
+        var detailsData = {};
 
         var service = {
-            getProjects: getProjects
+            getProjects: getProjects,
+            getDetailsData: getDetailsData
         };
 
         return service;
 
         function getProjects(refresh) {
             var preview_path = '1gam_projects';
-            if (refresh || !this.projectList) {
+            if (refresh || !this.projectData) {
                 return $http.get(preview_path + '/project_list.json').then(function(data) {
-                    this.projectList = data.data;
+                    this.projectData = data.data;
 
                     // Adjust the image links so that they are correct.
-                    for (var i = 0; i < this.projectList.length; ++i) {
-                        for (var j = 0; j < this.projectList[i].previews.length; ++j) {
-                            this.projectList[i].previews[j] = preview_path + '/' + this.projectList[i].previews[j];
+                    for (var i = 0; i < this.projectData.length; ++i) {
+                        for (var j = 0; j < this.projectData[i].previews.length; ++j) {
+                            this.projectData[i].previews[j] = preview_path + '/' + this.projectData[i].previews[j];
                         }
                     }
 
-                    return this.projectList;
+                    return this.projectData;
                 })
             } else {
                 var deferrer = $q.defer();
-                deferrer.resolve(rhis.projectList);
+                deferrer.resolve(this.projectData);
+                return deferrer.promise;
+            }
+        }
+
+        function getDetailsData(refresh) {
+            if (refresh || !this.detailsData) {
+                return $http.get('details.json').then(function(data) {
+                    this.detailsData = data.data;
+                    return this.detailsData;
+                })
+            } else {
+                var deferrer = $q.defer();
+                deferrer.resolve(this.detailsData);
                 return deferrer.promise;
             }
         }
     });
 
-    app.controller('ProjectListController', ["$scope", "$http", "ProjectFactory", function($scope, $http, ProjectFactory) {
+    app.controller('ProjectListController', ["$scope", "$http", "DataService", function($scope, $http, DataService) {
         $scope.oneAtATime = true;
 
-        ProjectFactory.getProjects().then(function(projects){
+        DataService.getProjects().then(function(projects){
             $scope.projects = projects;
         }, function(err){
             console.log('uh oh!');
         });
     }]);
 
-    app.controller('DropdownCtrl', function($scope) {
-        $scope.items = [
-            "The first choice!",
-            "And another choice for you.",
-            "but wait! A third!"
-        ];
+    app.controller('TabsController', function($scope, $window, DataService) {
+        // $scope.tabs = [
+        //     { title:'Interests', content:'My interests...' },
+        //     // { title:'Dynamic Title 2', content:'Dynamic content 2', disabled: true }
+        // ];
+
+        // style="border:2px solid black;margin"
+        // style="height: 505px"
+        // style="margin:auto;height:100%;max-height:100%
+        DataService.getDetailsData().then(function(data) {
+            $scope.tabs = data;
+            $scope.details = data;
+        }, function(err) {
+            console.log('uh oh!');
+        });
     });
 
-    app.controller('TabsController', function($scope, $window) {
-        $scope.tabs = [
-            { title:'Interests', content:'My interests...' },
-            // { title:'Dynamic Title 2', content:'Dynamic content 2', disabled: true }
-        ];
-
-        $scope.alertMe = function() {
-            setTimeout(function() {
-                $window.alert('You\'ve selected the alert tab!');
-            });
-        };
-
-        // $scope.tabs[0].active = true;
-    });
-
-    app.controller('ProjectsCarouselCtrl', function ($http, $scope, ProjectFactory) {
-        ///////////////////////////////////////////////////////////////////////
-
+    app.controller('ProjectsCarouselCtrl', function ($http, $scope, DataService) {
         $scope.myInterval = 5000;
         $scope.noWrapSlides = false;
         var slides = $scope.slides = [];
@@ -85,7 +89,7 @@
             });
         };
 
-        ProjectFactory.getProjects().then(function(projects){
+        DataService.getProjects().then(function(projects){
             $scope.projects = projects;
 
             for (var i = 0; i < projects.length; ++i) {
