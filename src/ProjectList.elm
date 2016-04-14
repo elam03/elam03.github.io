@@ -3,7 +3,7 @@ module ProjectList where
 import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+-- import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (..)
 import Task
@@ -26,10 +26,7 @@ type alias Model =
 init : String -> (Model, Effects Action)
 init file =
   ( Model file "Loading" []
-  -- , Effects.none
-  -- , getData "http://localhost:8000/1gam_projects/project_list.json"
-  , getData "http://elam03.github.io/1gam_projects/project_list.json"
-
+  , getData file
   )
 
 -- UPDATE
@@ -71,15 +68,17 @@ view address model =
     let
         numProjects = toString (List.length model.projects)
     in
-        div [ style [ "width" => "600px" ] ]
-            [ h2 [ headerStyle ]
-                [ text model.file
-                , button [onClick address RequestRefresh] [ text "Refresh" ]
-                ]
-            -- , p [] [ text ("numProjects: " ++ numProjects) ]
-            , viewProjects model.projects
-            -- , text model.rawProjects
+        div [ style [] ]
+            [ viewProjects model.projects
             ]
+            -- [ h2 [ headerStyle ]
+            --     [ text model.file
+            --     , button [onClick address RequestRefresh] [ text "Refresh" ]
+            --     ]
+            -- -- , p [] [ text ("numProjects: " ++ numProjects) ]
+            -- , viewProjects model.projects
+            -- -- , text model.rawProjects
+            -- ]
 
 viewProjects : List Project -> Html
 viewProjects projects =
@@ -89,8 +88,11 @@ viewProjects projects =
 
 viewProject : Project -> Html
 viewProject project =
-    div []
+    li []
         [ text project.title
+        -- , p [] [text "blah"]
+        , p [] [ text project.description ]
+        , a [ linkStyle ] [ text project.content ]
         -- , span [] project.description
         ]
 
@@ -99,6 +101,12 @@ headerStyle =
   style
     [ "width" => "200px"
     , "text-align" => "center"
+    ]
+
+linkStyle : Attribute
+linkStyle =
+  style
+    [
     ]
 
 imgStyle : String -> Attribute

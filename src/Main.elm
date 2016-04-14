@@ -2,93 +2,70 @@ module Main (..) where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
-import Html.Attributes exposing (..)
+-- import Html.Attributes exposing (..)
 -- import Html.Events as Events
 -- import Http
+import Signal exposing (..)
 import StartApp
 import Task exposing (..)
+-- import Time exposing (..)
 -- import Json.Decode as Json
 
 import RandomGif
 import ProjectList
+import Cityscape exposing (..)
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
 type Action
     = NoOp
-    -- | Refresh
-    -- | OnRefresh (Result Http.Error String)
-    -- | NewGif (Maybe String)
     | Left RandomGif.Action
     | ProjectListActions ProjectList.Action
     | Message
+    | CityscapeActions Cityscape.Action
 
 
 type alias Model =
     { left : RandomGif.Model
     , projectList : ProjectList.Model
+    , cityscape : Cityscape.Model
     }
-
--- initialModel : Model
--- initialModel =
---     {   message = "hello"
---     ,   projectData = getProjectData
---     ,   left = {}
---     -- ,   projectData = "asdfasdf"
---     }
 
 init : String -> String -> (Model, Effects Action)
 init topic fileLocation =
     let
         (left, leftFx) = RandomGif.init topic
         (projectList, projectListFx) = ProjectList.init fileLocation
+        (cityscape, cityscapeFx) = Cityscape.init (500, 200)
     in
         ( { left = left
           , projectList = projectList
+          , cityscape = cityscape
           }
         , Effects.batch
             [ Effects.map Left leftFx
             , Effects.map ProjectListActions projectListFx
+            , Effects.map CityscapeActions cityscapeFx
             ]
         )
-
--- get : String -> Task Http.Error (List String)
--- get query =
---     Http.get places ("http://api.zippopotam.us/us/" ++ query)
---
--- places : Json.Decoder (List String)
--- places =
---     let place =
---         Json.object2 (\city state -> city ++ ", " ++ state)
---             ("place name" := Json.string)
---             ("state" := Json.string)
---     in
---         "places" := Json.list place
-
-myStyle : Html.Attribute
-myStyle =
-    style
-        [ ("height", "100px")
-        , ("width", "100px")
-        , ("border-style", "solid")
-        , ("border-color", "black")
-        , ("display", "flex")
-        -- , ("border-style", "solid")
-        ]
 
 view : Signal.Address Action -> Model -> Html
 view address model =
     div []
-        [ div [ style [ ("display", "flex") ] ]
-            [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
-            ]
-        , div [ style [ ("display", "flex") ] ]
-            [ RandomGif.view (Signal.forwardTo address Left) model.left
-            ]
+        [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
+        --     ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
+        --     ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ RandomGif.view (Signal.forwardTo address Left) model.left
+        --     ]
         ]
 
-update : Action -> Model -> ( Model, Effects.Effects Action )
+update : Action -> Model -> (Model, Effects.Effects Action)
 update action model =
     case Debug.log "action" action of
         Left act ->
@@ -105,6 +82,13 @@ update action model =
                 ( { model | projectList = projectList }
                 , Effects.map ProjectListActions fx
                 )
+        CityscapeActions act ->
+            let
+                (cityscape, fx) = Cityscape.update act model.cityscape
+            in
+                ( { model | cityscape = cityscape }
+                , Effects.map CityscapeActions fx
+                )
         _ ->
             ( model, Effects.none )
 
@@ -112,11 +96,10 @@ app : StartApp.App Model
 app =
     StartApp.start
         { init = init "funny cats" "http://elam03.github.io/1gam_projects/project_list.json"
-        , inputs = []
+        , inputs = [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs) ]
         , update = update
         , view = view
         }
-
 
 main : Signal.Signal Html
 main =
