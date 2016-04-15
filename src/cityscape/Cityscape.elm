@@ -140,7 +140,14 @@ updateBuildingsInModel model =
 
 wrapBuildings : Int -> List Building -> List Building
 wrapBuildings widthWrap buildings =
-    buildings |> List.map (\b -> { b | x = toFloat (((round b.x + (widthWrap // 2)) % widthWrap) - (widthWrap // 2)) } )
+    let
+        w = toFloat widthWrap
+        checkRightEdge b = if b.x >  (w / 2) then { b | x = b.x - b.w - w } else b
+        checkLeftEdge  b = if b.x < -(w / 2 + b.w) then { b | x = b.x + b.w + w } else b
+    in
+        buildings
+            |> List.map checkRightEdge
+            |> List.map checkLeftEdge
 
 updateWindowDimensions : (Int, Int) -> Model -> Model
 updateWindowDimensions (w, h) model =
@@ -246,15 +253,18 @@ addBuildingsUpdate : Model -> Model
 addBuildingsUpdate model =
     if model.numBuildingsToAdd > 0 then
         let
+            ww = toFloat (model.windowWidth // 2)
+            wh = toFloat (model.windowHeight // 2)
             randomValues = getRandomValues model 3
 
-            x = toValue -300 300 <| Array.get 0 randomValues
-            h = toValue 50 500 <| Array.get 1 randomValues
+            x = toValue -ww ww <| Array.get 0 randomValues
+            y = -wh
+            h = toValue 25 100 <| Array.get 1 randomValues
             l = pickLayer <| toValue 0 100 <| Array.get 1 randomValues
 
             modifiedModel = popRandomValues 3 model
         in
-            newBuilding x h l |> addBuilding modifiedModel |> reduceNewBuildingCount
+            newBuilding x y h l |> addBuilding modifiedModel |> reduceNewBuildingCount
     else
         model
 
@@ -285,14 +295,27 @@ inputs =
         , Signal.map WindowSizeChange Window.dimensions
         ]
 
+grad : Float -> Float -> Gradient
+grad w h =
+    linear (0, w) (0, h)
+        [ (0, rgb 0 171 235)
+        , (0.79, rgb 255 192 64)
+        , (0.8, brown)
+        , (1.0, rgb 38 192 0)
+        ]
+
 view : Signal.Address Action -> Model -> Html
 view address model =
     let
         (mx, my) = (model.x, -model.y)
 
+        w = toFloat model.windowWidth
+        h = toFloat model.windowHeight
         allBuildings = model.buildings |> List.map displayBuilding
 
-        things = allBuildings
+        things =
+            [ gradient (grad 100 -100) (rect w h) ]
+            ++ allBuildings
             ++ (displayModelInfo model)
             ++ (displayMouseCursor (mx, my) model)
 

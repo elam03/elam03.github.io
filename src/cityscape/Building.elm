@@ -12,13 +12,13 @@ type Layer = Front | Middle | Back | Static
 type alias Size = { w : Float, h : Float }
 
 glassWindowSize : Size
-glassWindowSize = { w = 10, h = 30 }
+glassWindowSize = { w = 5, h = 9 }
 
 glassWindowSpacing : Size
-glassWindowSpacing = { w = 6, h = 15 }
+glassWindowSpacing = { w = 3, h = 3 }
 
 buildingWidth : number
-buildingWidth = 40
+buildingWidth = 30
 
 isBack : Building -> Bool
 isBack b = b.layer == Back
@@ -73,14 +73,14 @@ type alias Building =
     , windows : List GlassWindow
     }
 
-newBuilding : Float -> Float -> Layer -> Building
-newBuilding x' h' l' =
+newBuilding : Float -> Float -> Float -> Layer -> Building
+newBuilding x' y' h' l' =
     let
         w' = buildingWidth
     in
         { nullBuilding |
           x = x'
-        , y = 0
+        , y = y'
         , w = w'
         , h = h'
         , layer = l'
