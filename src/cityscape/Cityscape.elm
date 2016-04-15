@@ -41,31 +41,30 @@ type alias Model =
     ,   movementType : MovementType
     }
 
-initialModel : (Int, Int) -> Model
-initialModel (w, h) =
-    { x = 0
-    , y = 0
-    , dx = 0
-    , dy = 0
-    , kx = 0
-    , ky = 0
-    , keys = []
-    , t = 0
-    , dt = 0
-    , seed = Random.initialSeed 42
-    , buildings = []
-    , numBuildingsToAdd = 10
-    , randomValues = Array.fromList []
-    , windowWidth = w
-    , windowHeight = h
-    , movementType = TimeMove
-    }
-
 init : (Int, Int) -> (Model, Effects Action)
 init (w, h) =
-    ( initialModel (w, h)
-    , Effects.none
-    )
+    let model =
+        { x = 0
+        , y = 0
+        , dx = 0
+        , dy = 0
+        , kx = 0
+        , ky = 0
+        , keys = []
+        , t = 0
+        , dt = 0
+        , seed = Random.initialSeed 42
+        , buildings = []
+        , numBuildingsToAdd = 10
+        , randomValues = Array.fromList []
+        , windowWidth = w
+        , windowHeight = h
+        , movementType = TimeMove
+        }
+    in
+        ( model
+        , Effects.none
+        )
 
 -- UPDATE
 
@@ -76,75 +75,68 @@ type Action
     | MouseMoved (Int, Int)
     | WindowSizeChange (Int, Int)
 
--- updates : Signal Action
--- updates =
---     merge
---         (map TimeDelta )
-
 update : Action -> Model -> (Model, Effects Action)
 update action model =
     case action of
         None ->
             ( model, Effects.none )
-        TimeDelta dt ->
-            ( model |> randomUpdate |> addBuildingsUpdate |> timeUpdate dt, Effects.none )
+        MouseMoved (mx, my) ->
+            ( model |> mouseUpdate (mx, my), Effects.none )
         KeyDown keys ->
             ( model |> keysUpdate keys, Effects.none )
-        MouseMoved (mx, my) ->
-            ( model |> mouseUpdate (mx, my) |> updateBuildingsInModel (mx, my), Effects.none )
         WindowSizeChange (ww, wh) ->
-            ( model |> updateWindowDimensions (ww, wh), Effects.none )
-        -- _ ->
-        --     ( model, Effects.none )
+            ( model, Effects.none )
+        TimeDelta dt ->
+            ( model |> timeUpdate dt |> randomUpdate |> addBuildingsUpdate |> updateBuildingsInModel |> resetMouseDelta, Effects.none )
 
-update2 : (Float, Keys, (Int, Int), (Int, Int)) -> Model -> Model
-update2 (dt, keys, (mx, my), (ww, wh)) model =
-    model
-        |> updateWindowDimensions (ww, wh)
-        |> randomUpdate
-        |> timeUpdate dt
-        |> mouseUpdate (mx, my)
-        |> keysUpdate keys
-        |> addBuildingsUpdate
-        |> updateBuildingsInModel (mx, my)
-
-updateBuildings : Float -> Int -> (Int, Int) -> List Building -> List Building
-updateBuildings dt windowWidth (mx, my) buildings =
+updateBuildings : Float -> Float -> Int -> List Building -> List Building
+updateBuildings dx dt windowWidth buildings =
     let
-        backSpeed   = 3
-        middleSpeed = 2
-        frontSpeed  = 1
+        frontSpeed  = 25 * dx -- px/sec
+        middleSpeed = frontSpeed * 2
+        backSpeed   = frontSpeed * 3
         staticSpeed = 0
-
-        delta = dt
 
         backBuildings = buildings
                             |> List.filter isBack
-                            |> List.map (\b -> { b | x = b.x + delta / backSpeed } )
+                            |> List.map (\b -> { b | x = b.x + backSpeed / dt } )
         middleBuildings = buildings
                             |> List.filter isMiddle
-                            |> List.map (\b -> { b | x = b.x + delta / middleSpeed } )
+                            |> List.map (\b -> { b | x = b.x + middleSpeed / dt } )
         frontBuildings = buildings
                             |> List.filter isFront
-                            |> List.map (\b -> { b | x = b.x + delta / frontSpeed } )
+                            |> List.map (\b -> { b | x = b.x + frontSpeed / dt } )
 
-        updatedBuildings = wrapBuildings windowWidth (backBuildings ++ middleBuildings ++ frontBuildings)
+        allBuildings = (backBuildings ++ middleBuildings ++ frontBuildings)
+
+        updatedBuildings = allBuildings
+            |> wrapBuildings windowWidth
     in
         updatedBuildings
 
-updateBuildingsInModel : (Int, Int) -> Model -> Model
-updateBuildingsInModel (mx, my) model =
-    let
-        delta =
-            case model.movementType of
-                MouseMove -> model.dx
-                TimeMove -> model.dt
-                StaticMove -> 0
-                _ -> 0
+resetMouseDelta : Model -> Model
+resetMouseDelta model =
+    { model | dx = 0
+    ,         dy = 0
+    }
 
-        updatedBuildings = updateBuildings delta model.windowWidth (mx, my) model.buildings
-    in
-        { model | buildings = updatedBuildings }
+updateBuildingsInModel : Model -> Model
+updateBuildingsInModel model =
+    case model.movementType of
+        MouseMove ->
+            let
+                updatedBuildings = updateBuildings model.dx model.dt model.windowWidth model.buildings
+            in
+                { model | buildings = updatedBuildings }
+        TimeMove ->
+            let
+                updatedBuildings = updateBuildings 1 model.dt model.windowWidth model.buildings
+            in
+                { model | buildings = updatedBuildings }
+        StaticMove ->
+            model
+        _ ->
+            model
 
 wrapBuildings : Int -> List Building -> List Building
 wrapBuildings widthWrap buildings =
@@ -283,21 +275,14 @@ timeUpdate dt model =
     ,           dt = dt
     }
 
-input : Signal (Float, Keys, (Int, Int), (Int, Int))
-input =
-    let
-        timeDelta = Signal.map (\t -> t / 20) (fps 30)
-    in
-        Signal.map4 (,,,) timeDelta Keyboard.keysDown Mouse.position Window.dimensions
-
-
 inputs : Signal Action
 inputs =
     mergeMany
         [ Signal.map MouseMoved Mouse.position
         , Signal.map KeyDown Keyboard.keysDown
-        , Signal.map TimeDelta (Signal.map (\t -> t / 20) (fps 30))
-        -- , Signal.map WindowSizeChange Window.dimensions
+        -- , Signal.map TimeDelta (Signal.map (\t -> t / 20) (fps 30))
+        , Signal.map TimeDelta (fps 30)
+        , Signal.map WindowSizeChange Window.dimensions
         ]
 
 view : Signal.Address Action -> Model -> Html
@@ -317,21 +302,6 @@ view address model =
         Html.div
             [ style [ ("width", (toString model.windowWidth) ++ "px"), ("height", (toString model.windowHeight) ++ "px"), ("border-style", "solid") ] ]
             [ finalOutput ]
-
-view2 : Model -> Element
-view2 model =
-    let
-        (mx, my) = (model.x, -model.y)
-
-        allBuildings = model.buildings |> List.map displayBuilding
-
-        things = allBuildings ++ (displayModelInfo model) ++ (displayMouseCursor (mx, my) model)
-    in
-        collage model.windowWidth model.windowHeight things
-
-main : Signal Element
-main =
-    Signal.map view2 (Signal.foldp update2 (initialModel (200,200)) input)
 
 displayMouseCursor : (Float, Float) -> Model -> List Form
 displayMouseCursor (x, y) model =
