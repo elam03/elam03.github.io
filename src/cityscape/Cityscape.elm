@@ -22,6 +22,11 @@ import Building exposing (..)
 type alias Keys = Set.Set Char.KeyCode
 type MovementType = TimeMove | MouseMove | StaticMove | NullMove
 
+type alias Sunset =
+    { y : Float
+    , h : Float
+    }
+
 type alias Model =
     {   x : Float
     ,   y : Float
@@ -39,6 +44,8 @@ type alias Model =
     ,   windowWidth : Int
     ,   windowHeight : Int
     ,   movementType : MovementType
+    ,   sunset : Sunset
+    ,   showInfo : Bool
     }
 
 init : (Int, Int) -> (Model, Effects Action)
@@ -60,6 +67,8 @@ init (w, h) =
         , windowWidth = w
         , windowHeight = h
         , movementType = TimeMove
+        , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
+        , showInfo = False
         }
     in
         ( model
@@ -208,12 +217,20 @@ keysUpdateModel : Keys -> Model -> Model
 keysUpdateModel keys model =
     { model | keys = Set.toList keys }
 
+keysUpdateToggleInfo : Keys -> Model -> Model
+keysUpdateToggleInfo keys model =
+    if (isDown keys 'I') then
+        { model | showInfo = not model.showInfo }
+    else
+        model
+
 keysUpdate : Keys -> Model -> Model
 keysUpdate keys model =
     model
         |> keysUpdateModel keys
         |> keysUpdateAddBuildings keys
         |> keysUpdateMovementType keys
+        |> keysUpdateToggleInfo keys
 
 getNumBuildings : Model -> Int
 getNumBuildings model =
@@ -258,7 +275,7 @@ addBuildingsUpdate model =
             randomValues = getRandomValues model 3
 
             x = toValue -ww ww <| Array.get 0 randomValues
-            y = -wh
+            y = model.sunset.y
             h = toValue 25 100 <| Array.get 1 randomValues
             l = pickLayer <| toValue 0 100 <| Array.get 1 randomValues
 
@@ -296,25 +313,36 @@ inputs =
         ]
 
 grad : Float -> Float -> Gradient
-grad w h =
-    linear (0, w) (0, h)
-        [ (0, rgb 0 171 235)
-        , (0.79, rgb 255 192 64)
-        , (0.8, brown)
-        , (1.0, rgb 38 192 0)
-        ]
+grad y h =
+    let
+        split = 0.75
+        center = y - (h * (1.0 - split))
+    in
+        linear (0, center + h) (0, center)
+            [ (0.0,   rgb 0 171 235)  -- blue
+            , (split, rgb 255 192 64) -- yellow/orange
+            , (split, brown)          -- brown
+            , (1.0,   rgb 38 192 0)   -- green
+            ]
+
+viewSunset : Model -> Form
+viewSunset model =
+    let
+        w = toFloat model.windowWidth
+        h = toFloat model.windowHeight
+    in
+        gradient (grad model.sunset.y model.sunset.h) (rect w h)
 
 view : Signal.Address Action -> Model -> Html
 view address model =
     let
         (mx, my) = (model.x, -model.y)
 
-        w = toFloat model.windowWidth
-        h = toFloat model.windowHeight
         allBuildings = model.buildings |> List.map displayBuilding
+        sunset = model |> viewSunset
 
         things =
-            [ gradient (grad 100 -100) (rect w h) ]
+            [ sunset ]
             ++ allBuildings
             ++ (displayModelInfo model)
             ++ (displayMouseCursor (mx, my) model)
@@ -335,35 +363,38 @@ displayMouseCursor (x, y) model =
 
 displayModelInfo : Model -> List Form
 displayModelInfo model =
-    let m = (model.x, model.y)
-        d = (model.dx, model.dy)
-        t = round model.t
-        dt = round model.dt
-        keys = List.map (\key -> Char.fromCode key) model.keys
-        (ww, wh) = (toFloat model.windowWidth, toFloat model.windowHeight)
-        firstBuilding = List.head model.buildings |> Maybe.withDefault nullBuilding
-        movementType = model.movementType
+    if model.showInfo then
+        let m = (model.x, model.y)
+            d = (model.dx, model.dy)
+            t = round model.t
+            dt = round model.dt
+            keys = List.map (\key -> Char.fromCode key) model.keys
+            (ww, wh) = (toFloat model.windowWidth, toFloat model.windowHeight)
+            firstBuilding = List.head model.buildings |> Maybe.withDefault nullBuilding
+            movementType = model.movementType
 
-        allInfo =
-                [ show ("(x,y): " ++ toString m)
-                , show ("(dx,dy): " ++ toString d)
-                , show ("t: " ++ toString t)
-                , show ("dt: " ++ toString dt)
-                , show ("keys: " ++ toString keys)
-                , show ("(ww, wh): " ++ toString (ww, wh))
-                , show ("buildings: " ++ toString (List.length model.buildings))
-                , show ("first building: " ++ toString (round firstBuilding.x))
-                , show ("movementType: " ++ toString (movementType))
-                ]
+            allInfo =
+                    [ show ("(x,y): " ++ toString m)
+                    , show ("(dx,dy): " ++ toString d)
+                    , show ("t: " ++ toString t)
+                    , show ("dt: " ++ toString dt)
+                    , show ("keys: " ++ toString keys)
+                    , show ("(ww, wh): " ++ toString (ww, wh))
+                    , show ("buildings: " ++ toString (List.length model.buildings))
+                    , show ("first building: " ++ toString (round firstBuilding.x))
+                    , show ("movementType: " ++ toString (movementType))
+                    ]
 
-        randomValues = model.randomValues
-                            |> Array.toList
-                            |> List.map2 (,) [1..(Array.length model.randomValues)]
-                            |> List.map displayRandomValue
+            randomValues = model.randomValues
+                                |> Array.toList
+                                |> List.map2 (,) [1..(Array.length model.randomValues)]
+                                |> List.map displayRandomValue
 
-        formsToDisplay = [ toForm <| flow down allInfo ] ++ randomValues
-    in
-        formsToDisplay |> List.map (\a -> (a |> move (-ww / 2 + 80, wh / 2 - 100)))
+            formsToDisplay = [ toForm <| flow down allInfo ] ++ randomValues
+        in
+            formsToDisplay |> List.map (\a -> (a |> move (-ww / 2 + 80, wh / 2 - 100)))
+    else
+        []
 
 displayRandomValue : (Int, Float) -> Form
 displayRandomValue (x', value') =
