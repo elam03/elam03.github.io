@@ -2,7 +2,7 @@ module ProjectList where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, href, src)
 -- import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (..)
@@ -19,14 +19,14 @@ type alias Project =
 
 type alias Model =
     { file : String
-    , rawProjects : String
+    , assetPath : String
     , projects : List Project
     }
 
-init : String -> (Model, Effects Action)
-init file =
-  ( Model file "Loading" []
-  , getData file
+init : String -> String -> (Model, Effects Action)
+init projectList assetPath =
+  ( Model projectList assetPath []
+  , getData projectList
   )
 
 -- UPDATE
@@ -67,9 +67,17 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     let
         numProjects = toString (List.length model.projects)
+        -- project = viewProjects model.projects
+
+        projects =
+            model.projects
+                |> List.map (\proj -> {proj | previews = proj.previews})
+                |> viewProjects
+        -- {proj | previews = List.map (\p -> model.assetPath ++ p) proj.previews}
     in
-        div [ style [] ]
-            [ viewProjects model.projects
+        div [ style [("border-style", "solid")] ]
+            [ projects
+
             ]
             -- [ h2 [ headerStyle ]
             --     [ text model.file
@@ -80,34 +88,64 @@ view address model =
             -- -- , text model.rawProjects
             -- ]
 
+-- <table style="width:100%">
+--   <tr>
+--     <th>Firstname</th>
+--     <th>Lastname</th>
+--     <th>Points</th>
+--   </tr>
+--   <tr>
+--     <td>Eve</td>
+--     <td>Jackson</td>
+--     <td>94</td>
+--   </tr>
+-- </table>
+
+borderStyle : Attribute
+borderStyle =
+    style [ ("border-style", "solid"), ("border-width", "1px") ]
+
+composeProjectMap : Int -> List Project -> List Html
+composeProjectMap cols projects =
+    let
+        head = List.take cols projects
+        rest = List.drop cols projects
+    in
+        if List.isEmpty head then
+            []
+        else
+            [ (tr [] []) ] ++ (List.map viewProject head) ++ (composeProjectMap cols rest)
+
 viewProjects : List Project -> Html
 viewProjects projects =
-    projects
-        |> List.map viewProject
-        |> ul [ projectStyle ]
+    let
+        numProjects = List.length projects
+        numCols = 3
+
+        projects' = composeProjectMap numCols projects
+    in
+        table [ style [ ("width", "500px") ] ]
+            projects'
 
 viewProject : Project -> Html
 viewProject project =
-    li []
-        [ text project.title
-        -- , p [] [text "blah"]
-        , p [] [ text project.description ]
-        , a [ linkStyle ] [ text project.content ]
-        -- , span [] project.description
-        ]
+    let
+        path = Maybe.withDefault [] (project.previews) |> List.head |> Maybe.withDefault ""
 
-headerStyle : Attribute
-headerStyle =
-  style
-    [ "width" => "200px"
-    , "text-align" => "center"
-    ]
+        images = [ img [ src path, style [ ("width", "16px") ] ] [] ]
 
-linkStyle : Attribute
-linkStyle =
-  style
-    [
-    ]
+        content =
+            [ text project.title
+            , br [] []
+            , text project.description
+            , br [] []
+            , a [ href project.content ] [ text "download!" ]
+            ] ++ images
+    in
+        th [ borderStyle ]
+            [ div []
+                content
+            ]
 
 imgStyle : String -> Attribute
 imgStyle url =
@@ -119,10 +157,6 @@ imgStyle url =
     , "background-size" => "cover"
     , "background-image" => ("url('" ++ url ++ "')")
     ]
-
-projectStyle : Attribute
-projectStyle =
-    style []
 
 -- EFFECTS
 

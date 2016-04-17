@@ -2,7 +2,7 @@ module Main (..) where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
--- import Html.Attributes exposing (..)
+import Html.Attributes exposing (..)
 -- import Html.Events as Events
 -- import Http
 import Signal exposing (..)
@@ -32,11 +32,11 @@ type alias Model =
     , cityscape : Cityscape.Model
     }
 
-init : String -> String -> (Model, Effects Action)
-init topic fileLocation =
+init : String -> String -> String -> (Model, Effects Action)
+init topic fileLocation assetPath =
     let
         (left, leftFx) = RandomGif.init topic
-        (projectList, projectListFx) = ProjectList.init fileLocation
+        (projectList, projectListFx) = ProjectList.init fileLocation assetPath
         (cityscape, cityscapeFx) = Cityscape.init (500, 200)
     in
         ( { left = left
@@ -54,9 +54,9 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     div []
         [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
-        --     ]
+        , div [ style [ ("display", "flex") ] ]
+            [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
+            ]
         -- , div [ style [ ("display", "flex") ] ]
         --     [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
         --     ]
@@ -95,7 +95,7 @@ update action model =
 app : StartApp.App Model
 app =
     StartApp.start
-        { init = init "funny cats" "http://elam03.github.io/1gam_projects/project_list.json"
+        { init = init "funny cats" "http://elam03.github.io/1gam_projects/project_list.json" "http://elam03.github.io/1gam_projects/"
         , inputs = [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs) ]
         , update = update
         , view = view
