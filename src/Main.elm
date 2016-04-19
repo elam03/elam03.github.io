@@ -95,7 +95,8 @@ update action model =
 app : StartApp.App Model
 app =
     StartApp.start
-        { init = init "funny cats" "http://elam03.github.io/1gam_projects/project_list.json" "http://elam03.github.io/1gam_projects/"
+        -- { init = init "funny cats" "http://elam03.github.io/1gam_projects/project_list.json" "http://elam03.github.io/1gam_projects/"
+        { init = init "funny cats" "1gam_projects/project_list.json" "1gam_projects/"
         , inputs = [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs) ]
         , update = update
         , view = view

@@ -6,7 +6,11 @@ import Html.Attributes exposing (style, href, src)
 -- import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (..)
+import String exposing (..)
 import Task
+
+(=>) : a -> b -> (a, b)
+(=>) = (,)
 
 -- MODEL
 
@@ -23,10 +27,18 @@ type alias Model =
     , projects : List Project
     }
 
+errorProject : Project
+errorProject =
+    { title = "error"
+    , description = "error"
+    , content = "error"
+    , previews = Just ["error", "error"]
+    }
+
 init : String -> String -> (Model, Effects Action)
 init projectList assetPath =
   ( Model projectList assetPath []
-  , getData projectList
+  , getProjectData projectList
   )
 
 -- UPDATE
@@ -41,39 +53,53 @@ update action model =
     case action of
         RequestRefresh ->
             ( model
-            , getData model.file
+            , getProjectData model.file
             )
 
-        Refresh maybeNewFiles ->
+        Refresh maybeProjectsList ->
             let
-                data = Maybe.withDefault [] maybeNewFiles
+                addProjectDescription project =
+                    if (project.description |> length) > 0 then
+                        project
+                    else
+                        { project | description = "No Description available!" ++ project.description }
+
+                addProjectAssetPath project =
+                    let
+                        previews' =
+                            project.previews
+                                |> Maybe.withDefault []
+                                |> List.map (\p -> model.assetPath ++ p)
+
+                    in
+                        { project | previews = Just (previews') }
+
+                projects =
+                    maybeProjectsList
+                        |> Maybe.withDefault [errorProject]
+                        |> List.map addProjectDescription
+                        |> List.map addProjectAssetPath
             in
-                if List.isEmpty data then
-                    ( Model model.file "failed" data
+                if List.isEmpty projects then
+                    ( Model model.file "failed" projects
                     , Effects.none
                     )
                 else
-                    ( Model model.file ("success " ++ (toString <| List.length data)) data
+                    ( Model model.file "success" projects
                     , Effects.none
                     )
 
 -- VIEW
 
-(=>) : a -> b -> (a, b)
-(=>) = (,)
-
-
 view : Signal.Address Action -> Model -> Html
 view address model =
     let
         numProjects = toString (List.length model.projects)
-        -- project = viewProjects model.projects
 
         projects =
             model.projects
                 |> List.map (\proj -> {proj | previews = proj.previews})
                 |> viewProjects
-        -- {proj | previews = List.map (\p -> model.assetPath ++ p) proj.previews}
     in
         div [ style [("border-style", "solid")] ]
             [ projects
@@ -130,9 +156,10 @@ viewProjects projects =
 viewProject : Project -> Html
 viewProject project =
     let
-        path = Maybe.withDefault [] (project.previews) |> List.head |> Maybe.withDefault ""
-
-        images = [ img [ src path, style [ ("width", "16px") ] ] [] ]
+        images =
+            project.previews
+                |> Maybe.withDefault []
+                |> List.map (\path -> img [ src path, style [ ("width", "32px") ] ] [])
 
         content =
             [ text project.title
@@ -147,22 +174,11 @@ viewProject project =
                 content
             ]
 
-imgStyle : String -> Attribute
-imgStyle url =
-  style
-    [ "display" => "inline-block"
-    , "width" => "200px"
-    , "height" => "200px"
-    , "background-position" => "center center"
-    , "background-size" => "cover"
-    , "background-image" => ("url('" ++ url ++ "')")
-    ]
-
 -- EFFECTS
 
-getData : String -> Effects Action
-getData location =
-    Http.get decodeUrl location
+getProjectData : String -> Effects Action
+getProjectData location =
+    Http.get decodeProjectData location
         |> Task.toMaybe
         |> Task.map Refresh
         |> Effects.task
@@ -174,8 +190,8 @@ getData location =
 --         "previews": ["RocksPreview.png"]
 --     },
 
-decodeUrl : Decoder (List Project)
-decodeUrl =
+decodeProjectData : Decoder (List Project)
+decodeProjectData =
     list
         <| object4 Project
             ("title" := string)
