@@ -13712,7 +13712,7 @@ Elm.ProjectList.make = function (_elm) {
                                                   ,_1: "32px"}]))]),
          _U.list([]));
       },
-      A2($Maybe.withDefault,_U.list([]),project.previews));
+      project.previews);
       var content = A2($Basics._op["++"],
       _U.list([$Html.text(project.title)
               ,A2($Html.br,_U.list([]),_U.list([]))
@@ -13746,11 +13746,7 @@ Elm.ProjectList.make = function (_elm) {
       projects$);
    };
    var view = F2(function (address,model) {
-      var projects = viewProjects(A2($List.map,
-      function (proj) {
-         return _U.update(proj,{previews: proj.previews});
-      },
-      model.projects));
+      var projects = viewProjects(model.projects);
       var numProjects = $Basics.toString($List.length(model.projects));
       return A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
@@ -13765,7 +13761,7 @@ Elm.ProjectList.make = function (_elm) {
    var errorProject = {title: "error"
                       ,description: "error"
                       ,content: "error"
-                      ,previews: $Maybe.Just(_U.list(["error","error"]))};
+                      ,previews: _U.list(["error","error"])};
    var Model = F3(function (a,b,c) {
       return {file: a,assetPath: b,projects: c};
    });
@@ -13777,9 +13773,9 @@ Elm.ProjectList.make = function (_elm) {
    A2($Json$Decode._op[":="],"title",$Json$Decode.string),
    A2($Json$Decode._op[":="],"description",$Json$Decode.string),
    A2($Json$Decode._op[":="],"content",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   A2($Json$Decode._op[":="],
    "previews",
-   $Json$Decode.list($Json$Decode.string)))));
+   $Json$Decode.list($Json$Decode.string))));
    var getProjectData = function (location) {
       return $Effects.task(A2($Task.map,
       Refresh,
@@ -13802,8 +13798,8 @@ Elm.ProjectList.make = function (_elm) {
                function (p) {
                   return A2($Basics._op["++"],model.assetPath,p);
                },
-               A2($Maybe.withDefault,_U.list([]),project.previews));
-               return _U.update(project,{previews: $Maybe.Just(previews$)});
+               project.previews);
+               return _U.update(project,{previews: previews$});
             };
             var addProjectDescription = function (project) {
                return _U.cmp($String.length(project.description),

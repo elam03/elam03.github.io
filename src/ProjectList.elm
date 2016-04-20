@@ -18,7 +18,7 @@ type alias Project =
     { title : String
     , description : String
     , content : String
-    , previews : Maybe (List String)
+    , previews : List String
     }
 
 type alias Model =
@@ -32,7 +32,7 @@ errorProject =
     { title = "error"
     , description = "error"
     , content = "error"
-    , previews = Just ["error", "error"]
+    , previews = ["error", "error"]
     }
 
 init : String -> String -> (Model, Effects Action)
@@ -68,11 +68,10 @@ update action model =
                     let
                         previews' =
                             project.previews
-                                |> Maybe.withDefault []
                                 |> List.map (\p -> model.assetPath ++ p)
 
                     in
-                        { project | previews = Just (previews') }
+                        { project | previews = previews' }
 
                 projects =
                     maybeProjectsList
@@ -98,7 +97,6 @@ view address model =
 
         projects =
             model.projects
-                |> List.map (\proj -> {proj | previews = proj.previews})
                 |> viewProjects
     in
         div [ style [("border-style", "solid")] ]
@@ -158,7 +156,6 @@ viewProject project =
     let
         images =
             project.previews
-                |> Maybe.withDefault []
                 |> List.map (\path -> img [ src path, style [ ("width", "32px") ] ] [])
 
         content =
@@ -197,4 +194,4 @@ decodeProjectData =
             ("title" := string)
             ("description" := string)
             ("content" := string)
-            (maybe ("previews" := (list string)))
+            ("previews" := (list string))
