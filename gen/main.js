@@ -12347,94 +12347,6 @@ Elm.Html.Attributes.make = function (_elm) {
                                         ,property: property
                                         ,attribute: attribute};
 };
-Elm.Html = Elm.Html || {};
-Elm.Html.Events = Elm.Html.Events || {};
-Elm.Html.Events.make = function (_elm) {
-   "use strict";
-   _elm.Html = _elm.Html || {};
-   _elm.Html.Events = _elm.Html.Events || {};
-   if (_elm.Html.Events.values) return _elm.Html.Events.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $VirtualDom = Elm.VirtualDom.make(_elm);
-   var _op = {};
-   var keyCode = A2($Json$Decode._op[":="],
-   "keyCode",
-   $Json$Decode.$int);
-   var targetChecked = A2($Json$Decode.at,
-   _U.list(["target","checked"]),
-   $Json$Decode.bool);
-   var targetValue = A2($Json$Decode.at,
-   _U.list(["target","value"]),
-   $Json$Decode.string);
-   var defaultOptions = $VirtualDom.defaultOptions;
-   var Options = F2(function (a,b) {
-      return {stopPropagation: a,preventDefault: b};
-   });
-   var onWithOptions = $VirtualDom.onWithOptions;
-   var on = $VirtualDom.on;
-   var messageOn = F3(function (name,addr,msg) {
-      return A3(on,
-      name,
-      $Json$Decode.value,
-      function (_p0) {
-         return A2($Signal.message,addr,msg);
-      });
-   });
-   var onClick = messageOn("click");
-   var onDoubleClick = messageOn("dblclick");
-   var onMouseMove = messageOn("mousemove");
-   var onMouseDown = messageOn("mousedown");
-   var onMouseUp = messageOn("mouseup");
-   var onMouseEnter = messageOn("mouseenter");
-   var onMouseLeave = messageOn("mouseleave");
-   var onMouseOver = messageOn("mouseover");
-   var onMouseOut = messageOn("mouseout");
-   var onBlur = messageOn("blur");
-   var onFocus = messageOn("focus");
-   var onSubmit = messageOn("submit");
-   var onKey = F3(function (name,addr,handler) {
-      return A3(on,
-      name,
-      keyCode,
-      function (code) {
-         return A2($Signal.message,addr,handler(code));
-      });
-   });
-   var onKeyUp = onKey("keyup");
-   var onKeyDown = onKey("keydown");
-   var onKeyPress = onKey("keypress");
-   return _elm.Html.Events.values = {_op: _op
-                                    ,onBlur: onBlur
-                                    ,onFocus: onFocus
-                                    ,onSubmit: onSubmit
-                                    ,onKeyUp: onKeyUp
-                                    ,onKeyDown: onKeyDown
-                                    ,onKeyPress: onKeyPress
-                                    ,onClick: onClick
-                                    ,onDoubleClick: onDoubleClick
-                                    ,onMouseMove: onMouseMove
-                                    ,onMouseDown: onMouseDown
-                                    ,onMouseUp: onMouseUp
-                                    ,onMouseEnter: onMouseEnter
-                                    ,onMouseLeave: onMouseLeave
-                                    ,onMouseOver: onMouseOver
-                                    ,onMouseOut: onMouseOut
-                                    ,on: on
-                                    ,onWithOptions: onWithOptions
-                                    ,defaultOptions: defaultOptions
-                                    ,targetValue: targetValue
-                                    ,targetChecked: targetChecked
-                                    ,keyCode: keyCode
-                                    ,Options: Options};
-};
 Elm.Native.Http = {};
 Elm.Native.Http.make = function(localRuntime) {
 
@@ -13573,111 +13485,6 @@ Elm.Cityscape.make = function (_elm) {
                                   ,displayModelInfo: displayModelInfo
                                   ,displayRandomValue: displayRandomValue};
 };
-Elm.RandomGif = Elm.RandomGif || {};
-Elm.RandomGif.make = function (_elm) {
-   "use strict";
-   _elm.RandomGif = _elm.RandomGif || {};
-   if (_elm.RandomGif.values) return _elm.RandomGif.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var decodeUrl = A2($Json$Decode.at,
-   _U.list(["data","image_url"]),
-   $Json$Decode.string);
-   _op["=>"] = F2(function (v0,v1) {
-      return {ctor: "_Tuple2",_0: v0,_1: v1};
-   });
-   var headerStyle = $Html$Attributes.style(_U.list([A2(_op["=>"],
-                                                    "width",
-                                                    "200px")
-                                                    ,A2(_op["=>"],"text-align","center")]));
-   var imgStyle = function (url) {
-      return $Html$Attributes.style(_U.list([A2(_op["=>"],
-                                            "display",
-                                            "inline-block")
-                                            ,A2(_op["=>"],"width","200px")
-                                            ,A2(_op["=>"],"height","200px")
-                                            ,A2(_op["=>"],"background-position","center center")
-                                            ,A2(_op["=>"],"background-size","cover")
-                                            ,A2(_op["=>"],
-                                            "background-image",
-                                            A2($Basics._op["++"],
-                                            "url(\'",
-                                            A2($Basics._op["++"],url,"\')")))]));
-   };
-   var randomUrl = function (topic) {
-      return A2($Http.url,
-      "http://api.giphy.com/v1/gifs/random",
-      _U.list([A2(_op["=>"],"api_key","dc6zaTOxFJmzC")
-              ,A2(_op["=>"],"tag",topic)]));
-   };
-   var NewGif = function (a) {    return {ctor: "NewGif",_0: a};};
-   var getRandomGif = function (topic) {
-      return $Effects.task(A2($Task.map,
-      NewGif,
-      $Task.toMaybe(A2($Http.get,decodeUrl,randomUrl(topic)))));
-   };
-   var RequestMore = {ctor: "RequestMore"};
-   var view = F2(function (address,model) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.style(_U.list([A2(_op["=>"],
-      "width",
-      "200px")]))]),
-      _U.list([A2($Html.h2,
-              _U.list([headerStyle]),
-              _U.list([$Html.text(model.topic)]))
-              ,A2($Html.div,_U.list([imgStyle(model.gifUrl)]),_U.list([]))
-              ,A2($Html.button,
-              _U.list([A2($Html$Events.onClick,address,RequestMore)]),
-              _U.list([$Html.text("More Please!")]))]));
-   });
-   var Model = F2(function (a,b) {
-      return {topic: a,gifUrl: b};
-   });
-   var init = function (topic) {
-      return {ctor: "_Tuple2"
-             ,_0: A2(Model,topic,"assets/waiting.gif")
-             ,_1: getRandomGif(topic)};
-   };
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      if (_p0.ctor === "RequestMore") {
-            return {ctor: "_Tuple2"
-                   ,_0: model
-                   ,_1: getRandomGif(model.topic)};
-         } else {
-            return {ctor: "_Tuple2"
-                   ,_0: A2(Model,
-                   model.topic,
-                   A2($Maybe.withDefault,model.gifUrl,_p0._0))
-                   ,_1: $Effects.none};
-         }
-   });
-   return _elm.RandomGif.values = {_op: _op
-                                  ,Model: Model
-                                  ,init: init
-                                  ,RequestMore: RequestMore
-                                  ,NewGif: NewGif
-                                  ,update: update
-                                  ,view: view
-                                  ,headerStyle: headerStyle
-                                  ,imgStyle: imgStyle
-                                  ,getRandomGif: getRandomGif
-                                  ,randomUrl: randomUrl
-                                  ,decodeUrl: decodeUrl};
-};
 Elm.ProjectList = Elm.ProjectList || {};
 Elm.ProjectList.make = function (_elm) {
    "use strict";
@@ -13698,10 +13505,6 @@ Elm.ProjectList.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var borderStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                     ,_0: "border-style"
-                                                     ,_1: "solid"}
-                                                    ,{ctor: "_Tuple2",_0: "border-width",_1: "1px"}]));
    var viewProject = function (project) {
       var images = A2($List.map,
       function (path) {
@@ -13723,8 +13526,8 @@ Elm.ProjectList.make = function (_elm) {
               _U.list([$Html.text("download!")]))]),
       images);
       return A2($Html.th,
-      _U.list([borderStyle]),
-      _U.list([A2($Html.div,_U.list([]),content)]));
+      _U.list([$Html$Attributes.$class("projectlist")]),
+      content);
    };
    var composeProjectMap = F2(function (cols,projects) {
       var rest = A2($List.drop,cols,projects);
@@ -13740,19 +13543,13 @@ Elm.ProjectList.make = function (_elm) {
       var projects$ = A2(composeProjectMap,numCols,projects);
       var numProjects = $List.length(projects);
       return A2($Html.table,
-      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                               ,_0: "width"
-                                               ,_1: "500px"}]))]),
+      _U.list([$Html$Attributes.$class("projectlist")]),
       projects$);
    };
    var view = F2(function (address,model) {
       var projects = viewProjects(model.projects);
       var numProjects = $Basics.toString($List.length(model.projects));
-      return A2($Html.div,
-      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                               ,_0: "border-style"
-                                               ,_1: "solid"}]))]),
-      _U.list([projects]));
+      return A2($Html.div,_U.list([]),_U.list([projects]));
    });
    var Refresh = function (a) {
       return {ctor: "Refresh",_0: a};
@@ -13832,7 +13629,6 @@ Elm.ProjectList.make = function (_elm) {
                                     ,Refresh: Refresh
                                     ,update: update
                                     ,view: view
-                                    ,borderStyle: borderStyle
                                     ,composeProjectMap: composeProjectMap
                                     ,viewProjects: viewProjects
                                     ,viewProject: viewProject
@@ -13854,14 +13650,13 @@ Elm.Main.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $ProjectList = Elm.ProjectList.make(_elm),
-   $RandomGif = Elm.RandomGif.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var Model = F3(function (a,b,c) {
-      return {left: a,projectList: b,cityscape: c};
+   var Model = F2(function (a,b) {
+      return {projectList: a,cityscape: b};
    });
    var CityscapeActions = function (a) {
       return {ctor: "CityscapeActions",_0: a};
@@ -13870,6 +13665,20 @@ Elm.Main.make = function (_elm) {
    var ProjectListActions = function (a) {
       return {ctor: "ProjectListActions",_0: a};
    };
+   var init = F2(function (fileLocation,assetPath) {
+      var _p0 = $Cityscape.init({ctor: "_Tuple2",_0: 500,_1: 200});
+      var cityscape = _p0._0;
+      var cityscapeFx = _p0._1;
+      var _p1 = A2($ProjectList.init,fileLocation,assetPath);
+      var projectList = _p1._0;
+      var projectListFx = _p1._1;
+      return {ctor: "_Tuple2"
+             ,_0: {projectList: projectList,cityscape: cityscape}
+             ,_1: $Effects.batch(_U.list([A2($Effects.map,
+                                         ProjectListActions,
+                                         projectListFx)
+                                         ,A2($Effects.map,CityscapeActions,cityscapeFx)]))};
+   });
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
@@ -13884,54 +13693,30 @@ Elm.Main.make = function (_elm) {
               A2($Signal.forwardTo,address,ProjectListActions),
               model.projectList)]))]));
    });
-   var Left = function (a) {    return {ctor: "Left",_0: a};};
-   var init = F3(function (topic,fileLocation,assetPath) {
-      var _p0 = $Cityscape.init({ctor: "_Tuple2",_0: 500,_1: 200});
-      var cityscape = _p0._0;
-      var cityscapeFx = _p0._1;
-      var _p1 = A2($ProjectList.init,fileLocation,assetPath);
-      var projectList = _p1._0;
-      var projectListFx = _p1._1;
-      var _p2 = $RandomGif.init(topic);
-      var left = _p2._0;
-      var leftFx = _p2._1;
-      return {ctor: "_Tuple2"
-             ,_0: {left: left,projectList: projectList,cityscape: cityscape}
-             ,_1: $Effects.batch(_U.list([A2($Effects.map,Left,leftFx)
-                                         ,A2($Effects.map,ProjectListActions,projectListFx)
-                                         ,A2($Effects.map,CityscapeActions,cityscapeFx)]))};
-   });
    var update = F2(function (action,model) {
-      var _p3 = A2($Debug.log,"action",action);
-      switch (_p3.ctor)
-      {case "Left": var _p4 = A2($RandomGif.update,_p3._0,model.left);
-           var left = _p4._0;
-           var fx = _p4._1;
-           return {ctor: "_Tuple2"
-                  ,_0: _U.update(model,{left: left})
-                  ,_1: A2($Effects.map,Left,fx)};
-         case "ProjectListActions": var _p5 = A2($ProjectList.update,
-           _p3._0,
+      var _p2 = A2($Debug.log,"action",action);
+      switch (_p2.ctor)
+      {case "ProjectListActions": var _p3 = A2($ProjectList.update,
+           _p2._0,
            model.projectList);
-           var projectList = _p5._0;
-           var fx = _p5._1;
+           var projectList = _p3._0;
+           var fx = _p3._1;
            return {ctor: "_Tuple2"
                   ,_0: _U.update(model,{projectList: projectList})
                   ,_1: A2($Effects.map,ProjectListActions,fx)};
-         case "CityscapeActions": var _p6 = A2($Cityscape.update,
-           _p3._0,
+         case "CityscapeActions": var _p4 = A2($Cityscape.update,
+           _p2._0,
            model.cityscape);
-           var cityscape = _p6._0;
-           var fx = _p6._1;
+           var cityscape = _p4._0;
+           var fx = _p4._1;
            return {ctor: "_Tuple2"
                   ,_0: _U.update(model,{cityscape: cityscape})
                   ,_1: A2($Effects.map,CityscapeActions,fx)};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
-   var app = $StartApp.start({init: A3(init,
-                             "funny cats",
-                             "1gam_projects/project_list.json",
-                             "1gam_projects/")
+   var app = $StartApp.start({init: A2(init,
+                             "assets/1gam_projects/project_list.json",
+                             "assets/1gam_projects/")
                              ,inputs: _U.list([A2($Signal.map,
                              function (a) {
                                 return CityscapeActions(a);
@@ -13948,7 +13733,6 @@ Elm.Main.make = function (_elm) {
    });
    return _elm.Main.values = {_op: _op
                              ,NoOp: NoOp
-                             ,Left: Left
                              ,ProjectListActions: ProjectListActions
                              ,Message: Message
                              ,CityscapeActions: CityscapeActions

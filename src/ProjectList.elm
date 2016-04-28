@@ -2,8 +2,7 @@ module ProjectList where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
-import Html.Attributes exposing (style, href, src)
--- import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
 import String exposing (..)
@@ -99,35 +98,8 @@ view address model =
             model.projects
                 |> viewProjects
     in
-        div [ style [("border-style", "solid")] ]
-            [ projects
-
-            ]
-            -- [ h2 [ headerStyle ]
-            --     [ text model.file
-            --     , button [onClick address RequestRefresh] [ text "Refresh" ]
-            --     ]
-            -- -- , p [] [ text ("numProjects: " ++ numProjects) ]
-            -- , viewProjects model.projects
-            -- -- , text model.rawProjects
-            -- ]
-
--- <table style="width:100%">
---   <tr>
---     <th>Firstname</th>
---     <th>Lastname</th>
---     <th>Points</th>
---   </tr>
---   <tr>
---     <td>Eve</td>
---     <td>Jackson</td>
---     <td>94</td>
---   </tr>
--- </table>
-
-borderStyle : Attribute
-borderStyle =
-    style [ ("border-style", "solid"), ("border-width", "1px") ]
+        div []
+            [ projects ]
 
 composeProjectMap : Int -> List Project -> List Html
 composeProjectMap cols projects =
@@ -148,7 +120,7 @@ viewProjects projects =
 
         projects' = composeProjectMap numCols projects
     in
-        table [ style [ ("width", "500px") ] ]
+        table [ class "projectlist" ]
             projects'
 
 viewProject : Project -> Html
@@ -166,10 +138,8 @@ viewProject project =
             , a [ href project.content ] [ text "download!" ]
             ] ++ images
     in
-        th [ borderStyle ]
-            [ div []
-                content
-            ]
+        th [ class "projectlist" ]
+            content
 
 -- EFFECTS
 
@@ -179,13 +149,6 @@ getProjectData location =
         |> Task.toMaybe
         |> Task.map Refresh
         |> Effects.task
-
---     {
---         "title": "1GAM - Rocks",
---         "description": "",
---         "content": "https://drive.google.com/file/d/0BwxvfZmN_TFHT0JsN3RyUmI2d3M/edit?usp=sharing",
---         "previews": ["RocksPreview.png"]
---     },
 
 decodeProjectData : Decoder (List Project)
 decodeProjectData =
