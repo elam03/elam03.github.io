@@ -11,8 +11,9 @@ import Task exposing (..)
 -- import Time exposing (..)
 -- import Json.Decode as Json
 
+import Cityscape
 import ProjectList
-import Cityscape exposing (..)
+import SummaryList
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -20,27 +21,31 @@ import Cityscape exposing (..)
 type Action
     = NoOp
     | ProjectListActions ProjectList.Action
-    | Message
     | CityscapeActions Cityscape.Action
+    | SummaryListActions SummaryList.Action
 
 
 type alias Model =
-    { projectList : ProjectList.Model
-    , cityscape : Cityscape.Model
+    { cityscape : Cityscape.Model
+    , projectList : ProjectList.Model
+    , summaryList : SummaryList.Model
     }
 
-init : String -> String -> (Model, Effects Action)
-init fileLocation assetPath =
+init : String -> String -> String -> (Model, Effects Action)
+init projectListFileLocation summaryFileLocation assetPath =
     let
-        (projectList, projectListFx) = ProjectList.init fileLocation assetPath
         (cityscape, cityscapeFx) = Cityscape.init (500, 200)
+        (projectList, projectListFx) = ProjectList.init projectListFileLocation assetPath
+        (summaryList, summaryListFx) = SummaryList.init summaryFileLocation
     in
-        ( { projectList = projectList
-          , cityscape = cityscape
+        ( { cityscape = cityscape
+          , projectList = projectList
+          , summaryList = summaryList
           }
         , Effects.batch
-            [ Effects.map ProjectListActions projectListFx
-            , Effects.map CityscapeActions cityscapeFx
+            [ Effects.map CityscapeActions cityscapeFx
+            , Effects.map ProjectListActions projectListFx
+            , Effects.map SummaryListActions summaryListFx
             ]
         )
 
@@ -50,22 +55,13 @@ view address model =
         [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
         , div [ style [ ("display", "flex") ] ]
             [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
+            , SummaryList.view (Signal.forwardTo address SummaryListActions) model.summaryList
             ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
-        --     ]
         ]
 
 update : Action -> Model -> (Model, Effects.Effects Action)
 update action model =
     case Debug.log "action" action of
-        ProjectListActions act ->
-            let
-                (projectList, fx) = ProjectList.update act model.projectList
-            in
-                ( { model | projectList = projectList }
-                , Effects.map ProjectListActions fx
-                )
         CityscapeActions act ->
             let
                 (cityscape, fx) = Cityscape.update act model.cityscape
@@ -73,13 +69,30 @@ update action model =
                 ( { model | cityscape = cityscape }
                 , Effects.map CityscapeActions fx
                 )
+
+        ProjectListActions act ->
+            let
+                (projectList, fx) = ProjectList.update act model.projectList
+            in
+                ( { model | projectList = projectList }
+                , Effects.map ProjectListActions fx
+                )
+
+        SummaryListActions act ->
+            let
+                (summaryList, fx) = SummaryList.update act model.summaryList
+            in
+                ( { model | summaryList = summaryList }
+                , Effects.map SummaryListActions fx
+                )
+
         _ ->
             ( model, Effects.none )
 
 app : StartApp.App Model
 app =
     StartApp.start
-        { init = init "assets/1gam_projects/project_list.json" "assets/1gam_projects/"
+        { init = init "assets/1gam_projects/project_list.json" "assets/summary_data.json" "assets/1gam_projects/"
         , inputs = [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs) ]
         , update = update
         , view = view
