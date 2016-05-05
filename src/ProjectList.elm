@@ -14,11 +14,18 @@ import Utils exposing (..)
 
 -- MODEL
 
+type alias ProjectList =
+    { projects : List Project
+    }
+
 type alias Project =
     { title : String
-    , description : String
-    , content : String
-    , previews : List String
+    , category : Maybe String
+    , keywords : Maybe (List String)
+    , description : Maybe String
+    , sourceUrl : Maybe String
+    , downloadUrl : Maybe String
+    , previews : Maybe (List String)
     }
 
 type alias Model =
@@ -27,12 +34,20 @@ type alias Model =
     , projects : List Project
     }
 
+errorProjectList : ProjectList
+errorProjectList =
+    { projects = [ errorProject ]
+    }
+
 errorProject : Project
 errorProject =
     { title = "error"
-    , description = "error"
-    , content = "error"
-    , previews = ["error", "error"]
+    , category = Just "error"
+    , keywords = Just ["error"]
+    , description = Just "error"
+    , sourceUrl = Just "error"
+    , downloadUrl = Just "error"
+    , previews = Just ["error", "error"]
     }
 
 init : String -> String -> (Model, Effects Action)
@@ -45,7 +60,7 @@ init projectList assetPath =
 
 type Action
     = RequestRefresh
-    | Refresh (Maybe (List Project))
+    | Refresh (Maybe ProjectList)
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -59,23 +74,29 @@ update action model =
         Refresh maybeProjectsList ->
             let
                 addProjectDescription project =
-                    if (project.description |> length) > 0 then
-                        project
-                    else
-                        { project | description = "No Description available!" ++ project.description }
+                    let
+                        description = Maybe.withDefault "" project.description
+                    in
+                        if (description |> length) > 0 then
+                            project
+                        else
+                            { project | description = Just "No Description available!" }
 
                 addProjectAssetPath project =
                     let
                         previews' =
                             project.previews
+                                |> Maybe.withDefault []
                                 |> List.map (\p -> model.assetPath ++ p)
-
                     in
-                        { project | previews = previews' }
+                        { project | previews = Just previews' }
+
+                projectList =
+                    maybeProjectsList
+                        |> Maybe.withDefault errorProjectList
 
                 projects =
-                    maybeProjectsList
-                        |> Maybe.withDefault [errorProject]
+                    projectList.projects
                         |> List.map addProjectDescription
                         |> List.map addProjectAssetPath
             in
@@ -118,17 +139,53 @@ viewProjects projects =
 viewProject : Project -> List Html
 viewProject project =
     let
-        images =
+        titleContent =
+            [ h3 [] [ text project.title ] ]
+
+        categoryContent =
+            case project.category of
+                Just category -> [ p [] [ text category ] ]
+                Nothing -> []
+
+        keywordsContent =
+            project.keywords
+                |> Maybe.withDefault []
+                |> List.map (\keyword -> p [ style [ ("font-weight", "bold") ] ] [ text keyword ])
+
+        descriptionContent =
+            case project.description of
+                Just description -> [ p [ style [ ("text-align", "left") ] ] [ text description ] ]
+                Nothing -> []
+
+        sourceUrlContent =
+            case project.sourceUrl of
+                Just sourceUrl -> [ a [ href sourceUrl ] [ text "Source Link" ] ]
+                Nothing -> []
+
+        downloadUrlContent =
+            case project.downloadUrl of
+                Just downloadUrl -> [ a [ href downloadUrl ] [ text "Download Link" ] ]
+                Nothing -> []
+
+        previewsContent =
             project.previews
+                |> Maybe.withDefault []
                 |> List.map (\path -> img [ src path, style [ ("width", "32px") ] ] [])
 
+        break = [ br [] [] ]
+
         content =
-            [ text project.title
-            , br [] []
-            , text project.description
-            , br [] []
-            , a [ href project.content ] [ text "download!" ]
-            ] ++ images
+            titleContent
+            ++ categoryContent
+            ++ keywordsContent
+            ++ break
+            ++ descriptionContent
+            ++ break
+            ++ sourceUrlContent
+            ++ break
+            ++ downloadUrlContent
+            ++ break
+            ++ previewsContent
     in
         content
 
@@ -136,16 +193,23 @@ viewProject project =
 
 getProjectData : String -> Effects Action
 getProjectData location =
-    Http.get decodeProjectData location
+    Http.get decodeData location
         |> Task.toMaybe
         |> Task.map Refresh
         |> Effects.task
 
-decodeProjectData : Decoder (List Project)
-decodeProjectData =
-    list
-        <| object4 Project
-            ("title" := string)
-            ("description" := string)
-            ("content" := string)
-            ("previews" := (list string))
+decodeData : Decoder (ProjectList)
+decodeData =
+    object1 ProjectList
+        ( "projects" :=
+            ( list
+                <| object7 Project
+                    ("title" := string)
+                    (maybe ("category" := string))
+                    (maybe ("keywords" := (list string)))
+                    (maybe ("description" := string))
+                    (maybe ("sourceUrl" := string))
+                    (maybe ("downloadUrl" := string))
+                    (maybe ("previews" := (list string)))
+            )
+        )

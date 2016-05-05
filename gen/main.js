@@ -13546,7 +13546,8 @@ Elm.ProjectList.make = function (_elm) {
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
    var viewProject = function (project) {
-      var images = A2($List.map,
+      var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
+      var previewsContent = A2($List.map,
       function (path) {
          return A2($Html.img,
          _U.list([$Html$Attributes.src(path)
@@ -13555,16 +13556,80 @@ Elm.ProjectList.make = function (_elm) {
                                                   ,_1: "32px"}]))]),
          _U.list([]));
       },
-      project.previews);
+      A2($Maybe.withDefault,_U.list([]),project.previews));
+      var downloadUrlContent = function () {
+         var _p0 = project.downloadUrl;
+         if (_p0.ctor === "Just") {
+               return _U.list([A2($Html.a,
+               _U.list([$Html$Attributes.href(_p0._0)]),
+               _U.list([$Html.text("Download Link")]))]);
+            } else {
+               return _U.list([]);
+            }
+      }();
+      var sourceUrlContent = function () {
+         var _p1 = project.sourceUrl;
+         if (_p1.ctor === "Just") {
+               return _U.list([A2($Html.a,
+               _U.list([$Html$Attributes.href(_p1._0)]),
+               _U.list([$Html.text("Source Link")]))]);
+            } else {
+               return _U.list([]);
+            }
+      }();
+      var descriptionContent = function () {
+         var _p2 = project.description;
+         if (_p2.ctor === "Just") {
+               return _U.list([A2($Html.p,
+               _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                        ,_0: "text-align"
+                                                        ,_1: "left"}]))]),
+               _U.list([$Html.text(_p2._0)]))]);
+            } else {
+               return _U.list([]);
+            }
+      }();
+      var keywordsContent = A2($List.map,
+      function (keyword) {
+         return A2($Html.p,
+         _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                  ,_0: "font-weight"
+                                                  ,_1: "bold"}]))]),
+         _U.list([$Html.text(keyword)]));
+      },
+      A2($Maybe.withDefault,_U.list([]),project.keywords));
+      var categoryContent = function () {
+         var _p3 = project.category;
+         if (_p3.ctor === "Just") {
+               return _U.list([A2($Html.p,
+               _U.list([]),
+               _U.list([$Html.text(_p3._0)]))]);
+            } else {
+               return _U.list([]);
+            }
+      }();
+      var titleContent = _U.list([A2($Html.h3,
+      _U.list([]),
+      _U.list([$Html.text(project.title)]))]);
       var content = A2($Basics._op["++"],
-      _U.list([$Html.text(project.title)
-              ,A2($Html.br,_U.list([]),_U.list([]))
-              ,$Html.text(project.description)
-              ,A2($Html.br,_U.list([]),_U.list([]))
-              ,A2($Html.a,
-              _U.list([$Html$Attributes.href(project.content)]),
-              _U.list([$Html.text("download!")]))]),
-      images);
+      titleContent,
+      A2($Basics._op["++"],
+      categoryContent,
+      A2($Basics._op["++"],
+      keywordsContent,
+      A2($Basics._op["++"],
+      $break,
+      A2($Basics._op["++"],
+      descriptionContent,
+      A2($Basics._op["++"],
+      $break,
+      A2($Basics._op["++"],
+      sourceUrlContent,
+      A2($Basics._op["++"],
+      $break,
+      A2($Basics._op["++"],
+      downloadUrlContent,
+      A2($Basics._op["++"],$break,previewsContent))))))))));
       return content;
    };
    var viewProjects = function (projects) {
@@ -13589,27 +13654,55 @@ Elm.ProjectList.make = function (_elm) {
    };
    var RequestRefresh = {ctor: "RequestRefresh"};
    var errorProject = {title: "error"
-                      ,description: "error"
-                      ,content: "error"
-                      ,previews: _U.list(["error","error"])};
+                      ,category: $Maybe.Just("error")
+                      ,keywords: $Maybe.Just(_U.list(["error"]))
+                      ,description: $Maybe.Just("error")
+                      ,sourceUrl: $Maybe.Just("error")
+                      ,downloadUrl: $Maybe.Just("error")
+                      ,previews: $Maybe.Just(_U.list(["error","error"]))};
+   var errorProjectList = {projects: _U.list([errorProject])};
    var Model = F3(function (a,b,c) {
       return {file: a,assetPath: b,projects: c};
    });
-   var Project = F4(function (a,b,c,d) {
-      return {title: a,description: b,content: c,previews: d};
+   var Project = F7(function (a,b,c,d,e,f,g) {
+      return {title: a
+             ,category: b
+             ,keywords: c
+             ,description: d
+             ,sourceUrl: e
+             ,downloadUrl: f
+             ,previews: g};
    });
-   var decodeProjectData = $Json$Decode.list(A5($Json$Decode.object4,
+   var ProjectList = function (a) {    return {projects: a};};
+   var decodeData = A2($Json$Decode.object1,
+   ProjectList,
+   A2($Json$Decode._op[":="],
+   "projects",
+   $Json$Decode.list(A8($Json$Decode.object7,
    Project,
    A2($Json$Decode._op[":="],"title",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"description",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"content",$Json$Decode.string),
-   A2($Json$Decode._op[":="],
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "category",
+   $Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "keywords",
+   $Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "description",
+   $Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "sourceUrl",
+   $Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "downloadUrl",
+   $Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
    "previews",
-   $Json$Decode.list($Json$Decode.string))));
+   $Json$Decode.list($Json$Decode.string)))))));
    var getProjectData = function (location) {
       return $Effects.task(A2($Task.map,
       Refresh,
-      $Task.toMaybe(A2($Http.get,decodeProjectData,location))));
+      $Task.toMaybe(A2($Http.get,decodeData,location))));
    };
    var init = F2(function (projectList,assetPath) {
       return {ctor: "_Tuple2"
@@ -13617,32 +13710,34 @@ Elm.ProjectList.make = function (_elm) {
              ,_1: getProjectData(projectList)};
    });
    var update = F2(function (action,model) {
-      var _p0 = action;
-      if (_p0.ctor === "RequestRefresh") {
+      var _p4 = action;
+      if (_p4.ctor === "RequestRefresh") {
             return {ctor: "_Tuple2"
                    ,_0: model
                    ,_1: getProjectData(model.file)};
          } else {
+            var projectList = A2($Maybe.withDefault,
+            errorProjectList,
+            _p4._0);
             var addProjectAssetPath = function (project) {
                var previews$ = A2($List.map,
                function (p) {
                   return A2($Basics._op["++"],model.assetPath,p);
                },
-               project.previews);
-               return _U.update(project,{previews: previews$});
+               A2($Maybe.withDefault,_U.list([]),project.previews));
+               return _U.update(project,{previews: $Maybe.Just(previews$)});
             };
             var addProjectDescription = function (project) {
-               return _U.cmp($String.length(project.description),
+               var description = A2($Maybe.withDefault,
+               "",
+               project.description);
+               return _U.cmp($String.length(description),
                0) > 0 ? project : _U.update(project,
-               {description: A2($Basics._op["++"],
-               "No Description available!",
-               project.description)});
+               {description: $Maybe.Just("No Description available!")});
             };
             var projects = A2($List.map,
             addProjectAssetPath,
-            A2($List.map,
-            addProjectDescription,
-            A2($Maybe.withDefault,_U.list([errorProject]),_p0._0)));
+            A2($List.map,addProjectDescription,projectList.projects));
             return $List.isEmpty(projects) ? {ctor: "_Tuple2"
                                              ,_0: A3(Model,model.file,"failed",projects)
                                              ,_1: $Effects.none} : {ctor: "_Tuple2"
@@ -13654,8 +13749,10 @@ Elm.ProjectList.make = function (_elm) {
       return {ctor: "_Tuple2",_0: v0,_1: v1};
    });
    return _elm.ProjectList.values = {_op: _op
+                                    ,ProjectList: ProjectList
                                     ,Project: Project
                                     ,Model: Model
+                                    ,errorProjectList: errorProjectList
                                     ,errorProject: errorProject
                                     ,init: init
                                     ,RequestRefresh: RequestRefresh
@@ -13665,7 +13762,7 @@ Elm.ProjectList.make = function (_elm) {
                                     ,viewProjects: viewProjects
                                     ,viewProject: viewProject
                                     ,getProjectData: getProjectData
-                                    ,decodeProjectData: decodeProjectData};
+                                    ,decodeData: decodeData};
 };
 Elm.SummaryList = Elm.SummaryList || {};
 Elm.SummaryList.make = function (_elm) {
