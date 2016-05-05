@@ -7,30 +7,44 @@ import Http
 import Json.Decode exposing (..)
 import Task
 
+import Utils exposing (..)
+
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
 -- MODEL
 
+type alias SummaryData =
+    { summaries : List Summary
+    }
+
 type alias Summary =
     { title : String
-    , content : List String
+    , contents : List String
     }
 
 type alias Model =
     { file : String
-    , summaryData : List Summary
+    , summaryData : SummaryData
     }
+
+errorSummaryData : SummaryData
+errorSummaryData =
+    { summaries = [errorSummary]
+    }
+    -- { title = "error"
+    -- , contents = ["has", "occurred"]
+    -- }
 
 errorSummary : Summary
 errorSummary =
     { title = "error"
-    , content = ["has", "occurred"]
+    , contents = ["has", "occurred"]
     }
 
 init : String -> (Model, Effects Action)
 init fileUrl =
-  ( Model fileUrl []
+  ( Model fileUrl errorSummaryData
   , getData fileUrl
   )
 
@@ -38,7 +52,7 @@ init fileUrl =
 
 type Action
     = RequestRefresh
-    | Refresh (Maybe (List Summary))
+    | Refresh (Maybe (SummaryData))
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -53,16 +67,11 @@ update action model =
             let
                 summaryData =
                     maybeSummaryData
-                        |> Maybe.withDefault [errorSummary]
+                        |> Maybe.withDefault errorSummaryData
             in
-                if List.isEmpty summaryData then
-                    ( Model model.file summaryData
-                    , Effects.none
-                    )
-                else
-                    ( Model model.file summaryData
-                    , Effects.none
-                    )
+                ( Model model.file summaryData
+                , Effects.none
+                )
 
 -- VIEW
 
@@ -70,53 +79,36 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     let
         summaryData =
-            model.summaryData
+            model.summaryData.summaries
                 |> viewSummaries
-        header = [ text ("fileUrl: " ++ model.file) ]
     in
         div []
-            ( header
-              ++ [ summaryData ]
-            )
+            [ summaryData ]
 
 viewSummaries : List Summary -> Html
 viewSummaries summaryData =
     let
+        numCols = 2
+        classname = "summarylist"
+
         summaryData' =
             summaryData
-                |> List.map viewSummary
+                |> composeTiledHtml classname viewSummary numCols
     in
-        div []
+        table [ class classname ]
             summaryData'
 
-viewSummary : Summary -> Html
+viewSummary : Summary -> List Html
 viewSummary summary =
     let
-        content =
-            summary.content
-                |> List.map (\s -> text (s ++ " ! "))
-        html =
-            [ text summary.title
-            , br [] []
-            ] ++ content
+        contents =
+            summary.contents
+                |> List.map (\s -> li [] [ text s ])
+        classname = "summarylist-item"
     in
-        div [ class "summary" ]
-            html
-    -- let
-    --     images =
-    --         project.previews
-    --             |> List.map (\path -> img [ src path, style [ ("width", "32px") ] ] [])
-    --
-    --     content =
-    --         [ text project.title
-    --         , br [] []
-    --         , text project.description
-    --         , br [] []
-    --         , a [ href project.content ] [ text "download!" ]
-    --         ] ++ images
-    -- in
-    --     th [ class "summary" ]
-    --         content
+        [ h2 [ style [ ("text-align", "center") ] ] [ text summary.title ]
+        , ul [ style [ ("text-align", "left") ] ] contents
+        ]
 
 -- EFFECTS
 
@@ -127,9 +119,20 @@ getData location =
         |> Task.map Refresh
         |> Effects.task
 
-decodeData : Decoder (List Summary)
+decodeData : Decoder (SummaryData)
 decodeData =
-    list
-        <| object2 Summary
-            ("title" := string)
-            ("content" := (list string))
+    object1 SummaryData
+        ( "summaries" :=
+            ( list
+                <| object2 Summary
+                    ("title" := string)
+                    ("contents" := (list string))
+            )
+        )
+
+-- decodeData : Decoder (List Summary)
+-- decodeData =
+--     list
+--         <| object2 Summary
+--             ("title" := string)
+--             ("contents" := (list string))

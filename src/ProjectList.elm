@@ -7,6 +7,7 @@ import Http
 import Json.Decode exposing (..)
 import String exposing (..)
 import Task
+import Utils exposing (..)
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -101,29 +102,20 @@ view address model =
         div []
             [ projects ]
 
-composeProjectMap : Int -> List Project -> List Html
-composeProjectMap cols projects =
-    let
-        head = List.take cols projects
-        rest = List.drop cols projects
-    in
-        if List.isEmpty head then
-            []
-        else
-            [ (tr [] []) ] ++ (List.map viewProject head) ++ (composeProjectMap cols rest)
-
 viewProjects : List Project -> Html
 viewProjects projects =
     let
-        numProjects = List.length projects
         numCols = 3
+        classname = "projectlist"
 
-        projects' = composeProjectMap numCols projects
+        projects' =
+            projects
+                |> composeTiledHtml classname viewProject numCols
     in
-        table [ class "projectlist" ]
+        table [ class classname ]
             projects'
 
-viewProject : Project -> Html
+viewProject : Project -> List Html
 viewProject project =
     let
         images =
@@ -138,8 +130,7 @@ viewProject project =
             , a [ href project.content ] [ text "download!" ]
             ] ++ images
     in
-        th [ class "projectlist" ]
-            content
+        content
 
 -- EFFECTS
 

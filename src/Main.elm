@@ -53,9 +53,15 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     div []
         [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
+        -- , div [ style [ ("display", "flex"), ("border-style", "solid") ] ]
         , div [ style [ ("display", "flex") ] ]
+        -- , div [ style [ ("border-style", "solid") ] ]
+            [ SummaryList.view (Signal.forwardTo address SummaryListActions) model.summaryList
+            ]
+        -- , div [ style [ ("display", "flex"), ("border-style", "solid") ] ]
+        , div [ style [ ("display", "flex") ] ]
+        -- , div [ style [ ("border-style", "solid") ] ]
             [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
-            , SummaryList.view (Signal.forwardTo address SummaryListActions) model.summaryList
             ]
         ]
 

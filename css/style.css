@@ -2,18 +2,36 @@ body,
 html {
 }
 
-table.projectlist  {
-    background:#b5cfd2;
+.summarylist  {
+    background:#81dbe6;
     padding: 4px;
-    width: 500px;
+    width: 600px;
     border-width: 2px;
     border-style: solid;
 }
 
-th.projectlist {
+.summarylist-item {
+	background:#d5daec;
+	border-width: 1px;
+	/*padding: 4px;*/
+	border-style: solid;
+    font-family: "Arial";
+    font-size: 10px;
+}
+
+.projectlist  {
+    background:#b5cfd2;
+    padding: 4px;
+    width: 600px;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.projectlist-item {
 	background:#8296dd;
 	border-width: 2px;
 	padding: 4px;
 	border-style: solid;
     font-family: "Comic Sans MS";
+    font-size: 14px;
 }

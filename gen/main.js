@@ -13485,6 +13485,45 @@ Elm.Http.make = function (_elm) {
                              ,RawTimeout: RawTimeout
                              ,RawNetworkError: RawNetworkError};
 };
+Elm.Utils = Elm.Utils || {};
+Elm.Utils.make = function (_elm) {
+   "use strict";
+   _elm.Utils = _elm.Utils || {};
+   if (_elm.Utils.values) return _elm.Utils.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var composeTiledHtml = F4(function (classname,
+   transform,
+   cols,
+   list) {
+      var rest = A2($List.drop,cols,list);
+      var head = A2($List.take,cols,list);
+      var head$ = A2($List.map,
+      function (a) {
+         return A2($Html.th,
+         _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
+         classname,
+         "-item"))]),
+         a);
+      },
+      A2($List.map,transform,head));
+      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
+      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
+      A2($Basics._op["++"],
+      head$,
+      A4(composeTiledHtml,classname,transform,cols,rest)));
+   });
+   return _elm.Utils.values = {_op: _op
+                              ,composeTiledHtml: composeTiledHtml};
+};
 Elm.ProjectList = Elm.ProjectList || {};
 Elm.ProjectList.make = function (_elm) {
    "use strict";
@@ -13503,7 +13542,8 @@ Elm.ProjectList.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm),
-   $Task = Elm.Task.make(_elm);
+   $Task = Elm.Task.make(_elm),
+   $Utils = Elm.Utils.make(_elm);
    var _op = {};
    var viewProject = function (project) {
       var images = A2($List.map,
@@ -13525,25 +13565,18 @@ Elm.ProjectList.make = function (_elm) {
               _U.list([$Html$Attributes.href(project.content)]),
               _U.list([$Html.text("download!")]))]),
       images);
-      return A2($Html.th,
-      _U.list([$Html$Attributes.$class("projectlist")]),
-      content);
+      return content;
    };
-   var composeProjectMap = F2(function (cols,projects) {
-      var rest = A2($List.drop,cols,projects);
-      var head = A2($List.take,cols,projects);
-      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
-      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
-      A2($Basics._op["++"],
-      A2($List.map,viewProject,head),
-      A2(composeProjectMap,cols,rest)));
-   });
    var viewProjects = function (projects) {
+      var classname = "projectlist";
       var numCols = 3;
-      var projects$ = A2(composeProjectMap,numCols,projects);
-      var numProjects = $List.length(projects);
+      var projects$ = A4($Utils.composeTiledHtml,
+      classname,
+      viewProject,
+      numCols,
+      projects);
       return A2($Html.table,
-      _U.list([$Html$Attributes.$class("projectlist")]),
+      _U.list([$Html$Attributes.$class(classname)]),
       projects$);
    };
    var view = F2(function (address,model) {
@@ -13629,7 +13662,6 @@ Elm.ProjectList.make = function (_elm) {
                                     ,Refresh: Refresh
                                     ,update: update
                                     ,view: view
-                                    ,composeProjectMap: composeProjectMap
                                     ,viewProjects: viewProjects
                                     ,viewProject: viewProject
                                     ,getProjectData: getProjectData
@@ -13652,53 +13684,67 @@ Elm.SummaryList.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
+   $Task = Elm.Task.make(_elm),
+   $Utils = Elm.Utils.make(_elm);
    var _op = {};
    var viewSummary = function (summary) {
-      var content = A2($List.map,
+      var classname = "summarylist-item";
+      var contents = A2($List.map,
       function (s) {
-         return $Html.text(A2($Basics._op["++"],s," ! "));
+         return A2($Html.li,_U.list([]),_U.list([$Html.text(s)]));
       },
-      summary.content);
-      var html = A2($Basics._op["++"],
-      _U.list([$Html.text(summary.title)
-              ,A2($Html.br,_U.list([]),_U.list([]))]),
-      content);
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("summary")]),
-      html);
+      summary.contents);
+      return _U.list([A2($Html.h2,
+                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                              ,_0: "text-align"
+                                                              ,_1: "center"}]))]),
+                     _U.list([$Html.text(summary.title)]))
+                     ,A2($Html.ul,
+                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                              ,_0: "text-align"
+                                                              ,_1: "left"}]))]),
+                     contents)]);
    };
    var viewSummaries = function (summaryData) {
-      var summaryData$ = A2($List.map,viewSummary,summaryData);
-      return A2($Html.div,_U.list([]),summaryData$);
+      var classname = "summarylist";
+      var numCols = 2;
+      var summaryData$ = A4($Utils.composeTiledHtml,
+      classname,
+      viewSummary,
+      numCols,
+      summaryData);
+      return A2($Html.table,
+      _U.list([$Html$Attributes.$class(classname)]),
+      summaryData$);
    };
    var view = F2(function (address,model) {
-      var header = _U.list([$Html.text(A2($Basics._op["++"],
-      "fileUrl: ",
-      model.file))]);
-      var summaryData = viewSummaries(model.summaryData);
-      return A2($Html.div,
-      _U.list([]),
-      A2($Basics._op["++"],header,_U.list([summaryData])));
+      var summaryData = viewSummaries(model.summaryData.summaries);
+      return A2($Html.div,_U.list([]),_U.list([summaryData]));
    });
    var Refresh = function (a) {
       return {ctor: "Refresh",_0: a};
    };
    var RequestRefresh = {ctor: "RequestRefresh"};
    var errorSummary = {title: "error"
-                      ,content: _U.list(["has","occurred"])};
+                      ,contents: _U.list(["has","occurred"])};
+   var errorSummaryData = {summaries: _U.list([errorSummary])};
    var Model = F2(function (a,b) {
       return {file: a,summaryData: b};
    });
    var Summary = F2(function (a,b) {
-      return {title: a,content: b};
+      return {title: a,contents: b};
    });
-   var decodeData = $Json$Decode.list(A3($Json$Decode.object2,
+   var SummaryData = function (a) {    return {summaries: a};};
+   var decodeData = A2($Json$Decode.object1,
+   SummaryData,
+   A2($Json$Decode._op[":="],
+   "summaries",
+   $Json$Decode.list(A3($Json$Decode.object2,
    Summary,
    A2($Json$Decode._op[":="],"title",$Json$Decode.string),
    A2($Json$Decode._op[":="],
-   "content",
-   $Json$Decode.list($Json$Decode.string))));
+   "contents",
+   $Json$Decode.list($Json$Decode.string))))));
    var getData = function (location) {
       return $Effects.task(A2($Task.map,
       Refresh,
@@ -13706,7 +13752,7 @@ Elm.SummaryList.make = function (_elm) {
    };
    var init = function (fileUrl) {
       return {ctor: "_Tuple2"
-             ,_0: A2(Model,fileUrl,_U.list([]))
+             ,_0: A2(Model,fileUrl,errorSummaryData)
              ,_1: getData(fileUrl)};
    };
    var update = F2(function (action,model) {
@@ -13715,21 +13761,21 @@ Elm.SummaryList.make = function (_elm) {
             return {ctor: "_Tuple2",_0: model,_1: getData(model.file)};
          } else {
             var summaryData = A2($Maybe.withDefault,
-            _U.list([errorSummary]),
+            errorSummaryData,
             _p0._0);
-            return $List.isEmpty(summaryData) ? {ctor: "_Tuple2"
-                                                ,_0: A2(Model,model.file,summaryData)
-                                                ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                      ,_0: A2(Model,model.file,summaryData)
-                                                                      ,_1: $Effects.none};
+            return {ctor: "_Tuple2"
+                   ,_0: A2(Model,model.file,summaryData)
+                   ,_1: $Effects.none};
          }
    });
    _op["=>"] = F2(function (v0,v1) {
       return {ctor: "_Tuple2",_0: v0,_1: v1};
    });
    return _elm.SummaryList.values = {_op: _op
+                                    ,SummaryData: SummaryData
                                     ,Summary: Summary
                                     ,Model: Model
+                                    ,errorSummaryData: errorSummaryData
                                     ,errorSummary: errorSummary
                                     ,init: init
                                     ,RequestRefresh: RequestRefresh
@@ -13808,12 +13854,16 @@ Elm.Main.make = function (_elm) {
               _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                        ,_0: "display"
                                                        ,_1: "flex"}]))]),
+              _U.list([A2($SummaryList.view,
+              A2($Signal.forwardTo,address,SummaryListActions),
+              model.summaryList)]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "display"
+                                                       ,_1: "flex"}]))]),
               _U.list([A2($ProjectList.view,
-                      A2($Signal.forwardTo,address,ProjectListActions),
-                      model.projectList)
-                      ,A2($SummaryList.view,
-                      A2($Signal.forwardTo,address,SummaryListActions),
-                      model.summaryList)]))]));
+              A2($Signal.forwardTo,address,ProjectListActions),
+              model.projectList)]))]));
    });
    var update = F2(function (action,model) {
       var _p3 = A2($Debug.log,"action",action);

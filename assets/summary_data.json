@@ -1,87 +1,90 @@
-[
-    {
-        "title": "Interersts",
-        "contents":
-        [
-            "Origami",
-            "Game Programming",
-            "Robotics",
-            "Puzzles",
-            "Rubiks Cubes",
-            "Ultimate Frisbee",
-            "Physics"
-        ]
-    },
-    {
-        "title": "Languages",
-        "contents":
-        [
-            "C++",
-            "C",
-            "JavaScript",
-            "Python",
-            "C#",
-            "Lua",
-            "Perl",
-            "Visual Basic"
-        ]
-    },
-    {
-        "title": "Skills",
-        "contents":
-        [
-            "Windows",
-            "Linux",
-            "OSX",
-            "OpenGL",
-            "OpenCV",
-            "CUDA",
-            "DirectX",
-            "FFMPEG",
-            "FLTK",
-            "MFC",
-            "SVN",
-            "GIT",
-            "MySQL",
-            "NoSQL",
-            "DynamoDB",
-            "EC2",
-            "Multi-threaded Experience",
-            "Socket Experience"
-        ]
-    },
-    {
-        "title": "Experiences",
-        "contents":
-        [
-            "AI and tracking routines",
-            "Collision detection and optimizations",
-            "Object-Oriented Programming",
-            "Data-Oriented Programming",
-            "Image Processing",
-            "Video playback",
-            "Multi-monitor programming in Windows",
-            "Optimizing data storage and data workflow",
-            "Creative visual debugging tools",
-            "Raycasting",
-            "Realtime network programming",
-            "Ophthalmic astigmatic calculations",
-            "UI Implementation and Design",
-            "Administration experience with JIRA",
-            "Administration experience with Bugzilla"
-        ]
-    },
-    {
-        "title": "Motivations",
-        "contents":
-        [
-            "Explore Android/Java Programming",
-            "Design and create robotic automatons",
-            "Become an excellent Ultimate Frisbee Player",
-            "Explore application development for tablets",
-            "Explore web programming i.e. AJAX, etc...",
-            "Design and develop fun/interesting games",
-            "Become an excellent artist (drawing and/or painting)"
-        ]
-    }
-]
+{
+    "summaries":
+    [
+        {
+            "title": "Interersts",
+            "contents":
+            [
+                "Origami",
+                "Game Programming",
+                "Robotics",
+                "Puzzles",
+                "Rubiks Cubes",
+                "Ultimate Frisbee",
+                "Physics"
+            ]
+        },
+        {
+            "title": "Languages",
+            "contents":
+            [
+                "C++",
+                "C",
+                "JavaScript",
+                "Python",
+                "C#",
+                "Lua",
+                "Perl",
+                "Visual Basic"
+            ]
+        },
+        {
+            "title": "Skills",
+            "contents":
+            [
+                "Windows",
+                "Linux",
+                "OSX",
+                "OpenGL",
+                "OpenCV",
+                "CUDA",
+                "DirectX",
+                "FFMPEG",
+                "FLTK",
+                "MFC",
+                "SVN",
+                "GIT",
+                "MySQL",
+                "NoSQL",
+                "DynamoDB",
+                "EC2",
+                "Multi-threaded Experience",
+                "Socket Experience"
+            ]
+        },
+        {
+            "title": "Experiences",
+            "contents":
+            [
+                "AI and tracking routines",
+                "Collision detection and optimizations",
+                "Object-Oriented Programming",
+                "Data-Oriented Programming",
+                "Image Processing",
+                "Video playback",
+                "Multi-monitor programming in Windows",
+                "Optimizing data storage and data workflow",
+                "Creative visual debugging tools",
+                "Raycasting",
+                "Realtime network programming",
+                "Ophthalmic astigmatic calculations",
+                "UI Implementation and Design",
+                "Administration experience with JIRA",
+                "Administration experience with Bugzilla"
+            ]
+        },
+        {
+            "title": "Motivations",
+            "contents":
+            [
+                "Explore Android/Java Programming",
+                "Design and create robotic automatons",
+                "Become an excellent Ultimate Frisbee Player",
+                "Explore application development for tablets",
+                "Explore web programming i.e. AJAX, etc...",
+                "Design and develop fun/interesting games",
+                "Become an excellent artist (drawing and/or painting)"
+            ]
+        }
+    ]
+}
