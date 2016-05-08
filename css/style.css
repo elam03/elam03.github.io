@@ -35,3 +35,24 @@ html {
     font-family: "Comic Sans MS";
     font-size: 14px;
 }
+
+.bloglist  {
+    background:#bbe4e9;
+    padding: 4px;
+    width: 600px;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.bloglist-item {
+	background:#d0d1f6;
+	border-width: 1px;
+	/*padding: 4px;*/
+	border-style: solid;
+    font-family: "Arial";
+    font-size: 10px;
+}
+
+p.bloglist-item {
+    text-align: left;
+}

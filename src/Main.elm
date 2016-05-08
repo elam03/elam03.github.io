@@ -11,6 +11,7 @@ import Task exposing (..)
 -- import Time exposing (..)
 -- import Json.Decode as Json
 
+import BlogList
 import Cityscape
 import ProjectList
 import SummaryList
@@ -20,32 +21,37 @@ import SummaryList
 
 type Action
     = NoOp
-    | ProjectListActions ProjectList.Action
     | CityscapeActions Cityscape.Action
+    | ProjectListActions ProjectList.Action
     | SummaryListActions SummaryList.Action
+    | BlogListActions BlogList.Action
 
 
 type alias Model =
     { cityscape : Cityscape.Model
     , projectList : ProjectList.Model
     , summaryList : SummaryList.Model
+    , blogList : BlogList.Model
     }
 
-init : String -> String -> String -> (Model, Effects Action)
-init projectListFileLocation summaryFileLocation assetPath =
+init : String -> String -> String -> String -> (Model, Effects Action)
+init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
     let
-        (cityscape, cityscapeFx) = Cityscape.init (500, 200)
+        (cityscape, cityscapeFx) = Cityscape.init (600, 200)
         (projectList, projectListFx) = ProjectList.init projectListFileLocation assetPath
         (summaryList, summaryListFx) = SummaryList.init summaryFileLocation
+        (blogList, blogListFx) = BlogList.init blogFileLocation
     in
         ( { cityscape = cityscape
           , projectList = projectList
           , summaryList = summaryList
+          , blogList = blogList
           }
         , Effects.batch
             [ Effects.map CityscapeActions cityscapeFx
             , Effects.map ProjectListActions projectListFx
             , Effects.map SummaryListActions summaryListFx
+            , Effects.map BlogListActions blogListFx
             ]
         )
 
@@ -53,14 +59,13 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     div []
         [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
-        -- , div [ style [ ("display", "flex"), ("border-style", "solid") ] ]
         , div [ style [ ("display", "flex") ] ]
-        -- , div [ style [ ("border-style", "solid") ] ]
+            [ BlogList.view (Signal.forwardTo address BlogListActions) model.blogList
+            ]
+        , div [ style [ ("display", "flex") ] ]
             [ SummaryList.view (Signal.forwardTo address SummaryListActions) model.summaryList
             ]
-        -- , div [ style [ ("display", "flex"), ("border-style", "solid") ] ]
         , div [ style [ ("display", "flex") ] ]
-        -- , div [ style [ ("border-style", "solid") ] ]
             [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
             ]
         ]
@@ -92,14 +97,28 @@ update action model =
                 , Effects.map SummaryListActions fx
                 )
 
+        BlogListActions act ->
+            let
+                (blogList, fx) = BlogList.update act model.blogList
+            in
+                ( { model | blogList = blogList }
+                , Effects.map BlogListActions fx
+                )
+
         _ ->
             ( model, Effects.none )
 
 app : StartApp.App Model
 app =
     StartApp.start
-        { init = init "assets/1gam_projects/project_list.json" "assets/summary_data.json" "assets/1gam_projects/"
-        , inputs = [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs) ]
+        { init = init "assets/1gam_projects/project_list.json" "assets/summary_data.json" "assets/blogs/blog_content.json" "assets/1gam_projects/"
+        , inputs =
+            -- [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs)
+            -- , (Signal.map (\a -> BlogListActions a) BlogList.inputs)
+            -- ]
+            [ (Signal.map (\a -> BlogListActions a) BlogList.inputs)
+            ]
+
         , update = update
         , view = view
         }
