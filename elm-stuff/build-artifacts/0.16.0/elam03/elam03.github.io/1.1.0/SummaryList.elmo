@@ -1,0 +1,123 @@
+Elm.SummaryList = Elm.SummaryList || {};
+Elm.SummaryList.make = function (_elm) {
+   "use strict";
+   _elm.SummaryList = _elm.SummaryList || {};
+   if (_elm.SummaryList.values) return _elm.SummaryList.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Utils = Elm.Utils.make(_elm);
+   var _op = {};
+   var viewSummary = function (summary) {
+      var classname = "summarylist-item";
+      var contents = A2($List.map,
+      function (s) {
+         return A2($Html.li,_U.list([]),_U.list([$Html.text(s)]));
+      },
+      summary.contents);
+      return _U.list([A2($Html.h2,
+                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                              ,_0: "text-align"
+                                                              ,_1: "center"}]))]),
+                     _U.list([$Html.text(summary.title)]))
+                     ,A2($Html.ul,
+                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                              ,_0: "text-align"
+                                                              ,_1: "left"}]))]),
+                     contents)]);
+   };
+   var viewSummaries = function (summaryData) {
+      var classname = "summarylist";
+      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
+      classname,
+      "-item"))]);
+      var numCols = 2;
+      var summaryData$ = A4($Utils.composeTiledHtml,
+      attributes,
+      viewSummary,
+      numCols,
+      summaryData);
+      return A2($Html.table,
+      _U.list([$Html$Attributes.$class(classname)]),
+      summaryData$);
+   };
+   var view = F2(function (address,model) {
+      var summaryData = viewSummaries(model.summaryData.summaries);
+      return A2($Html.div,_U.list([]),_U.list([summaryData]));
+   });
+   var Refresh = function (a) {
+      return {ctor: "Refresh",_0: a};
+   };
+   var RequestRefresh = {ctor: "RequestRefresh"};
+   var errorSummary = {title: "error"
+                      ,contents: _U.list(["has","occurred"])};
+   var errorSummaryData = {summaries: _U.list([errorSummary])};
+   var Model = F2(function (a,b) {
+      return {file: a,summaryData: b};
+   });
+   var Summary = F2(function (a,b) {
+      return {title: a,contents: b};
+   });
+   var SummaryData = function (a) {    return {summaries: a};};
+   var decodeData = A2($Json$Decode.object1,
+   SummaryData,
+   A2($Json$Decode._op[":="],
+   "summaries",
+   $Json$Decode.list(A3($Json$Decode.object2,
+   Summary,
+   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
+   A2($Json$Decode._op[":="],
+   "contents",
+   $Json$Decode.list($Json$Decode.string))))));
+   var getData = function (location) {
+      return $Effects.task(A2($Task.map,
+      Refresh,
+      $Task.toMaybe(A2($Http.get,decodeData,location))));
+   };
+   var init = function (fileUrl) {
+      return {ctor: "_Tuple2"
+             ,_0: A2(Model,fileUrl,errorSummaryData)
+             ,_1: getData(fileUrl)};
+   };
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "RequestRefresh") {
+            return {ctor: "_Tuple2",_0: model,_1: getData(model.file)};
+         } else {
+            var summaryData = A2($Maybe.withDefault,
+            errorSummaryData,
+            _p0._0);
+            return {ctor: "_Tuple2"
+                   ,_0: A2(Model,model.file,summaryData)
+                   ,_1: $Effects.none};
+         }
+   });
+   _op["=>"] = F2(function (v0,v1) {
+      return {ctor: "_Tuple2",_0: v0,_1: v1};
+   });
+   return _elm.SummaryList.values = {_op: _op
+                                    ,SummaryData: SummaryData
+                                    ,Summary: Summary
+                                    ,Model: Model
+                                    ,errorSummaryData: errorSummaryData
+                                    ,errorSummary: errorSummary
+                                    ,init: init
+                                    ,RequestRefresh: RequestRefresh
+                                    ,Refresh: Refresh
+                                    ,update: update
+                                    ,view: view
+                                    ,viewSummaries: viewSummaries
+                                    ,viewSummary: viewSummary
+                                    ,getData: getData
+                                    ,decodeData: decodeData};
+};

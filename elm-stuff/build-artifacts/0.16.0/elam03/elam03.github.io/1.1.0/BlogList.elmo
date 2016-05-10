@@ -1,0 +1,246 @@
+Elm.BlogList = Elm.BlogList || {};
+Elm.BlogList.make = function (_elm) {
+   "use strict";
+   _elm.BlogList = _elm.BlogList || {};
+   if (_elm.BlogList.values) return _elm.BlogList.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Array = Elm.Array.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Char = Elm.Char.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Keyboard = Elm.Keyboard.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Markdown = Elm.Markdown.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Set = Elm.Set.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Utils = Elm.Utils.make(_elm);
+   var _op = {};
+   var viewBlog = function (blog) {
+      var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
+      var url = _U.list([A2($Html.p,
+      _U.list([]),
+      _U.list([$Html.text(A2($Maybe.withDefault,"",blog.url))]))]);
+      var content = A2($List.map,
+      function (c) {
+         return A2($Html.p,
+         _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                  ,_0: "text-align"
+                                                  ,_1: "left"}]))]),
+         _U.list([$Html.text(c)]));
+      },
+      A2($Maybe.withDefault,_U.list([]),blog.content));
+      var titleContent = _U.list([A2($Html.h3,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                               ,_0: "text-align"
+                                               ,_1: "center"}]))]),
+      _U.list([$Html.text(blog.title)]))]);
+      var allContent = A2($Basics._op["++"],
+      titleContent,
+      A2($Basics._op["++"],content,url));
+      return allContent;
+   };
+   var isDown = F2(function (keys,keyCode) {
+      return A2($Set.member,$Char.toCode(keyCode),keys);
+   });
+   var FocusBlog = function (a) {
+      return {ctor: "FocusBlog",_0: a};
+   };
+   var viewBlogs = F2(function (address,blogs) {
+      var classname = "bloglist";
+      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
+                               classname,
+                               "-item"))
+                               ,A2($Html$Events.onClick,address,FocusBlog(1))]);
+      var numCols = 1;
+      var blogs$ = A4($Utils.composeTiledHtml,
+      attributes,
+      viewBlog,
+      numCols,
+      blogs);
+      return A2($Html.table,
+      _U.list([$Html$Attributes.$class(classname)]),
+      blogs$);
+   });
+   var view = F2(function (address,model) {
+      var viewCurrBlog = A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                               ,_0: "border-style"
+                                               ,_1: "solid"}]))]),
+      model.currBlog);
+      var blogs = A2(viewBlogs,address,model.blogs);
+      var numBlogs = $Basics.toString($List.length(model.blogs));
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([viewCurrBlog
+              ,A2($Html.h3,
+              _U.list([]),
+              _U.list([$Html.text(A2($Basics._op["++"],
+              "debug: ",
+              A2($Basics._op["++"],
+              model.debug,
+              A2($Basics._op["++"],
+              " currId: ",
+              $Basics.toString(model.currId)))))]))
+              ,A2($Html.button,
+              _U.list([A2($Html$Events.onClick,address,FocusBlog(48))]),
+              _U.list([$Html.text("FocusBlog Test!")]))
+              ,blogs]));
+   });
+   var LoadBlog = function (a) {
+      return {ctor: "LoadBlog",_0: a};
+   };
+   var getContent = function (location) {
+      return $Effects.task(A2($Task.map,
+      LoadBlog,
+      $Task.toMaybe($Http.getString(location))));
+   };
+   var KeyDown = function (a) {
+      return {ctor: "KeyDown",_0: a};
+   };
+   var inputs = $Signal.mergeMany(_U.list([A2($Signal.map,
+   KeyDown,
+   $Keyboard.keysDown)]));
+   var Refresh = function (a) {
+      return {ctor: "Refresh",_0: a};
+   };
+   var RequestRefresh = {ctor: "RequestRefresh"};
+   var errorBlog = {title: "error"
+                   ,id: 0
+                   ,keywords: $Maybe.Just(_U.list(["error"]))
+                   ,content: $Maybe.Just(_U.list(["error","error"]))
+                   ,url: $Maybe.Just("")};
+   var errorBlogList = {blogs: _U.list([errorBlog])};
+   var Model = F5(function (a,b,c,d,e) {
+      return {file: a,blogs: b,currBlog: c,debug: d,currId: e};
+   });
+   var Blog = F5(function (a,b,c,d,e) {
+      return {title: a,id: b,keywords: c,content: d,url: e};
+   });
+   var BlogList = function (a) {    return {blogs: a};};
+   var decodeData = A2($Json$Decode.object1,
+   BlogList,
+   A2($Json$Decode._op[":="],
+   "blogs",
+   $Json$Decode.list(A6($Json$Decode.object5,
+   Blog,
+   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
+   $Json$Decode.succeed(0),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "keywords",
+   $Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "content",
+   $Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "url",
+   $Json$Decode.string))))));
+   var getBlogData = function (location) {
+      return $Effects.task(A2($Task.map,
+      Refresh,
+      $Task.toMaybe(A2($Http.get,decodeData,location))));
+   };
+   var init = function (blogList) {
+      return {ctor: "_Tuple2"
+             ,_0: A5(Model,blogList,_U.list([]),_U.list([]),"debug!",0)
+             ,_1: getBlogData(blogList)};
+   };
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "RequestRefresh": return {ctor: "_Tuple2"
+                                     ,_0: model
+                                     ,_1: getBlogData(model.file)};
+         case "Refresh": var blogList = A2($Maybe.withDefault,
+           errorBlogList,
+           _p0._0);
+           var blogs = blogList.blogs;
+           return $List.isEmpty(blogs) ? {ctor: "_Tuple2"
+                                         ,_0: A5(Model,
+                                         model.file,
+                                         blogs,
+                                         model.currBlog,
+                                         model.debug,
+                                         model.currId)
+                                         ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                               ,_0: A5(Model,
+                                                               model.file,
+                                                               blogs,
+                                                               model.currBlog,
+                                                               model.debug,
+                                                               model.currId)
+                                                               ,_1: $Effects.none};
+         case "KeyDown": var _p1 = _p0._0;
+           var actions = _U.list([getContent("assets/blogs/test_post.md")
+                                 ,getContent("assets/blogs/test_post2.md")
+                                 ,getContent("assets/blogs/test_post3.md")]);
+           return A2(isDown,_p1,_U.chr("T")) ? {ctor: "_Tuple2"
+                                               ,_0: model
+                                               ,_1: $Effects.batch(actions)} : A2(isDown,
+           _p1,
+           _U.chr("Y")) ? {ctor: "_Tuple2"
+                          ,_0: model
+                          ,_1: $Effects.batch($List.reverse(actions))} : {ctor: "_Tuple2"
+                                                                         ,_0: model
+                                                                         ,_1: $Effects.none};
+         case "LoadBlog": var debug = model.debug;
+           var currBlog = $Markdown.toHtml(A2($Maybe.withDefault,
+           "Failed to load!",
+           _p0._0));
+           return {ctor: "_Tuple2"
+                  ,_0: A5(Model,
+                  model.file,
+                  model.blogs,
+                  _U.list([currBlog]),
+                  debug,
+                  model.currId)
+                  ,_1: $Effects.none};
+         default:
+         var debug = $Basics.toString($List.length(model.blogs));
+           var index = _p0._0;
+           var blog = A2($Maybe.withDefault,
+           errorBlog,
+           A2($Array.get,index,$Array.fromList(model.blogs)));
+           var file = A2($Maybe.withDefault,"",blog.url);
+           return {ctor: "_Tuple2"
+                  ,_0: A5(Model,
+                  model.file,
+                  model.blogs,
+                  model.currBlog,
+                  debug,
+                  model.currId)
+                  ,_1: getContent(file)};}
+   });
+   _op["=>"] = F2(function (v0,v1) {
+      return {ctor: "_Tuple2",_0: v0,_1: v1};
+   });
+   return _elm.BlogList.values = {_op: _op
+                                 ,BlogList: BlogList
+                                 ,Blog: Blog
+                                 ,Model: Model
+                                 ,errorBlogList: errorBlogList
+                                 ,errorBlog: errorBlog
+                                 ,init: init
+                                 ,RequestRefresh: RequestRefresh
+                                 ,Refresh: Refresh
+                                 ,KeyDown: KeyDown
+                                 ,LoadBlog: LoadBlog
+                                 ,FocusBlog: FocusBlog
+                                 ,isDown: isDown
+                                 ,update: update
+                                 ,view: view
+                                 ,viewBlogs: viewBlogs
+                                 ,viewBlog: viewBlog
+                                 ,inputs: inputs
+                                 ,getBlogData: getBlogData
+                                 ,decodeData: decodeData
+                                 ,getContent: getContent};
+};

@@ -1,0 +1,34 @@
+Elm.Utils = Elm.Utils || {};
+Elm.Utils.make = function (_elm) {
+   "use strict";
+   _elm.Utils = _elm.Utils || {};
+   if (_elm.Utils.values) return _elm.Utils.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var composeTiledHtml = F4(function (attributes,
+   transform,
+   cols,
+   list) {
+      var rest = A2($List.drop,cols,list);
+      var head = A2($List.take,cols,list);
+      var head$ = A2($List.map,
+      function (a) {
+         return A2($Html.th,attributes,a);
+      },
+      A2($List.map,transform,head));
+      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
+      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
+      A2($Basics._op["++"],
+      head$,
+      A4(composeTiledHtml,attributes,transform,cols,rest)));
+   });
+   return _elm.Utils.values = {_op: _op
+                              ,composeTiledHtml: composeTiledHtml};
+};

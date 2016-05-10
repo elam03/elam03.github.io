@@ -1,0 +1,172 @@
+Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values) return _elm.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $BlogList = Elm.BlogList.make(_elm),
+   $Cityscape = Elm.Cityscape.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $ProjectList = Elm.ProjectList.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp = Elm.StartApp.make(_elm),
+   $SummaryList = Elm.SummaryList.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var Model = F4(function (a,b,c,d) {
+      return {cityscape: a
+             ,projectList: b
+             ,summaryList: c
+             ,blogList: d};
+   });
+   var BlogListActions = function (a) {
+      return {ctor: "BlogListActions",_0: a};
+   };
+   var SummaryListActions = function (a) {
+      return {ctor: "SummaryListActions",_0: a};
+   };
+   var ProjectListActions = function (a) {
+      return {ctor: "ProjectListActions",_0: a};
+   };
+   var CityscapeActions = function (a) {
+      return {ctor: "CityscapeActions",_0: a};
+   };
+   var init = F4(function (projectListFileLocation,
+   summaryFileLocation,
+   blogFileLocation,
+   assetPath) {
+      var _p0 = $BlogList.init(blogFileLocation);
+      var blogList = _p0._0;
+      var blogListFx = _p0._1;
+      var _p1 = $SummaryList.init(summaryFileLocation);
+      var summaryList = _p1._0;
+      var summaryListFx = _p1._1;
+      var _p2 = A2($ProjectList.init,
+      projectListFileLocation,
+      assetPath);
+      var projectList = _p2._0;
+      var projectListFx = _p2._1;
+      var _p3 = $Cityscape.init({ctor: "_Tuple2",_0: 600,_1: 200});
+      var cityscape = _p3._0;
+      var cityscapeFx = _p3._1;
+      return {ctor: "_Tuple2"
+             ,_0: {cityscape: cityscape
+                  ,projectList: projectList
+                  ,summaryList: summaryList
+                  ,blogList: blogList}
+             ,_1: $Effects.batch(_U.list([A2($Effects.map,
+                                         CityscapeActions,
+                                         cityscapeFx)
+                                         ,A2($Effects.map,ProjectListActions,projectListFx)
+                                         ,A2($Effects.map,SummaryListActions,summaryListFx)
+                                         ,A2($Effects.map,BlogListActions,blogListFx)]))};
+   });
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Cityscape.view,
+              A2($Signal.forwardTo,address,CityscapeActions),
+              model.cityscape)
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "display"
+                                                       ,_1: "flex"}]))]),
+              _U.list([A2($BlogList.view,
+              A2($Signal.forwardTo,address,BlogListActions),
+              model.blogList)]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "display"
+                                                       ,_1: "flex"}]))]),
+              _U.list([A2($SummaryList.view,
+              A2($Signal.forwardTo,address,SummaryListActions),
+              model.summaryList)]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "display"
+                                                       ,_1: "flex"}]))]),
+              _U.list([A2($ProjectList.view,
+              A2($Signal.forwardTo,address,ProjectListActions),
+              model.projectList)]))]));
+   });
+   var update = F2(function (action,model) {
+      var _p4 = A2($Debug.log,"action",action);
+      switch (_p4.ctor)
+      {case "CityscapeActions": var _p5 = A2($Cityscape.update,
+           _p4._0,
+           model.cityscape);
+           var cityscape = _p5._0;
+           var fx = _p5._1;
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(model,{cityscape: cityscape})
+                  ,_1: A2($Effects.map,CityscapeActions,fx)};
+         case "ProjectListActions": var _p6 = A2($ProjectList.update,
+           _p4._0,
+           model.projectList);
+           var projectList = _p6._0;
+           var fx = _p6._1;
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(model,{projectList: projectList})
+                  ,_1: A2($Effects.map,ProjectListActions,fx)};
+         case "SummaryListActions": var _p7 = A2($SummaryList.update,
+           _p4._0,
+           model.summaryList);
+           var summaryList = _p7._0;
+           var fx = _p7._1;
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(model,{summaryList: summaryList})
+                  ,_1: A2($Effects.map,SummaryListActions,fx)};
+         case "BlogListActions": var _p8 = A2($BlogList.update,
+           _p4._0,
+           model.blogList);
+           var blogList = _p8._0;
+           var fx = _p8._1;
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(model,{blogList: blogList})
+                  ,_1: A2($Effects.map,BlogListActions,fx)};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var app = $StartApp.start({init: A4(init,
+                             "assets/1gam_projects/project_list.json",
+                             "assets/summary_data.json",
+                             "assets/blogs/blog_content.json",
+                             "assets/1gam_projects/")
+                             ,inputs: _U.list([A2($Signal.map,
+                                              function (a) {
+                                                 return BlogListActions(a);
+                                              },
+                                              $BlogList.inputs)
+                                              ,A2($Signal.map,
+                                              function (a) {
+                                                 return CityscapeActions(a);
+                                              },
+                                              $Cityscape.inputs)])
+                             ,update: update
+                             ,view: view});
+   var main = app.html;
+   var runner = Elm.Native.Task.make(_elm).performSignal("runner",
+   app.tasks);
+   var NoOp = {ctor: "NoOp"};
+   _op["=>"] = F2(function (v0,v1) {
+      return {ctor: "_Tuple2",_0: v0,_1: v1};
+   });
+   return _elm.Main.values = {_op: _op
+                             ,NoOp: NoOp
+                             ,CityscapeActions: CityscapeActions
+                             ,ProjectListActions: ProjectListActions
+                             ,SummaryListActions: SummaryListActions
+                             ,BlogListActions: BlogListActions
+                             ,Model: Model
+                             ,init: init
+                             ,view: view
+                             ,update: update
+                             ,app: app
+                             ,main: main};
+};

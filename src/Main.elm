@@ -15,8 +15,6 @@ import BlogList
 import Cityscape
 import ProjectList
 import SummaryList
-import SpinSquare
-import BlogCellList
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -27,8 +25,6 @@ type Action
     | ProjectListActions ProjectList.Action
     | SummaryListActions SummaryList.Action
     | BlogListActions BlogList.Action
-    | SpinSquareActions SpinSquare.Action
-    | BlogCellListActions BlogCellList.Action
 
 
 type alias Model =
@@ -36,8 +32,6 @@ type alias Model =
     , projectList : ProjectList.Model
     , summaryList : SummaryList.Model
     , blogList : BlogList.Model
-    , spinSquare : SpinSquare.Model
-    , blogCellList : BlogCellList.Model
     }
 
 init : String -> String -> String -> String -> (Model, Effects Action)
@@ -47,23 +41,17 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
         (projectList, projectListFx) = ProjectList.init projectListFileLocation assetPath
         (summaryList, summaryListFx) = SummaryList.init summaryFileLocation
         (blogList, blogListFx) = BlogList.init blogFileLocation
-        (spinSquare, spinSquareFx) = SpinSquare.init
-        (blogCellList, blogCellListFx) = BlogCellList.init
     in
         ( { cityscape = cityscape
           , projectList = projectList
           , summaryList = summaryList
           , blogList = blogList
-          , spinSquare = spinSquare
-          , blogCellList = blogCellList
           }
         , Effects.batch
             [ Effects.map CityscapeActions cityscapeFx
             , Effects.map ProjectListActions projectListFx
             , Effects.map SummaryListActions summaryListFx
             , Effects.map BlogListActions blogListFx
-            , Effects.map SpinSquareActions spinSquareFx
-            , Effects.map BlogCellListActions blogCellListFx
             ]
         )
 
@@ -72,9 +60,6 @@ view address model =
     div []
         [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
         , div [ style [ ("display", "flex") ] ]
-            [ BlogCellList.view (Signal.forwardTo address BlogCellListActions) model.blogCellList
-            ]
-        , div [ style [ ("display", "flex") ] ]
             [ BlogList.view (Signal.forwardTo address BlogListActions) model.blogList
             ]
         , div [ style [ ("display", "flex") ] ]
@@ -82,9 +67,6 @@ view address model =
             ]
         , div [ style [ ("display", "flex") ] ]
             [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
-            ]
-        , div [ style [ ("display", "flex") ] ]
-            [ SpinSquare.view (Signal.forwardTo address SpinSquareActions) model.spinSquare
             ]
         ]
 
@@ -121,22 +103,6 @@ update action model =
             in
                 ( { model | blogList = blogList }
                 , Effects.map BlogListActions fx
-                )
-
-        SpinSquareActions act ->
-            let
-                (spinSquare, fx) = SpinSquare.update act model.spinSquare
-            in
-                ( { model | spinSquare = spinSquare }
-                , Effects.map SpinSquareActions fx
-                )
-
-        BlogCellListActions act ->
-            let
-                (blogCellList, fx) = BlogCellList.update act model.blogCellList
-            in
-                ( { model | blogCellList = blogCellList }
-                , Effects.map BlogCellListActions fx
                 )
 
         NoOp ->
