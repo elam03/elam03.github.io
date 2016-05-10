@@ -128,10 +128,11 @@ viewProjects projects =
     let
         numCols = 3
         classname = "projectlist"
+        attributes = [ class (classname ++ "-item") ]
 
         projects' =
             projects
-                |> composeTiledHtml classname viewProject numCols
+                |> composeTiledHtml attributes viewProject numCols
     in
         table [ class classname ]
             projects'

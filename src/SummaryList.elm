@@ -90,10 +90,11 @@ viewSummaries summaryData =
     let
         numCols = 2
         classname = "summarylist"
+        attributes = [ class (classname ++ "-item") ]
 
         summaryData' =
             summaryData
-                |> composeTiledHtml classname viewSummary numCols
+                |> composeTiledHtml attributes viewSummary numCols
     in
         table [ class classname ]
             summaryData'

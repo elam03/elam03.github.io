@@ -1,24 +1,31 @@
 module BlogList where
 
+import Array
 import Char
 import Effects exposing (Effects, Never)
 import Html exposing (..)
+import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
 import Keyboard
-import Mouse
+import Markdown
+-- import Mouse
 import Set
 import Signal
 import Task
 import Utils exposing (..)
-import Markdown
+
+-- import Svg exposing (svg, rect, g)
+-- import Svg.Attributes
+-- import Svg.Events exposing (onClick)
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
 -- MODEL
 
+type alias ID = Int
 type alias Keys = Set.Set Char.KeyCode
 
 type alias BlogList =
@@ -27,6 +34,7 @@ type alias BlogList =
 
 type alias Blog =
     { title : String
+    , id : ID
     , keywords : Maybe (List String)
     , content : Maybe (List String)
     , url : Maybe String
@@ -37,6 +45,7 @@ type alias Model =
     , blogs : List Blog
     , currBlog : List Html
     , debug : String
+    , currId : ID
     }
 
 errorBlogList : BlogList
@@ -47,6 +56,7 @@ errorBlogList =
 errorBlog : Blog
 errorBlog =
     { title = "error"
+    , id = 0
     , keywords = Just ["error"]
     , content = Just ["error", "error"]
     , url = Just ""
@@ -54,7 +64,7 @@ errorBlog =
 
 init : String -> (Model, Effects Action)
 init blogList =
-  ( Model blogList [] [] "debug!"
+  ( Model blogList [] [] "debug!" 0
   , getBlogData blogList
   )
 
@@ -65,7 +75,8 @@ type Action
     | Refresh (Maybe BlogList)
     | KeyDown Keys
     | LoadBlog (Maybe String)
-    | MouseDown (Int, Int)
+    | FocusBlog ID
+    -- | MouseDown (Int, Int)
 
 isDown : Keys -> Char -> Bool
 isDown keys keyCode =
@@ -89,11 +100,11 @@ update action model =
                     blogList.blogs
             in
                 if List.isEmpty blogs then
-                    ( Model model.file blogs model.currBlog model.debug
+                    ( Model model.file blogs model.currBlog model.debug model.currId
                     , Effects.none
                     )
                 else
-                    ( Model model.file blogs model.currBlog model.debug
+                    ( Model model.file blogs model.currBlog model.debug model.currId
                     , Effects.none
                     )
 
@@ -130,18 +141,47 @@ update action model =
                         |> Maybe.withDefault "Failed to load!"
                         |> Markdown.toHtml
 
+                debug =
+                    model.debug
+                    -- toString model.currId
             in
-                ( Model model.file model.blogs [ currBlog ] model.debug
+                ( Model model.file model.blogs [ currBlog ] debug model.currId
                 , Effects.none
                 )
 
-        MouseDown (x,y) ->
+        -- MouseDown (x,y) ->
+        --     let
+        --         s = "(" ++ (toString x) ++ "," ++ (toString y) ++ ")"
+        --     in
+        --         -- ( Model model.file model.blogs model.currBlog s
+        --         ( Model model.file model.blogs model.currBlog model.debug model.currId
+        --         , Effects.none
+        --         )
+
+        FocusBlog id ->
             let
-                s = "(" ++ (toString x) ++ "," ++ (toString y) ++ ")"
+                index = id
+
+                blog =
+                    model.blogs
+                        |> Array.fromList
+                        |> Array.get index
+                        |> Maybe.withDefault errorBlog
+
+                file =
+                    blog.url
+                        |> Maybe.withDefault ""
+
+                debug =
+                    -- model.debug
+                    -- file
+                    -- toString index
+                    toString <| List.length model.blogs
             in
-                ( Model model.file model.blogs model.currBlog s
-                , Effects.none
+                ( Model model.file model.blogs model.currBlog debug model.currId
+                , getContent file
                 )
+
 
 -- VIEW
 
@@ -152,7 +192,7 @@ view address model =
 
         blogs =
             model.blogs
-                |> viewBlogs
+                |> viewBlogs address
 
         viewCurrBlog =
             div [ style [ ("border-style", "solid") ] ]
@@ -161,19 +201,24 @@ view address model =
         div []
             -- [ h3 [] [ text model.debug ]
             [ viewCurrBlog
-            , h3 [] [ text model.debug ]
+            , h3 [] [ text ("debug: " ++ model.debug ++ " currId: " ++ toString model.currId) ]
+            , button [ onClick address (FocusBlog 48) ] [ text "FocusBlog Test!"]
             , blogs
             ]
 
-viewBlogs : List Blog -> Html
-viewBlogs blogs =
+viewBlogs : Signal.Address Action -> List Blog -> Html
+viewBlogs address blogs =
     let
         numCols = 1
         classname = "bloglist"
+        attributes =
+            [ class (classname ++ "-item")
+            , onClick address (FocusBlog 1)
+            ]
 
         blogs' =
             blogs
-                |> composeTiledHtml classname viewBlog numCols
+                |> composeTiledHtml attributes viewBlog numCols
     in
         table [ class classname ]
             blogs'
@@ -205,7 +250,7 @@ inputs : Signal Action
 inputs =
     Signal.mergeMany
         [ Signal.map KeyDown Keyboard.keysDown
-        , Signal.map MouseDown Mouse.position
+        -- , Signal.map MouseDown Mouse.position
         ]
 
 -- EFFECTS
@@ -222,8 +267,9 @@ decodeData =
     object1 BlogList
         ( "blogs" :=
             ( list
-                <| object4 Blog
+                <| object5 Blog
                     ("title" := string)
+                    (succeed 0)
                     (maybe ("keywords" := (list string)))
                     (maybe ("content" := (list string)))
                     (maybe ("url" := string))
