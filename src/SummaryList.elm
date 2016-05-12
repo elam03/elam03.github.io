@@ -78,38 +78,27 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
     let
+        numCols = 2
+        attributes = [ class "summarylist-table" ]
+
         summaryData =
             model.summaryData.summaries
-                |> viewSummaries
+                |> List.map (\s -> viewSummary address s)
+                |> composeTiledHtml numCols
     in
-        div []
-            [ summaryData ]
+        table attributes summaryData
 
-viewSummaries : List Summary -> Html
-viewSummaries summaryData =
-    let
-        numCols = 2
-        classname = "summarylist"
-        attributes = [ class (classname ++ "-item") ]
-
-        summaryData' =
-            summaryData
-                |> composeTiledHtml attributes viewSummary numCols
-    in
-        table [ class classname ]
-            summaryData'
-
-viewSummary : Summary -> List Html
-viewSummary summary =
+viewSummary : Signal.Address Action -> Summary -> Html
+viewSummary address summary =
     let
         contents =
             summary.contents
                 |> List.map (\s -> li [] [ text s ])
-        classname = "summarylist-item"
     in
-        [ h2 [ style [ ("text-align", "center") ] ] [ text summary.title ]
-        , ul [ style [ ("text-align", "left") ] ] contents
-        ]
+        th [ class "summarylist-item" ]
+            [ h2 [ style [ ("text-align", "center") ] ] [ text summary.title ]
+            , ul [ style [ ("text-align", "left") ] ] contents
+            ]
 
 -- EFFECTS
 

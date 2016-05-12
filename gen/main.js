@@ -7244,70 +7244,6 @@ Elm.Array.make = function (_elm) {
                               ,foldl: foldl
                               ,foldr: foldr};
 };
-Elm.Native.Char = {};
-Elm.Native.Char.make = function(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Char = localRuntime.Native.Char || {};
-	if (localRuntime.Native.Char.values)
-	{
-		return localRuntime.Native.Char.values;
-	}
-
-	var Utils = Elm.Native.Utils.make(localRuntime);
-
-	return localRuntime.Native.Char.values = {
-		fromCode: function(c) { return Utils.chr(String.fromCharCode(c)); },
-		toCode: function(c) { return c.charCodeAt(0); },
-		toUpper: function(c) { return Utils.chr(c.toUpperCase()); },
-		toLower: function(c) { return Utils.chr(c.toLowerCase()); },
-		toLocaleUpper: function(c) { return Utils.chr(c.toLocaleUpperCase()); },
-		toLocaleLower: function(c) { return Utils.chr(c.toLocaleLowerCase()); }
-	};
-};
-
-Elm.Char = Elm.Char || {};
-Elm.Char.make = function (_elm) {
-   "use strict";
-   _elm.Char = _elm.Char || {};
-   if (_elm.Char.values) return _elm.Char.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Native$Char = Elm.Native.Char.make(_elm);
-   var _op = {};
-   var fromCode = $Native$Char.fromCode;
-   var toCode = $Native$Char.toCode;
-   var toLocaleLower = $Native$Char.toLocaleLower;
-   var toLocaleUpper = $Native$Char.toLocaleUpper;
-   var toLower = $Native$Char.toLower;
-   var toUpper = $Native$Char.toUpper;
-   var isBetween = F3(function (low,high,$char) {
-      var code = toCode($char);
-      return _U.cmp(code,toCode(low)) > -1 && _U.cmp(code,
-      toCode(high)) < 1;
-   });
-   var isUpper = A2(isBetween,_U.chr("A"),_U.chr("Z"));
-   var isLower = A2(isBetween,_U.chr("a"),_U.chr("z"));
-   var isDigit = A2(isBetween,_U.chr("0"),_U.chr("9"));
-   var isOctDigit = A2(isBetween,_U.chr("0"),_U.chr("7"));
-   var isHexDigit = function ($char) {
-      return isDigit($char) || (A3(isBetween,
-      _U.chr("a"),
-      _U.chr("f"),
-      $char) || A3(isBetween,_U.chr("A"),_U.chr("F"),$char));
-   };
-   return _elm.Char.values = {_op: _op
-                             ,isUpper: isUpper
-                             ,isLower: isLower
-                             ,isDigit: isDigit
-                             ,isOctDigit: isOctDigit
-                             ,isHexDigit: isHexDigit
-                             ,toUpper: toUpper
-                             ,toLower: toLower
-                             ,toLocaleUpper: toLocaleUpper
-                             ,toLocaleLower: toLocaleLower
-                             ,toCode: toCode
-                             ,fromCode: fromCode};
-};
 Elm.Native.Effects = {};
 Elm.Native.Effects.make = function(localRuntime) {
 
@@ -8370,6 +8306,70 @@ Elm.Native.String.make = function(localRuntime) {
 	};
 };
 
+Elm.Native.Char = {};
+Elm.Native.Char.make = function(localRuntime) {
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Char = localRuntime.Native.Char || {};
+	if (localRuntime.Native.Char.values)
+	{
+		return localRuntime.Native.Char.values;
+	}
+
+	var Utils = Elm.Native.Utils.make(localRuntime);
+
+	return localRuntime.Native.Char.values = {
+		fromCode: function(c) { return Utils.chr(String.fromCharCode(c)); },
+		toCode: function(c) { return c.charCodeAt(0); },
+		toUpper: function(c) { return Utils.chr(c.toUpperCase()); },
+		toLower: function(c) { return Utils.chr(c.toLowerCase()); },
+		toLocaleUpper: function(c) { return Utils.chr(c.toLocaleUpperCase()); },
+		toLocaleLower: function(c) { return Utils.chr(c.toLocaleLowerCase()); }
+	};
+};
+
+Elm.Char = Elm.Char || {};
+Elm.Char.make = function (_elm) {
+   "use strict";
+   _elm.Char = _elm.Char || {};
+   if (_elm.Char.values) return _elm.Char.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Native$Char = Elm.Native.Char.make(_elm);
+   var _op = {};
+   var fromCode = $Native$Char.fromCode;
+   var toCode = $Native$Char.toCode;
+   var toLocaleLower = $Native$Char.toLocaleLower;
+   var toLocaleUpper = $Native$Char.toLocaleUpper;
+   var toLower = $Native$Char.toLower;
+   var toUpper = $Native$Char.toUpper;
+   var isBetween = F3(function (low,high,$char) {
+      var code = toCode($char);
+      return _U.cmp(code,toCode(low)) > -1 && _U.cmp(code,
+      toCode(high)) < 1;
+   });
+   var isUpper = A2(isBetween,_U.chr("A"),_U.chr("Z"));
+   var isLower = A2(isBetween,_U.chr("a"),_U.chr("z"));
+   var isDigit = A2(isBetween,_U.chr("0"),_U.chr("9"));
+   var isOctDigit = A2(isBetween,_U.chr("0"),_U.chr("7"));
+   var isHexDigit = function ($char) {
+      return isDigit($char) || (A3(isBetween,
+      _U.chr("a"),
+      _U.chr("f"),
+      $char) || A3(isBetween,_U.chr("A"),_U.chr("F"),$char));
+   };
+   return _elm.Char.values = {_op: _op
+                             ,isUpper: isUpper
+                             ,isLower: isLower
+                             ,isDigit: isDigit
+                             ,isOctDigit: isOctDigit
+                             ,isHexDigit: isHexDigit
+                             ,toUpper: toUpper
+                             ,toLower: toLower
+                             ,toLocaleUpper: toLocaleUpper
+                             ,toLocaleLower: toLocaleLower
+                             ,toCode: toCode
+                             ,fromCode: fromCode};
+};
 Elm.String = Elm.String || {};
 Elm.String.make = function (_elm) {
    "use strict";
@@ -12119,264 +12119,6 @@ Elm.Http.make = function (_elm) {
                              ,RawTimeout: RawTimeout
                              ,RawNetworkError: RawNetworkError};
 };
-Elm.Set = Elm.Set || {};
-Elm.Set.make = function (_elm) {
-   "use strict";
-   _elm.Set = _elm.Set || {};
-   if (_elm.Set.values) return _elm.Set.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $List = Elm.List.make(_elm);
-   var _op = {};
-   var foldr = F3(function (f,b,_p0) {
-      var _p1 = _p0;
-      return A3($Dict.foldr,
-      F3(function (k,_p2,b) {    return A2(f,k,b);}),
-      b,
-      _p1._0);
-   });
-   var foldl = F3(function (f,b,_p3) {
-      var _p4 = _p3;
-      return A3($Dict.foldl,
-      F3(function (k,_p5,b) {    return A2(f,k,b);}),
-      b,
-      _p4._0);
-   });
-   var toList = function (_p6) {
-      var _p7 = _p6;
-      return $Dict.keys(_p7._0);
-   };
-   var size = function (_p8) {
-      var _p9 = _p8;
-      return $Dict.size(_p9._0);
-   };
-   var member = F2(function (k,_p10) {
-      var _p11 = _p10;
-      return A2($Dict.member,k,_p11._0);
-   });
-   var isEmpty = function (_p12) {
-      var _p13 = _p12;
-      return $Dict.isEmpty(_p13._0);
-   };
-   var Set_elm_builtin = function (a) {
-      return {ctor: "Set_elm_builtin",_0: a};
-   };
-   var empty = Set_elm_builtin($Dict.empty);
-   var singleton = function (k) {
-      return Set_elm_builtin(A2($Dict.singleton,
-      k,
-      {ctor: "_Tuple0"}));
-   };
-   var insert = F2(function (k,_p14) {
-      var _p15 = _p14;
-      return Set_elm_builtin(A3($Dict.insert,
-      k,
-      {ctor: "_Tuple0"},
-      _p15._0));
-   });
-   var fromList = function (xs) {
-      return A3($List.foldl,insert,empty,xs);
-   };
-   var map = F2(function (f,s) {
-      return fromList(A2($List.map,f,toList(s)));
-   });
-   var remove = F2(function (k,_p16) {
-      var _p17 = _p16;
-      return Set_elm_builtin(A2($Dict.remove,k,_p17._0));
-   });
-   var union = F2(function (_p19,_p18) {
-      var _p20 = _p19;
-      var _p21 = _p18;
-      return Set_elm_builtin(A2($Dict.union,_p20._0,_p21._0));
-   });
-   var intersect = F2(function (_p23,_p22) {
-      var _p24 = _p23;
-      var _p25 = _p22;
-      return Set_elm_builtin(A2($Dict.intersect,_p24._0,_p25._0));
-   });
-   var diff = F2(function (_p27,_p26) {
-      var _p28 = _p27;
-      var _p29 = _p26;
-      return Set_elm_builtin(A2($Dict.diff,_p28._0,_p29._0));
-   });
-   var filter = F2(function (p,_p30) {
-      var _p31 = _p30;
-      return Set_elm_builtin(A2($Dict.filter,
-      F2(function (k,_p32) {    return p(k);}),
-      _p31._0));
-   });
-   var partition = F2(function (p,_p33) {
-      var _p34 = _p33;
-      var _p35 = A2($Dict.partition,
-      F2(function (k,_p36) {    return p(k);}),
-      _p34._0);
-      var p1 = _p35._0;
-      var p2 = _p35._1;
-      return {ctor: "_Tuple2"
-             ,_0: Set_elm_builtin(p1)
-             ,_1: Set_elm_builtin(p2)};
-   });
-   return _elm.Set.values = {_op: _op
-                            ,empty: empty
-                            ,singleton: singleton
-                            ,insert: insert
-                            ,remove: remove
-                            ,isEmpty: isEmpty
-                            ,member: member
-                            ,size: size
-                            ,foldl: foldl
-                            ,foldr: foldr
-                            ,map: map
-                            ,filter: filter
-                            ,partition: partition
-                            ,union: union
-                            ,intersect: intersect
-                            ,diff: diff
-                            ,toList: toList
-                            ,fromList: fromList};
-};
-Elm.Native.Keyboard = {};
-
-Elm.Native.Keyboard.make = function(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
-	if (localRuntime.Native.Keyboard.values)
-	{
-		return localRuntime.Native.Keyboard.values;
-	}
-
-	var NS = Elm.Native.Signal.make(localRuntime);
-
-
-	function keyEvent(event)
-	{
-		return {
-			alt: event.altKey,
-			meta: event.metaKey,
-			keyCode: event.keyCode
-		};
-	}
-
-
-	function keyStream(node, eventName, handler)
-	{
-		var stream = NS.input(eventName, { alt: false, meta: false, keyCode: 0 });
-
-		localRuntime.addListener([stream.id], node, eventName, function(e) {
-			localRuntime.notify(stream.id, handler(e));
-		});
-
-		return stream;
-	}
-
-	var downs = keyStream(document, 'keydown', keyEvent);
-	var ups = keyStream(document, 'keyup', keyEvent);
-	var presses = keyStream(document, 'keypress', keyEvent);
-	var blurs = keyStream(window, 'blur', function() { return null; });
-
-
-	return localRuntime.Native.Keyboard.values = {
-		downs: downs,
-		ups: ups,
-		blurs: blurs,
-		presses: presses
-	};
-};
-
-Elm.Keyboard = Elm.Keyboard || {};
-Elm.Keyboard.make = function (_elm) {
-   "use strict";
-   _elm.Keyboard = _elm.Keyboard || {};
-   if (_elm.Keyboard.values) return _elm.Keyboard.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Char = Elm.Char.make(_elm),
-   $Native$Keyboard = Elm.Native.Keyboard.make(_elm),
-   $Set = Elm.Set.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var presses = A2($Signal.map,
-   function (_) {
-      return _.keyCode;
-   },
-   $Native$Keyboard.presses);
-   var toXY = F2(function (_p0,keyCodes) {
-      var _p1 = _p0;
-      var is = function (keyCode) {
-         return A2($Set.member,keyCode,keyCodes) ? 1 : 0;
-      };
-      return {x: is(_p1.right) - is(_p1.left)
-             ,y: is(_p1.up) - is(_p1.down)};
-   });
-   var Directions = F4(function (a,b,c,d) {
-      return {up: a,down: b,left: c,right: d};
-   });
-   var dropMap = F2(function (f,signal) {
-      return $Signal.dropRepeats(A2($Signal.map,f,signal));
-   });
-   var EventInfo = F3(function (a,b,c) {
-      return {alt: a,meta: b,keyCode: c};
-   });
-   var Blur = {ctor: "Blur"};
-   var Down = function (a) {    return {ctor: "Down",_0: a};};
-   var Up = function (a) {    return {ctor: "Up",_0: a};};
-   var rawEvents = $Signal.mergeMany(_U.list([A2($Signal.map,
-                                             Up,
-                                             $Native$Keyboard.ups)
-                                             ,A2($Signal.map,Down,$Native$Keyboard.downs)
-                                             ,A2($Signal.map,$Basics.always(Blur),$Native$Keyboard.blurs)]));
-   var empty = {alt: false,meta: false,keyCodes: $Set.empty};
-   var update = F2(function (event,model) {
-      var _p2 = event;
-      switch (_p2.ctor)
-      {case "Down": var _p3 = _p2._0;
-           return {alt: _p3.alt
-                  ,meta: _p3.meta
-                  ,keyCodes: A2($Set.insert,_p3.keyCode,model.keyCodes)};
-         case "Up": var _p4 = _p2._0;
-           return {alt: _p4.alt
-                  ,meta: _p4.meta
-                  ,keyCodes: A2($Set.remove,_p4.keyCode,model.keyCodes)};
-         default: return empty;}
-   });
-   var model = A3($Signal.foldp,update,empty,rawEvents);
-   var alt = A2(dropMap,function (_) {    return _.alt;},model);
-   var meta = A2(dropMap,function (_) {    return _.meta;},model);
-   var keysDown = A2(dropMap,
-   function (_) {
-      return _.keyCodes;
-   },
-   model);
-   var arrows = A2(dropMap,
-   toXY({up: 38,down: 40,left: 37,right: 39}),
-   keysDown);
-   var wasd = A2(dropMap,
-   toXY({up: 87,down: 83,left: 65,right: 68}),
-   keysDown);
-   var isDown = function (keyCode) {
-      return A2(dropMap,$Set.member(keyCode),keysDown);
-   };
-   var ctrl = isDown(17);
-   var shift = isDown(16);
-   var space = isDown(32);
-   var enter = isDown(13);
-   var Model = F3(function (a,b,c) {
-      return {alt: a,meta: b,keyCodes: c};
-   });
-   return _elm.Keyboard.values = {_op: _op
-                                 ,arrows: arrows
-                                 ,wasd: wasd
-                                 ,enter: enter
-                                 ,space: space
-                                 ,ctrl: ctrl
-                                 ,shift: shift
-                                 ,alt: alt
-                                 ,meta: meta
-                                 ,isDown: isDown
-                                 ,keysDown: keysDown
-                                 ,presses: presses};
-};
 
 // setup
 Elm.Native = Elm.Native || {};
@@ -12537,512 +12279,6 @@ Elm.Markdown.make = function (_elm) {
                                  ,defaultOptions: defaultOptions
                                  ,toHtmlWith: toHtmlWith
                                  ,toElementWith: toElementWith};
-};
-Elm.Utils = Elm.Utils || {};
-Elm.Utils.make = function (_elm) {
-   "use strict";
-   _elm.Utils = _elm.Utils || {};
-   if (_elm.Utils.values) return _elm.Utils.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var composeTiledHtml = F4(function (attributes,
-   transform,
-   cols,
-   list) {
-      var rest = A2($List.drop,cols,list);
-      var head = A2($List.take,cols,list);
-      var head$ = A2($List.map,
-      function (a) {
-         return A2($Html.th,attributes,a);
-      },
-      A2($List.map,transform,head));
-      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
-      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
-      A2($Basics._op["++"],
-      head$,
-      A4(composeTiledHtml,attributes,transform,cols,rest)));
-   });
-   return _elm.Utils.values = {_op: _op
-                              ,composeTiledHtml: composeTiledHtml};
-};
-Elm.BlogList = Elm.BlogList || {};
-Elm.BlogList.make = function (_elm) {
-   "use strict";
-   _elm.BlogList = _elm.BlogList || {};
-   if (_elm.BlogList.values) return _elm.BlogList.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Array = Elm.Array.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Char = Elm.Char.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Keyboard = Elm.Keyboard.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Markdown = Elm.Markdown.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Set = Elm.Set.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm),
-   $Utils = Elm.Utils.make(_elm);
-   var _op = {};
-   var viewBlog = function (blog) {
-      var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
-      var url = _U.list([A2($Html.p,
-      _U.list([]),
-      _U.list([$Html.text(A2($Maybe.withDefault,"",blog.url))]))]);
-      var content = A2($List.map,
-      function (c) {
-         return A2($Html.p,
-         _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                  ,_0: "text-align"
-                                                  ,_1: "left"}]))]),
-         _U.list([$Html.text(c)]));
-      },
-      A2($Maybe.withDefault,_U.list([]),blog.content));
-      var titleContent = _U.list([A2($Html.h3,
-      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                               ,_0: "text-align"
-                                               ,_1: "center"}]))]),
-      _U.list([$Html.text(blog.title)]))]);
-      var allContent = A2($Basics._op["++"],
-      titleContent,
-      A2($Basics._op["++"],content,url));
-      return allContent;
-   };
-   var isDown = F2(function (keys,keyCode) {
-      return A2($Set.member,$Char.toCode(keyCode),keys);
-   });
-   var FocusBlog = function (a) {
-      return {ctor: "FocusBlog",_0: a};
-   };
-   var viewBlogs = F2(function (address,blogs) {
-      var classname = "bloglist";
-      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
-                               classname,
-                               "-item"))
-                               ,A2($Html$Events.onClick,address,FocusBlog(1))]);
-      var numCols = 1;
-      var blogs$ = A4($Utils.composeTiledHtml,
-      attributes,
-      viewBlog,
-      numCols,
-      blogs);
-      return A2($Html.table,
-      _U.list([$Html$Attributes.$class(classname)]),
-      blogs$);
-   });
-   var view = F2(function (address,model) {
-      var viewCurrBlog = A2($Html.div,
-      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                               ,_0: "border-style"
-                                               ,_1: "solid"}]))]),
-      model.currBlog);
-      var blogs = A2(viewBlogs,address,model.blogs);
-      var numBlogs = $Basics.toString($List.length(model.blogs));
-      return A2($Html.div,
-      _U.list([]),
-      _U.list([viewCurrBlog
-              ,A2($Html.h3,
-              _U.list([]),
-              _U.list([$Html.text(A2($Basics._op["++"],
-              "debug: ",
-              A2($Basics._op["++"],
-              model.debug,
-              A2($Basics._op["++"],
-              " currId: ",
-              $Basics.toString(model.currId)))))]))
-              ,A2($Html.button,
-              _U.list([A2($Html$Events.onClick,address,FocusBlog(48))]),
-              _U.list([$Html.text("FocusBlog Test!")]))
-              ,blogs]));
-   });
-   var LoadBlog = function (a) {
-      return {ctor: "LoadBlog",_0: a};
-   };
-   var getContent = function (location) {
-      return $Effects.task(A2($Task.map,
-      LoadBlog,
-      $Task.toMaybe($Http.getString(location))));
-   };
-   var KeyDown = function (a) {
-      return {ctor: "KeyDown",_0: a};
-   };
-   var inputs = $Signal.mergeMany(_U.list([A2($Signal.map,
-   KeyDown,
-   $Keyboard.keysDown)]));
-   var Refresh = function (a) {
-      return {ctor: "Refresh",_0: a};
-   };
-   var RequestRefresh = {ctor: "RequestRefresh"};
-   var errorBlog = {title: "error"
-                   ,id: 0
-                   ,keywords: $Maybe.Just(_U.list(["error"]))
-                   ,content: $Maybe.Just(_U.list(["error","error"]))
-                   ,url: $Maybe.Just("")};
-   var errorBlogList = {blogs: _U.list([errorBlog])};
-   var Model = F5(function (a,b,c,d,e) {
-      return {file: a,blogs: b,currBlog: c,debug: d,currId: e};
-   });
-   var Blog = F5(function (a,b,c,d,e) {
-      return {title: a,id: b,keywords: c,content: d,url: e};
-   });
-   var BlogList = function (a) {    return {blogs: a};};
-   var decodeData = A2($Json$Decode.object1,
-   BlogList,
-   A2($Json$Decode._op[":="],
-   "blogs",
-   $Json$Decode.list(A6($Json$Decode.object5,
-   Blog,
-   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
-   $Json$Decode.succeed(0),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
-   "keywords",
-   $Json$Decode.list($Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
-   "content",
-   $Json$Decode.list($Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
-   "url",
-   $Json$Decode.string))))));
-   var getBlogData = function (location) {
-      return $Effects.task(A2($Task.map,
-      Refresh,
-      $Task.toMaybe(A2($Http.get,decodeData,location))));
-   };
-   var init = function (blogList) {
-      return {ctor: "_Tuple2"
-             ,_0: A5(Model,blogList,_U.list([]),_U.list([]),"debug!",0)
-             ,_1: getBlogData(blogList)};
-   };
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
-      {case "RequestRefresh": return {ctor: "_Tuple2"
-                                     ,_0: model
-                                     ,_1: getBlogData(model.file)};
-         case "Refresh": var blogList = A2($Maybe.withDefault,
-           errorBlogList,
-           _p0._0);
-           var blogs = blogList.blogs;
-           return $List.isEmpty(blogs) ? {ctor: "_Tuple2"
-                                         ,_0: A5(Model,
-                                         model.file,
-                                         blogs,
-                                         model.currBlog,
-                                         model.debug,
-                                         model.currId)
-                                         ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                               ,_0: A5(Model,
-                                                               model.file,
-                                                               blogs,
-                                                               model.currBlog,
-                                                               model.debug,
-                                                               model.currId)
-                                                               ,_1: $Effects.none};
-         case "KeyDown": var _p1 = _p0._0;
-           var actions = _U.list([getContent("assets/blogs/test_post.md")
-                                 ,getContent("assets/blogs/test_post2.md")
-                                 ,getContent("assets/blogs/test_post3.md")]);
-           return A2(isDown,_p1,_U.chr("T")) ? {ctor: "_Tuple2"
-                                               ,_0: model
-                                               ,_1: $Effects.batch(actions)} : A2(isDown,
-           _p1,
-           _U.chr("Y")) ? {ctor: "_Tuple2"
-                          ,_0: model
-                          ,_1: $Effects.batch($List.reverse(actions))} : {ctor: "_Tuple2"
-                                                                         ,_0: model
-                                                                         ,_1: $Effects.none};
-         case "LoadBlog": var debug = model.debug;
-           var currBlog = $Markdown.toHtml(A2($Maybe.withDefault,
-           "Failed to load!",
-           _p0._0));
-           return {ctor: "_Tuple2"
-                  ,_0: A5(Model,
-                  model.file,
-                  model.blogs,
-                  _U.list([currBlog]),
-                  debug,
-                  model.currId)
-                  ,_1: $Effects.none};
-         default:
-         var debug = $Basics.toString($List.length(model.blogs));
-           var index = _p0._0;
-           var blog = A2($Maybe.withDefault,
-           errorBlog,
-           A2($Array.get,index,$Array.fromList(model.blogs)));
-           var file = A2($Maybe.withDefault,"",blog.url);
-           return {ctor: "_Tuple2"
-                  ,_0: A5(Model,
-                  model.file,
-                  model.blogs,
-                  model.currBlog,
-                  debug,
-                  model.currId)
-                  ,_1: getContent(file)};}
-   });
-   _op["=>"] = F2(function (v0,v1) {
-      return {ctor: "_Tuple2",_0: v0,_1: v1};
-   });
-   return _elm.BlogList.values = {_op: _op
-                                 ,BlogList: BlogList
-                                 ,Blog: Blog
-                                 ,Model: Model
-                                 ,errorBlogList: errorBlogList
-                                 ,errorBlog: errorBlog
-                                 ,init: init
-                                 ,RequestRefresh: RequestRefresh
-                                 ,Refresh: Refresh
-                                 ,KeyDown: KeyDown
-                                 ,LoadBlog: LoadBlog
-                                 ,FocusBlog: FocusBlog
-                                 ,isDown: isDown
-                                 ,update: update
-                                 ,view: view
-                                 ,viewBlogs: viewBlogs
-                                 ,viewBlog: viewBlog
-                                 ,inputs: inputs
-                                 ,getBlogData: getBlogData
-                                 ,decodeData: decodeData
-                                 ,getContent: getContent};
-};
-Elm.Building = Elm.Building || {};
-Elm.Building.make = function (_elm) {
-   "use strict";
-   _elm.Building = _elm.Building || {};
-   if (_elm.Building.values) return _elm.Building.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Color = Elm.Color.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var darkGrey = A4($Color.rgba,50,50,50,0.6);
-   var glassWindowToForm = function (window) {
-      return A2($Graphics$Collage.move,
-      {ctor: "_Tuple2"
-      ,_0: window.x + window.w / 2
-      ,_1: window.y + window.h / 2},
-      A2($Graphics$Collage.filled,
-      darkGrey,
-      A2($Graphics$Collage.rect,window.w,window.h)));
-   };
-   var clearGrey = A4($Color.rgba,111,111,111,0.6);
-   var displayBuilding = function (b) {
-      var windows = A2($List.map,
-      glassWindowToForm,
-      A2($List.map,
-      function (a) {
-         return _U.update(a,{x: a.x + b.x,y: a.y + b.y});
-      },
-      b.windows));
-      var allForms = A2($Basics._op["++"],
-      _U.list([A2($Graphics$Collage.move,
-      {ctor: "_Tuple2",_0: b.x + b.w / 2,_1: b.y + b.h / 2},
-      A2($Graphics$Collage.filled,
-      clearGrey,
-      A2($Graphics$Collage.rect,b.w,b.h)))]),
-      windows);
-      return $Graphics$Collage.group(allForms);
-   };
-   var Building = F6(function (a,b,c,d,e,f) {
-      return {x: a,y: b,w: c,h: d,layer: e,windows: f};
-   });
-   var newGlassWindow = F4(function (x$,y$,w$,h$) {
-      return {x: x$,y: y$,w: w$,h: h$};
-   });
-   var GlassWindow = F4(function (a,b,c,d) {
-      return {x: a,y: b,w: c,h: d};
-   });
-   var buildingWidth = 30;
-   var glassWindowSpacing = {w: 3,h: 3};
-   var glassWindowSize = {w: 5,h: 9};
-   var generateGlassWindows = F7(function (x,
-   y,
-   w,
-   h,
-   xSpacing,
-   ySpacing,
-   windows) {
-      generateGlassWindows: while (true)
-      if (_U.cmp(x + glassWindowSize.w + xSpacing,w) > 0)
-      return windows;
-      else if (_U.cmp(y + glassWindowSize.h + ySpacing,h) > 0) {
-               var _v0 = x + glassWindowSize.w + xSpacing,
-               _v1 = ySpacing,
-               _v2 = w,
-               _v3 = h,
-               _v4 = xSpacing,
-               _v5 = ySpacing,
-               _v6 = windows;
-               x = _v0;
-               y = _v1;
-               w = _v2;
-               h = _v3;
-               xSpacing = _v4;
-               ySpacing = _v5;
-               windows = _v6;
-               continue generateGlassWindows;
-            } else {
-               var _v7 = x,
-               _v8 = y + glassWindowSize.h + ySpacing,
-               _v9 = w,
-               _v10 = h,
-               _v11 = xSpacing,
-               _v12 = ySpacing,
-               _v13 = A2($Basics._op["++"],
-               windows,
-               _U.list([A4(newGlassWindow,
-               x,
-               y,
-               glassWindowSize.w,
-               glassWindowSize.h)]));
-               x = _v7;
-               y = _v8;
-               w = _v9;
-               h = _v10;
-               xSpacing = _v11;
-               ySpacing = _v12;
-               windows = _v13;
-               continue generateGlassWindows;
-            }
-   });
-   var Size = F2(function (a,b) {    return {w: a,h: b};});
-   var Static = {ctor: "Static"};
-   var isStatic = function (b) {    return _U.eq(b.layer,Static);};
-   var Back = {ctor: "Back"};
-   var isBack = function (b) {    return _U.eq(b.layer,Back);};
-   var Middle = {ctor: "Middle"};
-   var isMiddle = function (b) {    return _U.eq(b.layer,Middle);};
-   var Front = {ctor: "Front"};
-   var isFront = function (b) {    return _U.eq(b.layer,Front);};
-   var nullBuilding = {x: 0
-                      ,y: 0
-                      ,w: buildingWidth
-                      ,h: 0
-                      ,layer: Front
-                      ,windows: _U.list([])};
-   var newBuilding = F4(function (x$,y$,h$,l$) {
-      var w$ = buildingWidth;
-      return _U.update(nullBuilding,
-      {x: x$
-      ,y: y$
-      ,w: w$
-      ,h: h$
-      ,layer: l$
-      ,windows: A7(generateGlassWindows,
-      glassWindowSpacing.w,
-      glassWindowSpacing.h,
-      w$,
-      h$,
-      glassWindowSpacing.w,
-      glassWindowSpacing.h,
-      _U.list([]))});
-   });
-   return _elm.Building.values = {_op: _op
-                                 ,Front: Front
-                                 ,Middle: Middle
-                                 ,Back: Back
-                                 ,Static: Static
-                                 ,Size: Size
-                                 ,glassWindowSize: glassWindowSize
-                                 ,glassWindowSpacing: glassWindowSpacing
-                                 ,buildingWidth: buildingWidth
-                                 ,isBack: isBack
-                                 ,isMiddle: isMiddle
-                                 ,isFront: isFront
-                                 ,isStatic: isStatic
-                                 ,GlassWindow: GlassWindow
-                                 ,newGlassWindow: newGlassWindow
-                                 ,generateGlassWindows: generateGlassWindows
-                                 ,Building: Building
-                                 ,newBuilding: newBuilding
-                                 ,nullBuilding: nullBuilding
-                                 ,clearGrey: clearGrey
-                                 ,darkGrey: darkGrey
-                                 ,glassWindowToForm: glassWindowToForm
-                                 ,displayBuilding: displayBuilding};
-};
-Elm.Native = Elm.Native || {};
-Elm.Native.Mouse = {};
-Elm.Native.Mouse.make = function(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Mouse = localRuntime.Native.Mouse || {};
-	if (localRuntime.Native.Mouse.values)
-	{
-		return localRuntime.Native.Mouse.values;
-	}
-
-	var NS = Elm.Native.Signal.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
-
-	var position = NS.input('Mouse.position', Utils.Tuple2(0, 0));
-
-	var isDown = NS.input('Mouse.isDown', false);
-
-	var clicks = NS.input('Mouse.clicks', Utils.Tuple0);
-
-	var node = localRuntime.isFullscreen()
-		? document
-		: localRuntime.node;
-
-	localRuntime.addListener([clicks.id], node, 'click', function click() {
-		localRuntime.notify(clicks.id, Utils.Tuple0);
-	});
-	localRuntime.addListener([isDown.id], node, 'mousedown', function down() {
-		localRuntime.notify(isDown.id, true);
-	});
-	localRuntime.addListener([isDown.id], node, 'mouseup', function up() {
-		localRuntime.notify(isDown.id, false);
-	});
-	localRuntime.addListener([position.id], node, 'mousemove', function move(e) {
-		localRuntime.notify(position.id, Utils.getXY(e));
-	});
-
-	return localRuntime.Native.Mouse.values = {
-		position: position,
-		isDown: isDown,
-		clicks: clicks
-	};
-};
-
-Elm.Mouse = Elm.Mouse || {};
-Elm.Mouse.make = function (_elm) {
-   "use strict";
-   _elm.Mouse = _elm.Mouse || {};
-   if (_elm.Mouse.values) return _elm.Mouse.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Native$Mouse = Elm.Native.Mouse.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var clicks = $Native$Mouse.clicks;
-   var isDown = $Native$Mouse.isDown;
-   var position = $Native$Mouse.position;
-   var x = A2($Signal.map,$Basics.fst,position);
-   var y = A2($Signal.map,$Basics.snd,position);
-   return _elm.Mouse.values = {_op: _op
-                              ,position: position
-                              ,x: x
-                              ,y: y
-                              ,isDown: isDown
-                              ,clicks: clicks};
 };
 Elm.Random = Elm.Random || {};
 Elm.Random.make = function (_elm) {
@@ -13320,6 +12556,763 @@ Elm.Random.make = function (_elm) {
                                ,maxInt: maxInt
                                ,generate: generate
                                ,initialSeed: initialSeed};
+};
+Elm.Utils = Elm.Utils || {};
+Elm.Utils.make = function (_elm) {
+   "use strict";
+   _elm.Utils = _elm.Utils || {};
+   if (_elm.Utils.values) return _elm.Utils.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Random = Elm.Random.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var composeTiledHtml = F2(function (cols,list) {
+      var rest = A2($List.drop,cols,list);
+      var head = A2($List.take,cols,list);
+      var head$ = head;
+      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
+      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
+      A2($Basics._op["++"],head$,A2(composeTiledHtml,cols,rest)));
+   });
+   var composeTiledHtml2 = F4(function (attributes,
+   transform,
+   cols,
+   list) {
+      var rest = A2($List.drop,cols,list);
+      var head = A2($List.take,cols,list);
+      var head$ = A2($List.map,
+      function (a) {
+         return A2($Html.th,attributes,a);
+      },
+      A2($List.map,transform,head));
+      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
+      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
+      A2($Basics._op["++"],
+      head$,
+      A4(composeTiledHtml2,attributes,transform,cols,rest)));
+   });
+   var randomFloats = A2($Signal.sampleOn,
+   $Time.every($Time.second),
+   $Signal.constant(A2($Random.list,10,A2($Random.$float,0,1))));
+   return _elm.Utils.values = {_op: _op
+                              ,randomFloats: randomFloats
+                              ,composeTiledHtml2: composeTiledHtml2
+                              ,composeTiledHtml: composeTiledHtml};
+};
+Elm.BlogList = Elm.BlogList || {};
+Elm.BlogList.make = function (_elm) {
+   "use strict";
+   _elm.BlogList = _elm.BlogList || {};
+   if (_elm.BlogList.values) return _elm.BlogList.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Array = Elm.Array.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Markdown = Elm.Markdown.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Utils = Elm.Utils.make(_elm);
+   var _op = {};
+   var Tick = function (a) {    return {ctor: "Tick",_0: a};};
+   var inputs = $Signal.mergeMany(_U.list([A2($Signal.map,
+   Tick,
+   $Time.every($Time.minute))]));
+   var FocusBlog = function (a) {
+      return {ctor: "FocusBlog",_0: a};
+   };
+   var viewBlog = F2(function (address,blog) {
+      var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
+      var debugContent = _U.list([A2($Html.p,
+      _U.list([]),
+      _U.list([$Html.text(A2($Basics._op["++"],
+      "id: ",
+      $Basics.toString(blog.id)))]))]);
+      var url = _U.list([A2($Html.p,
+      _U.list([]),
+      _U.list([$Html.text(A2($Maybe.withDefault,"",blog.url))]))]);
+      var content = A2($List.map,
+      function (c) {
+         return A2($Html.p,
+         _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                  ,_0: "text-align"
+                                                  ,_1: "left"}]))]),
+         _U.list([$Html.text(c)]));
+      },
+      A2($Maybe.withDefault,_U.list([]),blog.content));
+      var titleContent = _U.list([A2($Html.h3,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                               ,_0: "text-align"
+                                               ,_1: "center"}]))]),
+      _U.list([$Html.text(blog.title)]))]);
+      var allContent = A2($Basics._op["++"],
+      titleContent,
+      A2($Basics._op["++"],
+      content,
+      A2($Basics._op["++"],debugContent,url)));
+      var attributes = _U.list([$Html$Attributes.$class("bloglist-item")
+                               ,A2($Html$Events.onClick,address,FocusBlog(blog.id))]);
+      return A2($Html.th,attributes,allContent);
+   });
+   var view = F2(function (address,model) {
+      var viewCurrBlog = A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                               ,_0: "border-style"
+                                               ,_1: "solid"}]))]),
+      model.currBlog);
+      var numCols = 2;
+      var blogs = A2($Utils.composeTiledHtml,
+      numCols,
+      A2($List.map,
+      function (b) {
+         return A2(viewBlog,address,b);
+      },
+      model.blogs));
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([viewCurrBlog
+              ,A2($Html.h3,
+              _U.list([]),
+              _U.list([$Html.text(A2($Basics._op["++"],
+              "debug: ",
+              A2($Basics._op["++"],
+              model.debug,
+              A2($Basics._op["++"],
+              " currId: ",
+              $Basics.toString(model.currId)))))]))
+              ,A2($Html.table,
+              _U.list([$Html$Attributes.$class("bloglist-table")]),
+              blogs)]));
+   });
+   var LoadBlogMarkdown = function (a) {
+      return {ctor: "LoadBlogMarkdown",_0: a};
+   };
+   var getContent = function (location) {
+      return $Effects.task(A2($Task.map,
+      LoadBlogMarkdown,
+      $Task.toMaybe($Http.getString(location))));
+   };
+   var LoadBlogList = function (a) {
+      return {ctor: "LoadBlogList",_0: a};
+   };
+   var errorBlog = {title: "error"
+                   ,id: 0
+                   ,keywords: $Maybe.Just(_U.list(["error"]))
+                   ,content: $Maybe.Just(_U.list(["error","error"]))
+                   ,url: $Maybe.Just("")};
+   var errorBlogList = {blogs: _U.list([errorBlog])};
+   var Model = F5(function (a,b,c,d,e) {
+      return {blogListFile: a
+             ,blogs: b
+             ,currBlog: c
+             ,debug: d
+             ,currId: e};
+   });
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "LoadBlogList": var blogs = function (_) {
+              return _.blogs;
+           }(A2($Maybe.withDefault,errorBlogList,_p0._0));
+           var populateBlogId = function (b) {
+              return $Basics.snd($List.unzip(A2($List.map,
+              function (_p1) {
+                 var _p2 = _p1;
+                 var _p3 = _p2._0;
+                 return {ctor: "_Tuple2"
+                        ,_0: _p3
+                        ,_1: _U.update(_p2._1,{id: _p3})};
+              },
+              A2($List.indexedMap,
+              F2(function (v0,v1) {
+                 return {ctor: "_Tuple2",_0: v0,_1: v1};
+              }),
+              b))));
+           };
+           var blogs$ = populateBlogId(blogs);
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(model,{blogs: blogs$})
+                  ,_1: $Effects.none};
+         case "LoadBlogMarkdown": var debug = model.debug;
+           var currBlog = $Markdown.toHtml(A2($Maybe.withDefault,
+           "Failed to load!",
+           _p0._0));
+           return {ctor: "_Tuple2"
+                  ,_0: A5(Model,
+                  model.blogListFile,
+                  model.blogs,
+                  _U.list([currBlog]),
+                  debug,
+                  model.currId)
+                  ,_1: $Effects.none};
+         case "FocusBlog":
+         var debug = $Basics.toString($List.length(model.blogs));
+           var blog = A2($Maybe.withDefault,
+           errorBlog,
+           A2($Array.get,_p0._0,$Array.fromList(model.blogs)));
+           var blogMarkdownFile = A2($Maybe.withDefault,"",blog.url);
+           return {ctor: "_Tuple2"
+                  ,_0: A5(Model,
+                  model.blogListFile,
+                  model.blogs,
+                  model.currBlog,
+                  debug,
+                  model.currId)
+                  ,_1: getContent(blogMarkdownFile)};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var Blog = F5(function (a,b,c,d,e) {
+      return {title: a,id: b,keywords: c,content: d,url: e};
+   });
+   var BlogList = function (a) {    return {blogs: a};};
+   var decodeBlogList = A2($Json$Decode.object1,
+   BlogList,
+   A2($Json$Decode._op[":="],
+   "blogs",
+   $Json$Decode.list(A6($Json$Decode.object5,
+   Blog,
+   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
+   $Json$Decode.succeed(-1),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "keywords",
+   $Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "content",
+   $Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "url",
+   $Json$Decode.string))))));
+   var getBlogList = function (location) {
+      return $Effects.task(A2($Task.map,
+      LoadBlogList,
+      $Task.toMaybe(A2($Http.get,decodeBlogList,location))));
+   };
+   var init = function (blogList) {
+      return {ctor: "_Tuple2"
+             ,_0: A5(Model,blogList,_U.list([]),_U.list([]),"debug!",0)
+             ,_1: getBlogList(blogList)};
+   };
+   _op["=>"] = F2(function (v0,v1) {
+      return {ctor: "_Tuple2",_0: v0,_1: v1};
+   });
+   return _elm.BlogList.values = {_op: _op
+                                 ,BlogList: BlogList
+                                 ,Blog: Blog
+                                 ,Model: Model
+                                 ,errorBlogList: errorBlogList
+                                 ,errorBlog: errorBlog
+                                 ,init: init
+                                 ,LoadBlogList: LoadBlogList
+                                 ,LoadBlogMarkdown: LoadBlogMarkdown
+                                 ,FocusBlog: FocusBlog
+                                 ,Tick: Tick
+                                 ,update: update
+                                 ,view: view
+                                 ,viewBlog: viewBlog
+                                 ,inputs: inputs
+                                 ,getBlogList: getBlogList
+                                 ,getContent: getContent
+                                 ,decodeBlogList: decodeBlogList};
+};
+Elm.Building = Elm.Building || {};
+Elm.Building.make = function (_elm) {
+   "use strict";
+   _elm.Building = _elm.Building || {};
+   if (_elm.Building.values) return _elm.Building.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var darkGrey = A4($Color.rgba,50,50,50,0.6);
+   var glassWindowToForm = function (window) {
+      return A2($Graphics$Collage.move,
+      {ctor: "_Tuple2"
+      ,_0: window.x + window.w / 2
+      ,_1: window.y + window.h / 2},
+      A2($Graphics$Collage.filled,
+      darkGrey,
+      A2($Graphics$Collage.rect,window.w,window.h)));
+   };
+   var clearGrey = A4($Color.rgba,111,111,111,0.6);
+   var displayBuilding = function (b) {
+      var windows = A2($List.map,
+      glassWindowToForm,
+      A2($List.map,
+      function (a) {
+         return _U.update(a,{x: a.x + b.x,y: a.y + b.y});
+      },
+      b.windows));
+      var allForms = A2($Basics._op["++"],
+      _U.list([A2($Graphics$Collage.move,
+      {ctor: "_Tuple2",_0: b.x + b.w / 2,_1: b.y + b.h / 2},
+      A2($Graphics$Collage.filled,
+      clearGrey,
+      A2($Graphics$Collage.rect,b.w,b.h)))]),
+      windows);
+      return $Graphics$Collage.group(allForms);
+   };
+   var Building = F6(function (a,b,c,d,e,f) {
+      return {x: a,y: b,w: c,h: d,layer: e,windows: f};
+   });
+   var newGlassWindow = F4(function (x$,y$,w$,h$) {
+      return {x: x$,y: y$,w: w$,h: h$};
+   });
+   var GlassWindow = F4(function (a,b,c,d) {
+      return {x: a,y: b,w: c,h: d};
+   });
+   var buildingWidth = 30;
+   var glassWindowSpacing = {w: 3,h: 3};
+   var glassWindowSize = {w: 5,h: 9};
+   var generateGlassWindows = F7(function (x,
+   y,
+   w,
+   h,
+   xSpacing,
+   ySpacing,
+   windows) {
+      generateGlassWindows: while (true)
+      if (_U.cmp(x + glassWindowSize.w + xSpacing,w) > 0)
+      return windows;
+      else if (_U.cmp(y + glassWindowSize.h + ySpacing,h) > 0) {
+               var _v0 = x + glassWindowSize.w + xSpacing,
+               _v1 = ySpacing,
+               _v2 = w,
+               _v3 = h,
+               _v4 = xSpacing,
+               _v5 = ySpacing,
+               _v6 = windows;
+               x = _v0;
+               y = _v1;
+               w = _v2;
+               h = _v3;
+               xSpacing = _v4;
+               ySpacing = _v5;
+               windows = _v6;
+               continue generateGlassWindows;
+            } else {
+               var _v7 = x,
+               _v8 = y + glassWindowSize.h + ySpacing,
+               _v9 = w,
+               _v10 = h,
+               _v11 = xSpacing,
+               _v12 = ySpacing,
+               _v13 = A2($Basics._op["++"],
+               windows,
+               _U.list([A4(newGlassWindow,
+               x,
+               y,
+               glassWindowSize.w,
+               glassWindowSize.h)]));
+               x = _v7;
+               y = _v8;
+               w = _v9;
+               h = _v10;
+               xSpacing = _v11;
+               ySpacing = _v12;
+               windows = _v13;
+               continue generateGlassWindows;
+            }
+   });
+   var Size = F2(function (a,b) {    return {w: a,h: b};});
+   var Static = {ctor: "Static"};
+   var isStatic = function (b) {    return _U.eq(b.layer,Static);};
+   var Back = {ctor: "Back"};
+   var isBack = function (b) {    return _U.eq(b.layer,Back);};
+   var Middle = {ctor: "Middle"};
+   var isMiddle = function (b) {    return _U.eq(b.layer,Middle);};
+   var Front = {ctor: "Front"};
+   var isFront = function (b) {    return _U.eq(b.layer,Front);};
+   var nullBuilding = {x: 0
+                      ,y: 0
+                      ,w: buildingWidth
+                      ,h: 0
+                      ,layer: Front
+                      ,windows: _U.list([])};
+   var newBuilding = F4(function (x$,y$,h$,l$) {
+      var w$ = buildingWidth;
+      return _U.update(nullBuilding,
+      {x: x$
+      ,y: y$
+      ,w: w$
+      ,h: h$
+      ,layer: l$
+      ,windows: A7(generateGlassWindows,
+      glassWindowSpacing.w,
+      glassWindowSpacing.h,
+      w$,
+      h$,
+      glassWindowSpacing.w,
+      glassWindowSpacing.h,
+      _U.list([]))});
+   });
+   return _elm.Building.values = {_op: _op
+                                 ,Front: Front
+                                 ,Middle: Middle
+                                 ,Back: Back
+                                 ,Static: Static
+                                 ,Size: Size
+                                 ,glassWindowSize: glassWindowSize
+                                 ,glassWindowSpacing: glassWindowSpacing
+                                 ,buildingWidth: buildingWidth
+                                 ,isBack: isBack
+                                 ,isMiddle: isMiddle
+                                 ,isFront: isFront
+                                 ,isStatic: isStatic
+                                 ,GlassWindow: GlassWindow
+                                 ,newGlassWindow: newGlassWindow
+                                 ,generateGlassWindows: generateGlassWindows
+                                 ,Building: Building
+                                 ,newBuilding: newBuilding
+                                 ,nullBuilding: nullBuilding
+                                 ,clearGrey: clearGrey
+                                 ,darkGrey: darkGrey
+                                 ,glassWindowToForm: glassWindowToForm
+                                 ,displayBuilding: displayBuilding};
+};
+Elm.Set = Elm.Set || {};
+Elm.Set.make = function (_elm) {
+   "use strict";
+   _elm.Set = _elm.Set || {};
+   if (_elm.Set.values) return _elm.Set.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm);
+   var _op = {};
+   var foldr = F3(function (f,b,_p0) {
+      var _p1 = _p0;
+      return A3($Dict.foldr,
+      F3(function (k,_p2,b) {    return A2(f,k,b);}),
+      b,
+      _p1._0);
+   });
+   var foldl = F3(function (f,b,_p3) {
+      var _p4 = _p3;
+      return A3($Dict.foldl,
+      F3(function (k,_p5,b) {    return A2(f,k,b);}),
+      b,
+      _p4._0);
+   });
+   var toList = function (_p6) {
+      var _p7 = _p6;
+      return $Dict.keys(_p7._0);
+   };
+   var size = function (_p8) {
+      var _p9 = _p8;
+      return $Dict.size(_p9._0);
+   };
+   var member = F2(function (k,_p10) {
+      var _p11 = _p10;
+      return A2($Dict.member,k,_p11._0);
+   });
+   var isEmpty = function (_p12) {
+      var _p13 = _p12;
+      return $Dict.isEmpty(_p13._0);
+   };
+   var Set_elm_builtin = function (a) {
+      return {ctor: "Set_elm_builtin",_0: a};
+   };
+   var empty = Set_elm_builtin($Dict.empty);
+   var singleton = function (k) {
+      return Set_elm_builtin(A2($Dict.singleton,
+      k,
+      {ctor: "_Tuple0"}));
+   };
+   var insert = F2(function (k,_p14) {
+      var _p15 = _p14;
+      return Set_elm_builtin(A3($Dict.insert,
+      k,
+      {ctor: "_Tuple0"},
+      _p15._0));
+   });
+   var fromList = function (xs) {
+      return A3($List.foldl,insert,empty,xs);
+   };
+   var map = F2(function (f,s) {
+      return fromList(A2($List.map,f,toList(s)));
+   });
+   var remove = F2(function (k,_p16) {
+      var _p17 = _p16;
+      return Set_elm_builtin(A2($Dict.remove,k,_p17._0));
+   });
+   var union = F2(function (_p19,_p18) {
+      var _p20 = _p19;
+      var _p21 = _p18;
+      return Set_elm_builtin(A2($Dict.union,_p20._0,_p21._0));
+   });
+   var intersect = F2(function (_p23,_p22) {
+      var _p24 = _p23;
+      var _p25 = _p22;
+      return Set_elm_builtin(A2($Dict.intersect,_p24._0,_p25._0));
+   });
+   var diff = F2(function (_p27,_p26) {
+      var _p28 = _p27;
+      var _p29 = _p26;
+      return Set_elm_builtin(A2($Dict.diff,_p28._0,_p29._0));
+   });
+   var filter = F2(function (p,_p30) {
+      var _p31 = _p30;
+      return Set_elm_builtin(A2($Dict.filter,
+      F2(function (k,_p32) {    return p(k);}),
+      _p31._0));
+   });
+   var partition = F2(function (p,_p33) {
+      var _p34 = _p33;
+      var _p35 = A2($Dict.partition,
+      F2(function (k,_p36) {    return p(k);}),
+      _p34._0);
+      var p1 = _p35._0;
+      var p2 = _p35._1;
+      return {ctor: "_Tuple2"
+             ,_0: Set_elm_builtin(p1)
+             ,_1: Set_elm_builtin(p2)};
+   });
+   return _elm.Set.values = {_op: _op
+                            ,empty: empty
+                            ,singleton: singleton
+                            ,insert: insert
+                            ,remove: remove
+                            ,isEmpty: isEmpty
+                            ,member: member
+                            ,size: size
+                            ,foldl: foldl
+                            ,foldr: foldr
+                            ,map: map
+                            ,filter: filter
+                            ,partition: partition
+                            ,union: union
+                            ,intersect: intersect
+                            ,diff: diff
+                            ,toList: toList
+                            ,fromList: fromList};
+};
+Elm.Native.Keyboard = {};
+
+Elm.Native.Keyboard.make = function(localRuntime) {
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
+	if (localRuntime.Native.Keyboard.values)
+	{
+		return localRuntime.Native.Keyboard.values;
+	}
+
+	var NS = Elm.Native.Signal.make(localRuntime);
+
+
+	function keyEvent(event)
+	{
+		return {
+			alt: event.altKey,
+			meta: event.metaKey,
+			keyCode: event.keyCode
+		};
+	}
+
+
+	function keyStream(node, eventName, handler)
+	{
+		var stream = NS.input(eventName, { alt: false, meta: false, keyCode: 0 });
+
+		localRuntime.addListener([stream.id], node, eventName, function(e) {
+			localRuntime.notify(stream.id, handler(e));
+		});
+
+		return stream;
+	}
+
+	var downs = keyStream(document, 'keydown', keyEvent);
+	var ups = keyStream(document, 'keyup', keyEvent);
+	var presses = keyStream(document, 'keypress', keyEvent);
+	var blurs = keyStream(window, 'blur', function() { return null; });
+
+
+	return localRuntime.Native.Keyboard.values = {
+		downs: downs,
+		ups: ups,
+		blurs: blurs,
+		presses: presses
+	};
+};
+
+Elm.Keyboard = Elm.Keyboard || {};
+Elm.Keyboard.make = function (_elm) {
+   "use strict";
+   _elm.Keyboard = _elm.Keyboard || {};
+   if (_elm.Keyboard.values) return _elm.Keyboard.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Char = Elm.Char.make(_elm),
+   $Native$Keyboard = Elm.Native.Keyboard.make(_elm),
+   $Set = Elm.Set.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var presses = A2($Signal.map,
+   function (_) {
+      return _.keyCode;
+   },
+   $Native$Keyboard.presses);
+   var toXY = F2(function (_p0,keyCodes) {
+      var _p1 = _p0;
+      var is = function (keyCode) {
+         return A2($Set.member,keyCode,keyCodes) ? 1 : 0;
+      };
+      return {x: is(_p1.right) - is(_p1.left)
+             ,y: is(_p1.up) - is(_p1.down)};
+   });
+   var Directions = F4(function (a,b,c,d) {
+      return {up: a,down: b,left: c,right: d};
+   });
+   var dropMap = F2(function (f,signal) {
+      return $Signal.dropRepeats(A2($Signal.map,f,signal));
+   });
+   var EventInfo = F3(function (a,b,c) {
+      return {alt: a,meta: b,keyCode: c};
+   });
+   var Blur = {ctor: "Blur"};
+   var Down = function (a) {    return {ctor: "Down",_0: a};};
+   var Up = function (a) {    return {ctor: "Up",_0: a};};
+   var rawEvents = $Signal.mergeMany(_U.list([A2($Signal.map,
+                                             Up,
+                                             $Native$Keyboard.ups)
+                                             ,A2($Signal.map,Down,$Native$Keyboard.downs)
+                                             ,A2($Signal.map,$Basics.always(Blur),$Native$Keyboard.blurs)]));
+   var empty = {alt: false,meta: false,keyCodes: $Set.empty};
+   var update = F2(function (event,model) {
+      var _p2 = event;
+      switch (_p2.ctor)
+      {case "Down": var _p3 = _p2._0;
+           return {alt: _p3.alt
+                  ,meta: _p3.meta
+                  ,keyCodes: A2($Set.insert,_p3.keyCode,model.keyCodes)};
+         case "Up": var _p4 = _p2._0;
+           return {alt: _p4.alt
+                  ,meta: _p4.meta
+                  ,keyCodes: A2($Set.remove,_p4.keyCode,model.keyCodes)};
+         default: return empty;}
+   });
+   var model = A3($Signal.foldp,update,empty,rawEvents);
+   var alt = A2(dropMap,function (_) {    return _.alt;},model);
+   var meta = A2(dropMap,function (_) {    return _.meta;},model);
+   var keysDown = A2(dropMap,
+   function (_) {
+      return _.keyCodes;
+   },
+   model);
+   var arrows = A2(dropMap,
+   toXY({up: 38,down: 40,left: 37,right: 39}),
+   keysDown);
+   var wasd = A2(dropMap,
+   toXY({up: 87,down: 83,left: 65,right: 68}),
+   keysDown);
+   var isDown = function (keyCode) {
+      return A2(dropMap,$Set.member(keyCode),keysDown);
+   };
+   var ctrl = isDown(17);
+   var shift = isDown(16);
+   var space = isDown(32);
+   var enter = isDown(13);
+   var Model = F3(function (a,b,c) {
+      return {alt: a,meta: b,keyCodes: c};
+   });
+   return _elm.Keyboard.values = {_op: _op
+                                 ,arrows: arrows
+                                 ,wasd: wasd
+                                 ,enter: enter
+                                 ,space: space
+                                 ,ctrl: ctrl
+                                 ,shift: shift
+                                 ,alt: alt
+                                 ,meta: meta
+                                 ,isDown: isDown
+                                 ,keysDown: keysDown
+                                 ,presses: presses};
+};
+Elm.Native = Elm.Native || {};
+Elm.Native.Mouse = {};
+Elm.Native.Mouse.make = function(localRuntime) {
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Mouse = localRuntime.Native.Mouse || {};
+	if (localRuntime.Native.Mouse.values)
+	{
+		return localRuntime.Native.Mouse.values;
+	}
+
+	var NS = Elm.Native.Signal.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+
+	var position = NS.input('Mouse.position', Utils.Tuple2(0, 0));
+
+	var isDown = NS.input('Mouse.isDown', false);
+
+	var clicks = NS.input('Mouse.clicks', Utils.Tuple0);
+
+	var node = localRuntime.isFullscreen()
+		? document
+		: localRuntime.node;
+
+	localRuntime.addListener([clicks.id], node, 'click', function click() {
+		localRuntime.notify(clicks.id, Utils.Tuple0);
+	});
+	localRuntime.addListener([isDown.id], node, 'mousedown', function down() {
+		localRuntime.notify(isDown.id, true);
+	});
+	localRuntime.addListener([isDown.id], node, 'mouseup', function up() {
+		localRuntime.notify(isDown.id, false);
+	});
+	localRuntime.addListener([position.id], node, 'mousemove', function move(e) {
+		localRuntime.notify(position.id, Utils.getXY(e));
+	});
+
+	return localRuntime.Native.Mouse.values = {
+		position: position,
+		isDown: isDown,
+		clicks: clicks
+	};
+};
+
+Elm.Mouse = Elm.Mouse || {};
+Elm.Mouse.make = function (_elm) {
+   "use strict";
+   _elm.Mouse = _elm.Mouse || {};
+   if (_elm.Mouse.values) return _elm.Mouse.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Native$Mouse = Elm.Native.Mouse.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var clicks = $Native$Mouse.clicks;
+   var isDown = $Native$Mouse.isDown;
+   var position = $Native$Mouse.position;
+   var x = A2($Signal.map,$Basics.fst,position);
+   var y = A2($Signal.map,$Basics.snd,position);
+   return _elm.Mouse.values = {_op: _op
+                              ,position: position
+                              ,x: x
+                              ,y: y
+                              ,isDown: isDown
+                              ,clicks: clicks};
 };
 Elm.Native = Elm.Native || {};
 Elm.Native.Window = {};
@@ -14035,7 +14028,7 @@ Elm.ProjectList.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
-   var viewProject = function (project) {
+   var viewProject = F2(function (address,project) {
       var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
       var previewsContent = A2($List.map,
       function (path) {
@@ -14120,27 +14113,21 @@ Elm.ProjectList.make = function (_elm) {
       A2($Basics._op["++"],
       downloadUrlContent,
       A2($Basics._op["++"],$break,previewsContent))))))))));
-      return content;
-   };
-   var viewProjects = function (projects) {
-      var classname = "projectlist";
-      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
-      classname,
-      "-item"))]);
-      var numCols = 3;
-      var projects$ = A4($Utils.composeTiledHtml,
-      attributes,
-      viewProject,
-      numCols,
-      projects);
-      return A2($Html.table,
-      _U.list([$Html$Attributes.$class(classname)]),
-      projects$);
-   };
+      return A2($Html.th,
+      _U.list([$Html$Attributes.$class("projectlist-item")]),
+      content);
+   });
    var view = F2(function (address,model) {
-      var projects = viewProjects(model.projects);
-      var numProjects = $Basics.toString($List.length(model.projects));
-      return A2($Html.div,_U.list([]),_U.list([projects]));
+      var attributes = _U.list([$Html$Attributes.$class("projectlist-table")]);
+      var numCols = 3;
+      var projects = A2($Utils.composeTiledHtml,
+      numCols,
+      A2($List.map,
+      function (p) {
+         return A2(viewProject,address,p);
+      },
+      model.projects));
+      return A2($Html.table,attributes,projects);
    });
    var Refresh = function (a) {
       return {ctor: "Refresh",_0: a};
@@ -14252,7 +14239,6 @@ Elm.ProjectList.make = function (_elm) {
                                     ,Refresh: Refresh
                                     ,update: update
                                     ,view: view
-                                    ,viewProjects: viewProjects
                                     ,viewProject: viewProject
                                     ,getProjectData: getProjectData
                                     ,decodeData: decodeData};
@@ -14277,42 +14263,36 @@ Elm.SummaryList.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
-   var viewSummary = function (summary) {
-      var classname = "summarylist-item";
+   var viewSummary = F2(function (address,summary) {
       var contents = A2($List.map,
       function (s) {
          return A2($Html.li,_U.list([]),_U.list([$Html.text(s)]));
       },
       summary.contents);
-      return _U.list([A2($Html.h2,
-                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                              ,_0: "text-align"
-                                                              ,_1: "center"}]))]),
-                     _U.list([$Html.text(summary.title)]))
-                     ,A2($Html.ul,
-                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                              ,_0: "text-align"
-                                                              ,_1: "left"}]))]),
-                     contents)]);
-   };
-   var viewSummaries = function (summaryData) {
-      var classname = "summarylist";
-      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
-      classname,
-      "-item"))]);
-      var numCols = 2;
-      var summaryData$ = A4($Utils.composeTiledHtml,
-      attributes,
-      viewSummary,
-      numCols,
-      summaryData);
-      return A2($Html.table,
-      _U.list([$Html$Attributes.$class(classname)]),
-      summaryData$);
-   };
+      return A2($Html.th,
+      _U.list([$Html$Attributes.$class("summarylist-item")]),
+      _U.list([A2($Html.h2,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "text-align"
+                                                       ,_1: "center"}]))]),
+              _U.list([$Html.text(summary.title)]))
+              ,A2($Html.ul,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "text-align"
+                                                       ,_1: "left"}]))]),
+              contents)]));
+   });
    var view = F2(function (address,model) {
-      var summaryData = viewSummaries(model.summaryData.summaries);
-      return A2($Html.div,_U.list([]),_U.list([summaryData]));
+      var attributes = _U.list([$Html$Attributes.$class("summarylist-table")]);
+      var numCols = 2;
+      var summaryData = A2($Utils.composeTiledHtml,
+      numCols,
+      A2($List.map,
+      function (s) {
+         return A2(viewSummary,address,s);
+      },
+      model.summaryData.summaries));
+      return A2($Html.table,attributes,summaryData);
    });
    var Refresh = function (a) {
       return {ctor: "Refresh",_0: a};
@@ -14375,7 +14355,6 @@ Elm.SummaryList.make = function (_elm) {
                                     ,Refresh: Refresh
                                     ,update: update
                                     ,view: view
-                                    ,viewSummaries: viewSummaries
                                     ,viewSummary: viewSummary
                                     ,getData: getData
                                     ,decodeData: decodeData};

@@ -114,31 +114,19 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
     let
-        numProjects = toString (List.length model.projects)
+        numCols = 3
+        attributes = [ class "projectlist-table" ]
 
         projects =
             model.projects
-                |> viewProjects
+                |> List.map (\p -> viewProject address p)
+                |> composeTiledHtml numCols
+
     in
-        div []
-            [ projects ]
+        table attributes projects
 
-viewProjects : List Project -> Html
-viewProjects projects =
-    let
-        numCols = 3
-        classname = "projectlist"
-        attributes = [ class (classname ++ "-item") ]
-
-        projects' =
-            projects
-                |> composeTiledHtml attributes viewProject numCols
-    in
-        table [ class classname ]
-            projects'
-
-viewProject : Project -> List Html
-viewProject project =
+viewProject : Signal.Address Action -> Project -> Html
+viewProject address project =
     let
         titleContent =
             [ h3 [] [ text project.title ] ]
@@ -188,7 +176,7 @@ viewProject project =
             ++ break
             ++ previewsContent
     in
-        content
+        th [class "projectlist-item"] content
 
 -- EFFECTS
 
