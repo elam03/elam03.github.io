@@ -12581,29 +12581,11 @@ Elm.Utils.make = function (_elm) {
       _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
       A2($Basics._op["++"],head$,A2(composeTiledHtml,cols,rest)));
    });
-   var composeTiledHtml2 = F4(function (attributes,
-   transform,
-   cols,
-   list) {
-      var rest = A2($List.drop,cols,list);
-      var head = A2($List.take,cols,list);
-      var head$ = A2($List.map,
-      function (a) {
-         return A2($Html.th,attributes,a);
-      },
-      A2($List.map,transform,head));
-      return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
-      _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
-      A2($Basics._op["++"],
-      head$,
-      A4(composeTiledHtml2,attributes,transform,cols,rest)));
-   });
    var randomFloats = A2($Signal.sampleOn,
    $Time.every($Time.second),
    $Signal.constant(A2($Random.list,10,A2($Random.$float,0,1))));
    return _elm.Utils.values = {_op: _op
                               ,randomFloats: randomFloats
-                              ,composeTiledHtml2: composeTiledHtml2
                               ,composeTiledHtml: composeTiledHtml};
 };
 Elm.BlogList = Elm.BlogList || {};

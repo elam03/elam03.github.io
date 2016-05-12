@@ -19,7 +19,7 @@ Elm.ProjectList.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
-   var viewProject = function (project) {
+   var viewProject = F2(function (address,project) {
       var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
       var previewsContent = A2($List.map,
       function (path) {
@@ -104,27 +104,21 @@ Elm.ProjectList.make = function (_elm) {
       A2($Basics._op["++"],
       downloadUrlContent,
       A2($Basics._op["++"],$break,previewsContent))))))))));
-      return content;
-   };
-   var viewProjects = function (projects) {
-      var classname = "projectlist";
-      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
-      classname,
-      "-item"))]);
-      var numCols = 3;
-      var projects$ = A4($Utils.composeTiledHtml,
-      attributes,
-      viewProject,
-      numCols,
-      projects);
-      return A2($Html.table,
-      _U.list([$Html$Attributes.$class(classname)]),
-      projects$);
-   };
+      return A2($Html.th,
+      _U.list([$Html$Attributes.$class("projectlist-item")]),
+      content);
+   });
    var view = F2(function (address,model) {
-      var projects = viewProjects(model.projects);
-      var numProjects = $Basics.toString($List.length(model.projects));
-      return A2($Html.div,_U.list([]),_U.list([projects]));
+      var attributes = _U.list([$Html$Attributes.$class("projectlist-table")]);
+      var numCols = 3;
+      var projects = A2($Utils.composeTiledHtml,
+      numCols,
+      A2($List.map,
+      function (p) {
+         return A2(viewProject,address,p);
+      },
+      model.projects));
+      return A2($Html.table,attributes,projects);
    });
    var Refresh = function (a) {
       return {ctor: "Refresh",_0: a};
@@ -236,7 +230,6 @@ Elm.ProjectList.make = function (_elm) {
                                     ,Refresh: Refresh
                                     ,update: update
                                     ,view: view
-                                    ,viewProjects: viewProjects
                                     ,viewProject: viewProject
                                     ,getProjectData: getProjectData
                                     ,decodeData: decodeData};

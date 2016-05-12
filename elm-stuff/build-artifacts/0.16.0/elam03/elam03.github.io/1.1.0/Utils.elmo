@@ -9,26 +9,23 @@ Elm.Utils.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Random = Elm.Random.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
    var _op = {};
-   var composeTiledHtml = F4(function (attributes,
-   transform,
-   cols,
-   list) {
+   var composeTiledHtml = F2(function (cols,list) {
       var rest = A2($List.drop,cols,list);
       var head = A2($List.take,cols,list);
-      var head$ = A2($List.map,
-      function (a) {
-         return A2($Html.th,attributes,a);
-      },
-      A2($List.map,transform,head));
+      var head$ = head;
       return $List.isEmpty(head) ? _U.list([]) : A2($Basics._op["++"],
       _U.list([A2($Html.tr,_U.list([]),_U.list([]))]),
-      A2($Basics._op["++"],
-      head$,
-      A4(composeTiledHtml,attributes,transform,cols,rest)));
+      A2($Basics._op["++"],head$,A2(composeTiledHtml,cols,rest)));
    });
+   var randomFloats = A2($Signal.sampleOn,
+   $Time.every($Time.second),
+   $Signal.constant(A2($Random.list,10,A2($Random.$float,0,1))));
    return _elm.Utils.values = {_op: _op
+                              ,randomFloats: randomFloats
                               ,composeTiledHtml: composeTiledHtml};
 };

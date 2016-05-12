@@ -18,42 +18,36 @@ Elm.SummaryList.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
-   var viewSummary = function (summary) {
-      var classname = "summarylist-item";
+   var viewSummary = F2(function (address,summary) {
       var contents = A2($List.map,
       function (s) {
          return A2($Html.li,_U.list([]),_U.list([$Html.text(s)]));
       },
       summary.contents);
-      return _U.list([A2($Html.h2,
-                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                              ,_0: "text-align"
-                                                              ,_1: "center"}]))]),
-                     _U.list([$Html.text(summary.title)]))
-                     ,A2($Html.ul,
-                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                              ,_0: "text-align"
-                                                              ,_1: "left"}]))]),
-                     contents)]);
-   };
-   var viewSummaries = function (summaryData) {
-      var classname = "summarylist";
-      var attributes = _U.list([$Html$Attributes.$class(A2($Basics._op["++"],
-      classname,
-      "-item"))]);
-      var numCols = 2;
-      var summaryData$ = A4($Utils.composeTiledHtml,
-      attributes,
-      viewSummary,
-      numCols,
-      summaryData);
-      return A2($Html.table,
-      _U.list([$Html$Attributes.$class(classname)]),
-      summaryData$);
-   };
+      return A2($Html.th,
+      _U.list([$Html$Attributes.$class("summarylist-item")]),
+      _U.list([A2($Html.h2,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "text-align"
+                                                       ,_1: "center"}]))]),
+              _U.list([$Html.text(summary.title)]))
+              ,A2($Html.ul,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                       ,_0: "text-align"
+                                                       ,_1: "left"}]))]),
+              contents)]));
+   });
    var view = F2(function (address,model) {
-      var summaryData = viewSummaries(model.summaryData.summaries);
-      return A2($Html.div,_U.list([]),_U.list([summaryData]));
+      var attributes = _U.list([$Html$Attributes.$class("summarylist-table")]);
+      var numCols = 2;
+      var summaryData = A2($Utils.composeTiledHtml,
+      numCols,
+      A2($List.map,
+      function (s) {
+         return A2(viewSummary,address,s);
+      },
+      model.summaryData.summaries));
+      return A2($Html.table,attributes,summaryData);
    });
    var Refresh = function (a) {
       return {ctor: "Refresh",_0: a};
@@ -116,7 +110,6 @@ Elm.SummaryList.make = function (_elm) {
                                     ,Refresh: Refresh
                                     ,update: update
                                     ,view: view
-                                    ,viewSummaries: viewSummaries
                                     ,viewSummary: viewSummary
                                     ,getData: getData
                                     ,decodeData: decodeData};
