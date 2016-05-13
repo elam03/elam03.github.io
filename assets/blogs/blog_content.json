@@ -1,0 +1,15 @@
+{
+    "blogs":
+    [
+        {
+            "title": "Initial Thoughts on elm",
+            "keywords":
+            [
+                "firstpost",
+                "elm"
+            ],
+            "date": "5/12/2016",
+            "url": "assets/blogs/initial_thoughts_on_elm.md"
+        }
+    ]
+}

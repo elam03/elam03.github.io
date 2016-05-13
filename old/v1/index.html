@@ -1,70 +1,14 @@
 <!DOCTYPE html>
-
-<html ng-app="elam03.github.io.app">
-
+<html>
     <head>
-        <meta charset="UTF-8">
+        <meta charset="utf-8">
         <title>elam03.github.io</title>
+        <link rel="stylesheet" href="css/style.css">
     </head>
-
     <body>
-        <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="style.css" type="text/css" media="screen" />
-        <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
-        <script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
-        <script type="text/javascript" src="bower_components/angular-touch/angular-touch.min.js"></script>
-        <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-        <script type="text/javascript" src="app.js"></script>
-
-        <!-- <h1>Welcome to elam03.github.ui!</h1> -->
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">Eric Lam</a>
-            </div>
-
-            <ul class="nav navbar-nav">
-                <li data-match-route="/$"><a href="#/">Home</a></li>
-            </ul>
-        </nav>
-
-        <div ng-controller="TabsController">
-            <uib-tabset>
-                <uib-tab heading="Projects">
-                    <div ng-controller="ProjectsCarouselCtrl">
-                        <div>
-                            <uib-carousel interval="myInterval" no-wrap="noWrapSlides" class="carousel-style">
-                                <uib-slide ng-repeat="slide in slides" active="slide.active" class="slide-style">
-                                    <div class="slide-caption">
-                                        <p>{{slide.text}}</p>
-                                        <a href="{{slide.link}}">Download Link</a>
-                                    </div>
-                                    <img ng-src="{{slide.image}}" class="slide-img">
-                                </uib-slide>
-                            </uib-carousel>
-                        </div>
-                    </div>
-                </uib-tab>
-
-                <!-- <uib-tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disable="tab.disabled">
-                    <p ng-repeat="content in tab.contents">{{content}}</p>
-                </uib-tab> -->
-
-                <uib-tab heading="Summary">
-
-                    <div ng-repeat="detail in details" class="detail-style">
-                        <h1>{{detail.title}}</h1>
-                        <ul>
-                            <li ng-repeat="content in detail.contents">{{content}}</li>
-                        </ul>
-                    </div>
-                    <!-- <p ng-repeat="content in tab.contents">{{content}}</p> -->
-                </uib-tab>
-
-                <uib-tab heading="cityscape-in-elm">
-                    <a class="navbar-brand" href="/cityscape-in-elm/index.html">cityscape-in-elm</a>
-                </uib-tab>
-            </uib-tabset>
-        </div>
+        <script src="gen/main.js"></script>
+        <script>
+            Elm.fullscreen(Elm.Main);
+        </script>
     </body>
-
 </html>
