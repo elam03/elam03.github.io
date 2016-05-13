@@ -12625,8 +12625,6 @@ Elm.BlogList.make = function (_elm) {
    };
    var viewBlog = F2(function (address,blog) {
       var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
-      var debugContent = _U.list([]);
-      var urlContent = _U.list([]);
       var keywordContent = function () {
          var allKeywords = A3($List.foldl,
          F2(function (x,y) {    return A2($Basics._op["++"],x,y);}),
@@ -12638,6 +12636,11 @@ Elm.BlogList.make = function (_elm) {
          _U.list([]),
          _U.list([$Html.text(allKeywords)]))]);
       }();
+      var dateContent = _U.list([A2($Html.h4,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                               ,_0: "text-align"
+                                               ,_1: "center"}]))]),
+      _U.list([$Html.text(A2($Maybe.withDefault,"",blog.date))]))]);
       var titleContent = _U.list([A2($Html.h3,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                ,_0: "text-align"
@@ -12645,9 +12648,7 @@ Elm.BlogList.make = function (_elm) {
       _U.list([$Html.text(blog.title)]))]);
       var allContent = A2($Basics._op["++"],
       titleContent,
-      A2($Basics._op["++"],
-      keywordContent,
-      A2($Basics._op["++"],urlContent,debugContent)));
+      A2($Basics._op["++"],dateContent,keywordContent));
       var attributes = _U.list([classStyle
                                ,A2($Html$Events.onClick,address,FocusBlog(blog.id))
                                ,A2($Html$Events.onMouseMove,address,HoverBlog(blog.id))]);
@@ -12694,9 +12695,9 @@ Elm.BlogList.make = function (_elm) {
    };
    var errorBlog = {title: "error"
                    ,id: 0
+                   ,date: $Maybe.Just("")
                    ,keywords: $Maybe.Just(_U.list(["error"]))
                    ,url: $Maybe.Just("")};
-   var errorBlogList = {blogs: _U.list([errorBlog])};
    var Model = F5(function (a,b,c,d,e) {
       return {blogListFile: a
              ,blogs: b
@@ -12704,13 +12705,27 @@ Elm.BlogList.make = function (_elm) {
              ,debug: d
              ,currId: e};
    });
+   var Blog = F5(function (a,b,c,d,e) {
+      return {title: a,id: b,date: c,keywords: d,url: e};
+   });
+   var decodeBlog = A6($Json$Decode.object5,
+   Blog,
+   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
+   $Json$Decode.succeed(-1),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "date",
+   $Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "keywords",
+   $Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],
+   "url",
+   $Json$Decode.string)));
+   var BlogList = function (a) {    return {blogs: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "LoadBlogList": var blogs = function (_) {
-              return _.blogs;
-           }(A2($Maybe.withDefault,errorBlogList,_p0._0));
-           var populateBlogId = function (b) {
+      {case "LoadBlogList": var populateBlogId = function (b) {
               return $Basics.snd($List.unzip(A2($List.map,
               function (_p1) {
                  var _p2 = _p1;
@@ -12725,9 +12740,11 @@ Elm.BlogList.make = function (_elm) {
               }),
               b))));
            };
-           var blogs$ = populateBlogId(blogs);
+           var blogs = populateBlogId(function (_) {
+              return _.blogs;
+           }(A2($Maybe.withDefault,BlogList(_U.list([])),_p0._0)));
            return {ctor: "_Tuple2"
-                  ,_0: _U.update(model,{blogs: blogs$})
+                  ,_0: _U.update(model,{blogs: blogs})
                   ,_1: $Effects.none};
          case "LoadBlogMarkdown": var debug = model.debug;
            var currBlog = $Markdown.toHtml(A2($Maybe.withDefault,
@@ -12760,24 +12777,11 @@ Elm.BlogList.make = function (_elm) {
                                   ,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
-   var Blog = F4(function (a,b,c,d) {
-      return {title: a,id: b,keywords: c,url: d};
-   });
-   var BlogList = function (a) {    return {blogs: a};};
    var decodeBlogList = A2($Json$Decode.object1,
    BlogList,
    A2($Json$Decode._op[":="],
    "blogs",
-   $Json$Decode.list(A5($Json$Decode.object4,
-   Blog,
-   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
-   $Json$Decode.succeed(-1),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
-   "keywords",
-   $Json$Decode.list($Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
-   "url",
-   $Json$Decode.string))))));
+   $Json$Decode.list(decodeBlog)));
    var getBlogList = function (location) {
       return $Effects.task(A2($Task.map,
       LoadBlogList,
@@ -12795,7 +12799,6 @@ Elm.BlogList.make = function (_elm) {
                                  ,BlogList: BlogList
                                  ,Blog: Blog
                                  ,Model: Model
-                                 ,errorBlogList: errorBlogList
                                  ,errorBlog: errorBlog
                                  ,init: init
                                  ,LoadBlogList: LoadBlogList
@@ -12810,6 +12813,7 @@ Elm.BlogList.make = function (_elm) {
                                  ,inputs: inputs
                                  ,getBlogList: getBlogList
                                  ,getContent: getContent
+                                 ,decodeBlog: decodeBlog
                                  ,decodeBlogList: decodeBlogList};
 };
 Elm.Building = Elm.Building || {};

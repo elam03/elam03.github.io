@@ -27,6 +27,7 @@ type alias BlogList =
 type alias Blog =
     { title : String
     , id : ID
+    , date : Maybe String
     , keywords : Maybe (List String)
     , url : Maybe String
     }
@@ -39,15 +40,11 @@ type alias Model =
     , currId : ID
     }
 
-errorBlogList : BlogList
-errorBlogList =
-    { blogs = [ errorBlog ]
-    }
-
 errorBlog : Blog
 errorBlog =
     { title = "error"
     , id = 0
+    , date = Just ""
     , keywords = Just ["error"]
     , url = Just ""
     }
@@ -81,12 +78,11 @@ update action model =
 
                 blogs =
                     maybeBlogsList
-                        |> Maybe.withDefault errorBlogList
+                        |> Maybe.withDefault (BlogList [])
                         |> .blogs
-
-                blogs' = populateBlogId blogs
+                        |> populateBlogId
             in
-                ( { model | blogs = blogs' }
+                ( { model | blogs = blogs }
                 , Effects.none
                 )
 
@@ -170,35 +166,25 @@ viewBlog address blog =
         titleContent =
             [ h3 [ style [ ("text-align", "center") ] ] [ text blog.title ] ]
 
+        dateContent =
+            [ h4 [ style [ ("text-align", "center") ] ] [ text <| Maybe.withDefault "" blog.date ] ]
+
         keywordContent =
             let
                 allKeywords =
                     blog.keywords
                         |> Maybe.withDefault []
-                        -- |> List.map (\w -> p [ classStyle ] [ text w ] )
                         |> List.intersperse ", "
                         |> List.foldl (++) ""
-                        -- |> List.map (\w -> p [] [ text w ] )
             in
                 [ p [] [text allKeywords] ]
-
-        urlContent =
-            []
-            -- [ p [] [ text (blog.url |> Maybe.withDefault "") ] ]
-
-        debugContent =
-            []
-            -- [ p [] [ text ("id: " ++ toString blog.id) ]
-            -- -- , button [ onClick address (FocusBlog blog.id) ] [ text "FocusBlog Test!"]
-            -- ]
 
         break = [ br [] [] ]
 
         allContent =
             titleContent
+            ++ dateContent
             ++ keywordContent
-            ++ urlContent
-            ++ debugContent
     in
         th attributes allContent
 
@@ -224,15 +210,16 @@ getContent location =
         |> Task.map LoadBlogMarkdown
         |> Effects.task
 
+decodeBlog : Decoder (Blog)
+decodeBlog =
+    object5 Blog
+        ("title" := string)
+        (succeed -1)
+        (maybe ("date" := string))
+        (maybe ("keywords" := (list string)))
+        (maybe ("url" := string))
+
 decodeBlogList : Decoder (BlogList)
 decodeBlogList =
     object1 BlogList
-        ( "blogs" :=
-            ( list
-                <| object4 Blog
-                    ("title" := string)
-                    (succeed -1)
-                    (maybe ("keywords" := (list string)))
-                    (maybe ("url" := string))
-            )
-        )
+        <| "blogs" := (list decodeBlog)
