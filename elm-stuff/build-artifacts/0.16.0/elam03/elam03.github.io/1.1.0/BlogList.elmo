@@ -22,32 +22,32 @@ Elm.BlogList.make = function (_elm) {
    $Time = Elm.Time.make(_elm),
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
+   var classStyle = $Html$Attributes.$class("bloglist");
    var Tick = function (a) {    return {ctor: "Tick",_0: a};};
    var inputs = $Signal.mergeMany(_U.list([A2($Signal.map,
    Tick,
    $Time.every($Time.minute))]));
+   var HoverBlog = function (a) {
+      return {ctor: "HoverBlog",_0: a};
+   };
    var FocusBlog = function (a) {
       return {ctor: "FocusBlog",_0: a};
    };
    var viewBlog = F2(function (address,blog) {
       var $break = _U.list([A2($Html.br,_U.list([]),_U.list([]))]);
-      var debugContent = _U.list([A2($Html.p,
-      _U.list([]),
-      _U.list([$Html.text(A2($Basics._op["++"],
-      "id: ",
-      $Basics.toString(blog.id)))]))]);
-      var url = _U.list([A2($Html.p,
-      _U.list([]),
-      _U.list([$Html.text(A2($Maybe.withDefault,"",blog.url))]))]);
-      var content = A2($List.map,
-      function (c) {
-         return A2($Html.p,
-         _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                  ,_0: "text-align"
-                                                  ,_1: "left"}]))]),
-         _U.list([$Html.text(c)]));
-      },
-      A2($Maybe.withDefault,_U.list([]),blog.content));
+      var debugContent = _U.list([]);
+      var urlContent = _U.list([]);
+      var keywordContent = function () {
+         var allKeywords = A3($List.foldl,
+         F2(function (x,y) {    return A2($Basics._op["++"],x,y);}),
+         "",
+         A2($List.intersperse,
+         ", ",
+         A2($Maybe.withDefault,_U.list([]),blog.keywords)));
+         return _U.list([A2($Html.p,
+         _U.list([]),
+         _U.list([$Html.text(allKeywords)]))]);
+      }();
       var titleContent = _U.list([A2($Html.h3,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                ,_0: "text-align"
@@ -56,10 +56,11 @@ Elm.BlogList.make = function (_elm) {
       var allContent = A2($Basics._op["++"],
       titleContent,
       A2($Basics._op["++"],
-      content,
-      A2($Basics._op["++"],debugContent,url)));
-      var attributes = _U.list([$Html$Attributes.$class("bloglist-item")
-                               ,A2($Html$Events.onClick,address,FocusBlog(blog.id))]);
+      keywordContent,
+      A2($Basics._op["++"],urlContent,debugContent)));
+      var attributes = _U.list([classStyle
+                               ,A2($Html$Events.onClick,address,FocusBlog(blog.id))
+                               ,A2($Html$Events.onMouseMove,address,HoverBlog(blog.id))]);
       return A2($Html.th,attributes,allContent);
    });
    var view = F2(function (address,model) {
@@ -67,7 +68,7 @@ Elm.BlogList.make = function (_elm) {
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                ,_0: "border-style"
                                                ,_1: "solid"}]))]),
-      model.currBlog);
+      _U.list([model.currBlog]));
       var numCols = 2;
       var blogs = A2($Utils.composeTiledHtml,
       numCols,
@@ -88,9 +89,7 @@ Elm.BlogList.make = function (_elm) {
               A2($Basics._op["++"],
               " currId: ",
               $Basics.toString(model.currId)))))]))
-              ,A2($Html.table,
-              _U.list([$Html$Attributes.$class("bloglist-table")]),
-              blogs)]));
+              ,A2($Html.table,_U.list([classStyle]),blogs)]));
    });
    var LoadBlogMarkdown = function (a) {
       return {ctor: "LoadBlogMarkdown",_0: a};
@@ -106,7 +105,6 @@ Elm.BlogList.make = function (_elm) {
    var errorBlog = {title: "error"
                    ,id: 0
                    ,keywords: $Maybe.Just(_U.list(["error"]))
-                   ,content: $Maybe.Just(_U.list(["error","error"]))
                    ,url: $Maybe.Just("")};
    var errorBlogList = {blogs: _U.list([errorBlog])};
    var Model = F5(function (a,b,c,d,e) {
@@ -149,7 +147,7 @@ Elm.BlogList.make = function (_elm) {
                   ,_0: A5(Model,
                   model.blogListFile,
                   model.blogs,
-                  _U.list([currBlog]),
+                  currBlog,
                   debug,
                   model.currId)
                   ,_1: $Effects.none};
@@ -167,25 +165,25 @@ Elm.BlogList.make = function (_elm) {
                   debug,
                   model.currId)
                   ,_1: getContent(blogMarkdownFile)};
+         case "HoverBlog": return {ctor: "_Tuple2"
+                                  ,_0: model
+                                  ,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
-   var Blog = F5(function (a,b,c,d,e) {
-      return {title: a,id: b,keywords: c,content: d,url: e};
+   var Blog = F4(function (a,b,c,d) {
+      return {title: a,id: b,keywords: c,url: d};
    });
    var BlogList = function (a) {    return {blogs: a};};
    var decodeBlogList = A2($Json$Decode.object1,
    BlogList,
    A2($Json$Decode._op[":="],
    "blogs",
-   $Json$Decode.list(A6($Json$Decode.object5,
+   $Json$Decode.list(A5($Json$Decode.object4,
    Blog,
    A2($Json$Decode._op[":="],"title",$Json$Decode.string),
    $Json$Decode.succeed(-1),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],
    "keywords",
-   $Json$Decode.list($Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],
-   "content",
    $Json$Decode.list($Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],
    "url",
@@ -197,7 +195,7 @@ Elm.BlogList.make = function (_elm) {
    };
    var init = function (blogList) {
       return {ctor: "_Tuple2"
-             ,_0: A5(Model,blogList,_U.list([]),_U.list([]),"debug!",0)
+             ,_0: A5(Model,blogList,_U.list([]),$Html.text(""),"debug!",0)
              ,_1: getBlogList(blogList)};
    };
    _op["=>"] = F2(function (v0,v1) {
@@ -213,8 +211,10 @@ Elm.BlogList.make = function (_elm) {
                                  ,LoadBlogList: LoadBlogList
                                  ,LoadBlogMarkdown: LoadBlogMarkdown
                                  ,FocusBlog: FocusBlog
+                                 ,HoverBlog: HoverBlog
                                  ,Tick: Tick
                                  ,update: update
+                                 ,classStyle: classStyle
                                  ,view: view
                                  ,viewBlog: viewBlog
                                  ,inputs: inputs

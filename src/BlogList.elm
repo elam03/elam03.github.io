@@ -3,7 +3,7 @@ module BlogList where
 import Array
 import Effects exposing (Effects, Never)
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseMove)
 import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
@@ -28,14 +28,13 @@ type alias Blog =
     { title : String
     , id : ID
     , keywords : Maybe (List String)
-    , content : Maybe (List String)
     , url : Maybe String
     }
 
 type alias Model =
     { blogListFile : String
     , blogs : List Blog
-    , currBlog : List Html
+    , currBlog : Html
     , debug : String
     , currId : ID
     }
@@ -50,13 +49,12 @@ errorBlog =
     { title = "error"
     , id = 0
     , keywords = Just ["error"]
-    , content = Just ["error", "error"]
     , url = Just ""
     }
 
 init : String -> (Model, Effects Action)
 init blogList =
-  ( Model blogList [] [] "debug!" 0
+  ( Model blogList [] (text "") "debug!" 0
   , getBlogList blogList
   )
 
@@ -66,6 +64,7 @@ type Action
     = LoadBlogList (Maybe BlogList)
     | LoadBlogMarkdown (Maybe String)
     | FocusBlog ID
+    | HoverBlog ID
     | Tick Float
 
 update : Action -> Model -> (Model, Effects Action)
@@ -101,7 +100,7 @@ update action model =
                 debug =
                     model.debug
             in
-                ( Model model.blogListFile model.blogs [ currBlog ] debug model.currId
+                ( Model model.blogListFile model.blogs currBlog debug model.currId
                 , Effects.none
                 )
 
@@ -124,12 +123,20 @@ update action model =
                 , getContent blogMarkdownFile
                 )
 
+        HoverBlog id ->
+            ( model
+            , Effects.none
+            )
+
         Tick t ->
             ( model
             , Effects.none
             )
 
 -- VIEW
+
+classStyle : Html.Attribute
+classStyle = class "bloglist"
 
 view : Signal.Address Action -> Model -> Html
 view address model =
@@ -143,45 +150,55 @@ view address model =
 
         viewCurrBlog =
             div [ style [ ("border-style", "solid") ] ]
-                model.currBlog
+                [ model.currBlog ]
     in
         div []
             [ viewCurrBlog
             , h3 [] [ text ("debug: " ++ model.debug ++ " currId: " ++ toString model.currId) ]
-            , table [class "bloglist-table"] blogs
+            , table [ classStyle ] blogs
             ]
 
 viewBlog : Signal.Address Action -> Blog -> Html
 viewBlog address blog =
     let
         attributes =
-            [ class "bloglist-item"
+            [ classStyle
             , onClick address (FocusBlog blog.id)
+            , onMouseMove address (HoverBlog blog.id)
             ]
 
         titleContent =
             [ h3 [ style [ ("text-align", "center") ] ] [ text blog.title ] ]
 
-        content =
-            blog.content
-                |> Maybe.withDefault []
-                |> List.map (\c -> p [ style [ ("text-align", "left") ] ] [ text c ])
+        keywordContent =
+            let
+                allKeywords =
+                    blog.keywords
+                        |> Maybe.withDefault []
+                        -- |> List.map (\w -> p [ classStyle ] [ text w ] )
+                        |> List.intersperse ", "
+                        |> List.foldl (++) ""
+                        -- |> List.map (\w -> p [] [ text w ] )
+            in
+                [ p [] [text allKeywords] ]
 
-        url =
-            [ p [] [ text (blog.url |> Maybe.withDefault "") ] ]
+        urlContent =
+            []
+            -- [ p [] [ text (blog.url |> Maybe.withDefault "") ] ]
 
         debugContent =
-            [ p [] [ text ("id: " ++ toString blog.id) ]
-            -- , button [ onClick address (FocusBlog blog.id) ] [ text "FocusBlog Test!"]
-            ]
+            []
+            -- [ p [] [ text ("id: " ++ toString blog.id) ]
+            -- -- , button [ onClick address (FocusBlog blog.id) ] [ text "FocusBlog Test!"]
+            -- ]
 
         break = [ br [] [] ]
 
         allContent =
             titleContent
-            ++ content
+            ++ keywordContent
+            ++ urlContent
             ++ debugContent
-            ++ url
     in
         th attributes allContent
 
@@ -212,11 +229,10 @@ decodeBlogList =
     object1 BlogList
         ( "blogs" :=
             ( list
-                <| object5 Blog
+                <| object4 Blog
                     ("title" := string)
                     (succeed -1)
                     (maybe ("keywords" := (list string)))
-                    (maybe ("content" := (list string)))
                     (maybe ("url" := string))
             )
         )

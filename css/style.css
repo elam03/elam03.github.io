@@ -36,7 +36,7 @@ html {
     font-size: 14px;
 }
 
-.bloglist-table  {
+table.bloglist  {
     background:#bbe4e9;
     padding: 4px;
     width: 600px;
@@ -44,11 +44,20 @@ html {
     border-style: solid;
 }
 
-.bloglist-item {
+th.bloglist {
 	background:#d0d1f6;
 	border-width: 1px;
 	/*padding: 4px;*/
 	border-style: solid;
     font-family: "Arial";
-    font-size: 10px;
+    /*font-size: 12px;*/
+}
+
+h3.bloglist {
+    font-size: 24px;
+}
+
+p.bloglist {
+    /*background:#FF0000;*/
+    font-weight: 900;
 }
