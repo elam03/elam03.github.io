@@ -10,6 +10,15 @@
             ],
             "date": "5/12/2016",
             "url": "assets/blogs/initial_thoughts_on_elm.md"
+        },
+        {
+            "title": "Starting with a Cityscape",
+            "keywords":
+            [
+                "elm"
+            ],
+            "date": "5/15/2016",
+            "url": "assets/blogs/starting_with_a_cityscape.md"
         }
     ]
 }
