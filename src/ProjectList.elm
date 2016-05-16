@@ -1,10 +1,10 @@
-module ProjectList where
+module ProjectList exposing (..)
 
-import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
+import Platform.Cmd
 import String exposing (..)
 import Task
 import Utils exposing (..)
@@ -50,7 +50,7 @@ errorProject =
     , previews = Just ["error", "error"]
     }
 
-init : String -> String -> (Model, Effects Action)
+init : String -> String -> (Model, Cmd Msg)
 init projectList assetPath =
   ( Model projectList assetPath []
   , getProjectData projectList
@@ -58,12 +58,13 @@ init projectList assetPath =
 
 -- UPDATE
 
-type Action
+type Msg
     = RequestRefresh
-    | Refresh (Maybe ProjectList)
+    | Refresh ProjectList
+    | FetchFail Http.Error
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
         RequestRefresh ->
@@ -71,7 +72,7 @@ update action model =
             , getProjectData model.file
             )
 
-        Refresh maybeProjectsList ->
+        Refresh projectsList ->
             let
                 addProjectDescription project =
                     let
@@ -91,42 +92,41 @@ update action model =
                     in
                         { project | previews = Just previews' }
 
-                projectList =
-                    maybeProjectsList
-                        |> Maybe.withDefault errorProjectList
-
                 projects =
-                    projectList.projects
+                    projectsList.projects
                         |> List.map addProjectDescription
                         |> List.map addProjectAssetPath
             in
                 if List.isEmpty projects then
                     ( Model model.file "failed" projects
-                    , Effects.none
+                    , Cmd.none
                     )
                 else
                     ( Model model.file "success" projects
-                    , Effects.none
+                    , Cmd.none
                     )
+
+        FetchFail _ ->
+            (model, Cmd.none)
 
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
     let
         numCols = 3
         attributes = [ class "projectlist-table" ]
 
         projects =
             model.projects
-                |> List.map (\p -> viewProject address p)
+                |> List.map (\p -> viewProject p)
                 |> composeTiledHtml numCols
 
     in
         table attributes projects
 
-viewProject : Signal.Address Action -> Project -> Html
-viewProject address project =
+viewProject : Project -> Html Msg
+viewProject project =
     let
         titleContent =
             [ h3 [] [ text project.title ] ]
@@ -180,12 +180,10 @@ viewProject address project =
 
 -- EFFECTS
 
-getProjectData : String -> Effects Action
+getProjectData : String -> Cmd Msg
 getProjectData location =
     Http.get decodeData location
-        |> Task.toMaybe
-        |> Task.map Refresh
-        |> Effects.task
+        |> Task.perform FetchFail Refresh
 
 decodeData : Decoder (ProjectList)
 decodeData =

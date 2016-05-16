@@ -1,14 +1,13 @@
-module BlogList where
+module BlogList exposing (..)
 
 import Array
-import Effects exposing (Effects, Never)
 import Html exposing (..)
-import Html.Events exposing (onClick, onMouseMove)
+import Html.Events exposing (onClick)
 import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
 import Markdown
-import Signal
+import Platform.Cmd
 import Task
 import Time
 import Utils exposing (..)
@@ -35,7 +34,7 @@ type alias Blog =
 type alias Model =
     { blogListFile : String
     , blogs : List Blog
-    , currBlog : Html
+    , currBlog : Html Msg
     , debug : String
     , currId : ID
     }
@@ -49,7 +48,7 @@ errorBlog =
     , url = Just ""
     }
 
-init : String -> (Model, Effects Action)
+init : String -> (Model, Cmd Msg)
 init blogList =
   ( Model blogList [] (text "") "debug!" 0
   , getBlogList blogList
@@ -57,17 +56,18 @@ init blogList =
 
 -- UPDATE
 
-type Action
-    = LoadBlogList (Maybe BlogList)
-    | LoadBlogMarkdown (Maybe String)
+type Msg
+    = LoadBlogList BlogList
+    | LoadBlogMarkdown String
     | FocusBlog ID
     | HoverBlog ID
+    | FetchFail Http.Error
     | Tick Float
 
-update : Action -> Model -> (Model, Effects Action)
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
-        LoadBlogList maybeBlogsList ->
+        LoadBlogList blogsList ->
             let
                 populateBlogId b =
                     b
@@ -77,27 +77,27 @@ update action model =
                         |> snd
 
                 blogs =
-                    maybeBlogsList
-                        |> Maybe.withDefault (BlogList [])
+                    blogsList
+                        -- |> Maybe.withDefault (BlogList [])
                         |> .blogs
                         |> populateBlogId
             in
                 ( { model | blogs = blogs }
-                , Effects.none
+                , Cmd.none
                 )
 
-        LoadBlogMarkdown maybeMarkdownContent ->
+        LoadBlogMarkdown markdownContent ->
             let
                 currBlog =
-                    maybeMarkdownContent
-                        |> Maybe.withDefault "Failed to load!"
-                        |> Markdown.toHtml
+                    markdownContent
+                        -- |> Maybe.withDefault "Failed to load!"
+                        |> Markdown.toHtml []
 
                 debug =
                     model.debug
             in
                 ( Model model.blogListFile model.blogs currBlog debug model.currId
-                , Effects.none
+                , Cmd.none
                 )
 
         FocusBlog id ->
@@ -120,28 +120,27 @@ update action model =
                 )
 
         HoverBlog id ->
-            ( model
-            , Effects.none
-            )
+            (model, Cmd.none)
+
+        FetchFail _ ->
+            (model, Cmd.none)
 
         Tick t ->
-            ( model
-            , Effects.none
-            )
+            (model, Cmd.none)
 
 -- VIEW
 
-classStyle : Html.Attribute
+classStyle : Html.Attribute Msg
 classStyle = class "bloglist"
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
     let
         numCols = 2
 
         blogs =
             model.blogs
-                |> List.map (\b -> viewBlog address b)
+                |> List.map (\b -> viewBlog b)
                 |> composeTiledHtml numCols
 
         viewCurrBlog =
@@ -154,13 +153,12 @@ view address model =
             , table [ classStyle ] blogs
             ]
 
-viewBlog : Signal.Address Action -> Blog -> Html
-viewBlog address blog =
+viewBlog : Blog -> Html Msg
+viewBlog blog =
     let
         attributes =
             [ classStyle
-            , onClick address (FocusBlog blog.id)
-            , onMouseMove address (HoverBlog blog.id)
+            , onClick (FocusBlog blog.id)
             ]
 
         titleContent =
@@ -188,27 +186,33 @@ viewBlog address blog =
     in
         th attributes allContent
 
-inputs : Signal Action
-inputs =
-    Signal.mergeMany
-        [ Signal.map Tick <| Time.every <| Time.minute
-        ]
+-- inputs : Signal Msg
+-- inputs =
+--     Signal.mergeMany
+--         [ Signal.map Tick <| Time.every <| Time.minute
+--         ]
 
 -- EFFECTS
 
-getBlogList : String -> Effects Action
+getBlogList : String -> Cmd Msg
 getBlogList location =
     Http.get decodeBlogList location
-        |> Task.toMaybe
-        |> Task.map LoadBlogList
-        |> Effects.task
+        -- |> Task.perform (x -> msg) (a -> msg) Task.Task x a
+        -- |> Task.toMaybe
+        -- |> Task.map LoadBlogList -- Task never (Maybe LoadBlogList)
+        |> Task.perform FetchFail LoadBlogList
+        -- |> performSucceed LoadBlogList
+        -- |> Task.perform (x -> msg) (a -> msg) Task.Task x a
 
-getContent : String -> Effects Action
+
+getContent : String -> Cmd Msg
 getContent location =
     Http.getString location
-        |> Task.toMaybe
-        |> Task.map LoadBlogMarkdown
-        |> Effects.task
+        -- |> Task.toMaybe
+        -- |> Task.map LoadBlogMarkdown
+        |> Task.perform FetchFail LoadBlogMarkdown
+        -- |> performSucceed  LoadBlogMarkdown
+        -- |> Cmd.task
 
 decodeBlog : Decoder (Blog)
 decodeBlog =

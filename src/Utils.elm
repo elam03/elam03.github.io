@@ -1,18 +1,17 @@
-module Utils where
+module Utils exposing (..)
 
 import Html exposing (..)
-import Random exposing (..)
-import Signal exposing (..)
-import Time exposing (..)
+-- import Random exposing (..)
+-- import Time exposing (..)
 
 -- TODO: Use this later...
-randomFloats : Signal (Generator (List Float))
-randomFloats =
-    Random.list 10 (Random.float 0 1)
-        |> Signal.constant
-        |> Signal.sampleOn (Time.every Time.second)
+-- randomFloats : Signal (Generator (List Float))
+-- randomFloats =
+--     Random.list 10 (Random.float 0 1)
+--         |> Signal.constant
+--         |> Signal.sampleOn (Time.every Time.second)
 
-composeTiledHtml : Int -> List Html.Html -> List Html.Html
+composeTiledHtml : Int -> List (Html a) -> List (Html a)
 composeTiledHtml cols list =
     let
         head = List.take cols list

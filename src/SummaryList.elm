@@ -1,10 +1,10 @@
-module SummaryList where
+module SummaryList exposing (..)
 
-import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
+import Platform.Cmd
 import Task
 
 import Utils exposing (..)
@@ -42,7 +42,7 @@ errorSummary =
     , contents = ["has", "occurred"]
     }
 
-init : String -> (Model, Effects Action)
+init : String -> (Model, Cmd Msg)
 init fileUrl =
   ( Model fileUrl errorSummaryData
   , getData fileUrl
@@ -50,46 +50,43 @@ init fileUrl =
 
 -- UPDATE
 
-type Action
+type Msg
     = RequestRefresh
-    | Refresh (Maybe (SummaryData))
+    | Refresh SummaryData
+    | FetchFail Http.Error
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
         RequestRefresh ->
-            ( model
-            , getData model.file
+            (model, getData model.file)
+
+        Refresh summaryData ->
+            ( Model model.file summaryData
+            , Cmd.none
             )
 
-        Refresh maybeSummaryData ->
-            let
-                summaryData =
-                    maybeSummaryData
-                        |> Maybe.withDefault errorSummaryData
-            in
-                ( Model model.file summaryData
-                , Effects.none
-                )
+        FetchFail _ ->
+            (model, Cmd.none)
 
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
     let
         numCols = 2
         attributes = [ class "summarylist-table" ]
 
         summaryData =
             model.summaryData.summaries
-                |> List.map (\s -> viewSummary address s)
+                |> List.map (\s -> viewSummary s)
                 |> composeTiledHtml numCols
     in
         table attributes summaryData
 
-viewSummary : Signal.Address Action -> Summary -> Html
-viewSummary address summary =
+viewSummary : Summary -> Html Msg
+viewSummary summary =
     let
         contents =
             summary.contents
@@ -102,12 +99,13 @@ viewSummary address summary =
 
 -- EFFECTS
 
-getData : String -> Effects Action
+getData : String -> Cmd Msg
 getData location =
     Http.get decodeData location
-        |> Task.toMaybe
-        |> Task.map Refresh
-        |> Effects.task
+        |> Task.perform FetchFail Refresh
+        -- |> Task.toMaybe
+        -- |> Task.map Refresh
+        -- |> Cmd.task
 
 decodeData : Decoder (SummaryData)
 decodeData =

@@ -1,15 +1,9 @@
-module Main (..) where
+module Main exposing (..)
 
-import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
--- import Html.Events as Events
--- import Http
-import Signal exposing (..)
-import StartApp
-import Task exposing (..)
--- import Time exposing (..)
--- import Json.Decode as Json
+import Html.App as Html
+import List exposing (map)
 
 import BlogList
 import Cityscape
@@ -19,12 +13,12 @@ import SummaryList
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
-type Action
+type Msg
     = NoOp
-    | CityscapeActions Cityscape.Action
-    | ProjectListActions ProjectList.Action
-    | SummaryListActions SummaryList.Action
-    | BlogListActions BlogList.Action
+    | CityscapeMsgs Cityscape.Msg
+    | ProjectListMsgs ProjectList.Msg
+    | SummaryListMsgs SummaryList.Msg
+    | BlogListMsgs BlogList.Msg
 
 
 type alias Model =
@@ -34,7 +28,7 @@ type alias Model =
     , blogList : BlogList.Model
     }
 
-init : String -> String -> String -> String -> (Model, Effects Action)
+init : String -> String -> String -> String -> (Model, Cmd Msg)
 init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
     let
         (cityscape, cityscapeFx) = Cityscape.init (600, 200)
@@ -47,94 +41,106 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
           , summaryList = summaryList
           , blogList = blogList
           }
-        , Effects.batch
-            [ Effects.map CityscapeActions cityscapeFx
-            , Effects.map ProjectListActions projectListFx
-            , Effects.map SummaryListActions summaryListFx
-            , Effects.map BlogListActions blogListFx
+        , Cmd.batch
+            [ Cmd.map CityscapeMsgs cityscapeFx
+            , Cmd.map ProjectListMsgs projectListFx
+            , Cmd.map SummaryListMsgs summaryListFx
+            , Cmd.map BlogListMsgs blogListFx
             ]
         )
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
     div []
-        [ Cityscape.view (Signal.forwardTo address CityscapeActions) model.cityscape
+        [ text "blah"
+        , Html.map CityscapeMsgs (Cityscape.view model.cityscape)
         , div [ style [ ("display", "flex") ] ]
-            [ BlogList.view (Signal.forwardTo address BlogListActions) model.blogList
-            ]
+            [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
         , div [ style [ ("display", "flex") ] ]
-            [ SummaryList.view (Signal.forwardTo address SummaryListActions) model.summaryList
-            ]
+            [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
         , div [ style [ ("display", "flex") ] ]
-            [ ProjectList.view (Signal.forwardTo address ProjectListActions) model.projectList
-            ]
+            [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
         ]
+        -- [ Cityscape.view (Signal.forwardTo address CityscapeMsgs) model.cityscape
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ BlogList.view (Signal.forwardTo address BlogListMsgs) model.blogList
+        --     ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ SummaryList.view (Signal.forwardTo address SummaryListMsgs) model.summaryList
+        --     ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ ProjectList.view (Signal.forwardTo address ProjectListMsgs) model.projectList
+        --     ]
+        -- ]
+        -- [ Cityscape.view (Signal.forwardTo address CityscapeMsgs) model.cityscape
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ BlogList.view (Signal.forwardTo address BlogListMsgs) model.blogList
+        --     ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ SummaryList.view (Signal.forwardTo address SummaryListMsgs) model.summaryList
+        --     ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ ProjectList.view (Signal.forwardTo address ProjectListMsgs) model.projectList
+        --     ]
+        -- ]
 
-update : Action -> Model -> (Model, Effects.Effects Action)
+update : Msg -> Model -> (Model, Cmd.Cmd Msg)
 update action model =
     case Debug.log "action" action of
-        CityscapeActions act ->
+        CityscapeMsgs act ->
             let
                 (cityscape, fx) = Cityscape.update act model.cityscape
             in
                 ( { model | cityscape = cityscape }
-                , Effects.map CityscapeActions fx
+                , Cmd.map CityscapeMsgs fx
                 )
 
-        ProjectListActions act ->
+        ProjectListMsgs act ->
             let
                 (projectList, fx) = ProjectList.update act model.projectList
             in
                 ( { model | projectList = projectList }
-                , Effects.map ProjectListActions fx
+                , Cmd.map ProjectListMsgs fx
                 )
 
-        SummaryListActions act ->
+        SummaryListMsgs act ->
             let
                 (summaryList, fx) = SummaryList.update act model.summaryList
             in
                 ( { model | summaryList = summaryList }
-                , Effects.map SummaryListActions fx
+                , Cmd.map SummaryListMsgs fx
                 )
 
-        BlogListActions act ->
+        BlogListMsgs act ->
             let
                 (blogList, fx) = BlogList.update act model.blogList
             in
                 ( { model | blogList = blogList }
-                , Effects.map BlogListActions fx
+                , Cmd.map BlogListMsgs fx
                 )
 
         NoOp ->
-            ( model, Effects.none )
+            ( model, Cmd.none )
 
-app : StartApp.App Model
-app =
-    StartApp.start
+main =
+    Html.program
         { init = init "assets/1gam_projects/project_list.json" "assets/summary_data.json" "assets/blogs/blog_content.json" "assets/1gam_projects/"
-        , inputs =
-            -- [ (Signal.map (\a -> CityscapeActions a) Cityscape.inputs)
-            -- , (Signal.map (\a -> BlogListActions a) BlogList.inputs)
+        -- , inputs =
+            -- [ (Signal.map (\a -> CityscapeMsgs a) Cityscape.inputs)
+            -- , (Signal.map (\a -> BlogListMsgs a) BlogList.inputs)
             -- ]
 
-            [ (Signal.map (\a -> BlogListActions a) BlogList.inputs)
-            , (Signal.map (\a -> CityscapeActions a) Cityscape.inputs)
-            ]
+            -- [ (Signal.map (\a -> BlogListMsgs a) BlogList.inputs)
+            -- , (Signal.map (\a -> CityscapeMsgs a) Cityscape.inputs)
+            -- ]
             -- [
             --     Signal.mergeMany
-            --         [ (Signal.map (\a -> BlogListActions a) BlogList.inputs)
-            --         , (Signal.map (\a -> CityscapeActions a) Cityscape.inputs)
+            --         [ (Signal.map (\a -> BlogListMsgs a) BlogList.inputs)
+            --         , (Signal.map (\a -> CityscapeMsgs a) Cityscape.inputs)
             --         ]
             -- ]
 
         , update = update
         , view = view
+        , subscriptions = \_ -> Sub.none
         }
-
-main : Signal.Signal Html
-main =
-    app.html
-
-port runner : Signal (Task.Task Never ())
-port runner =
-    app.tasks

@@ -1,7 +1,7 @@
-module Building where
+module Building exposing (..)
 
 import Color exposing (..)
-import Graphics.Collage exposing (..)
+import Collage exposing (..)
 import List exposing (..)
 
 -------------------------------------------------------------------------------

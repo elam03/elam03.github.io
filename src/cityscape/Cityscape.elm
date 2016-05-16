@@ -1,20 +1,15 @@
-module Cityscape where
+module Cityscape exposing (..)
 
 import Array
 import Char
 import Color exposing (..)
-import Effects exposing (Effects, Never)
-import Graphics.Collage exposing (..)
-import Graphics.Element exposing (..)
+import Collage exposing (..)
+import Element exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Keyboard
-import Mouse
 import Random
 import Set
-import Signal exposing (..)
 import Time exposing (..)
-import Window
 
 import Building exposing (..)
 
@@ -48,7 +43,7 @@ type alias Model =
     ,   showInfo : Bool
     }
 
-init : (Int, Int) -> (Model, Effects Action)
+init : (Int, Int) -> (Model, Cmd Msg)
 init (w, h) =
     let model =
         { x = 0
@@ -72,31 +67,31 @@ init (w, h) =
         }
     in
         ( model
-        , Effects.none
+        , Cmd.none
         )
 
 -- UPDATE
 
-type Action
+type Msg
     = None
     | TimeDelta Float
     | KeyDown Keys
     | MouseMoved (Int, Int)
     | WindowSizeChange (Int, Int)
 
-update : Action -> Model -> (Model, Effects Action)
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
         None ->
-            ( model, Effects.none )
+            ( model, Cmd.none )
         MouseMoved (mx, my) ->
-            ( model |> mouseUpdate (mx, my), Effects.none )
+            ( model |> mouseUpdate (mx, my), Cmd.none )
         KeyDown keys ->
-            ( model |> keysUpdate keys, Effects.none )
+            ( model |> keysUpdate keys, Cmd.none )
         WindowSizeChange (ww, wh) ->
-            ( model, Effects.none )
+            ( model, Cmd.none )
         TimeDelta dt ->
-            ( model |> timeUpdate dt |> randomUpdate |> addBuildingsUpdate |> updateBuildingsInModel |> resetMouseDelta, Effects.none )
+            ( model |> timeUpdate dt |> randomUpdate |> addBuildingsUpdate |> updateBuildingsInModel |> resetMouseDelta, Cmd.none )
 
 updateBuildings : Float -> Float -> Int -> List Building -> List Building
 updateBuildings dx dt windowWidth buildings =
@@ -164,16 +159,17 @@ updateWindowDimensions (w, h) model =
 
 randomUpdate : Model -> Model
 randomUpdate model =
-    let generator = Random.list 100 (Random.float 0 1)
-        tuple = Random.generate generator model.seed
-        vs = Array.fromList (fst tuple)
-        newSeed = snd tuple
-        modifiedModel =
-            { model | seed = newSeed
-            ,         randomValues = vs
-            }
-    in
-        modifiedModel
+    model
+    -- let generator = Random.list 100 (Random.float 0 1)
+    --     tuple = Random.generate generator model.seed
+    --     vs = Array.fromList (fst tuple)
+    --     newSeed = snd tuple
+    --     modifiedModel =
+    --         { model | seed = newSeed
+    --         ,         randomValues = vs
+    --         }
+    -- in
+    --     modifiedModel
 
 increment : Bool -> Int
 increment condition =
@@ -302,15 +298,15 @@ timeUpdate dt model =
     ,           dt = dt
     }
 
-inputs : Signal Action
-inputs =
-    mergeMany
-        [ Signal.map MouseMoved Mouse.position
-        , Signal.map KeyDown Keyboard.keysDown
-        -- , Signal.map TimeDelta (Signal.map (\t -> t / 20) (fps 30))
-        , Signal.map TimeDelta (fps 30)
-        , Signal.map WindowSizeChange Window.dimensions
-        ]
+-- inputs : Signal Msg
+-- inputs =
+--     mergeMany
+--         [ Signal.map MouseMoved Mouse.position
+--         , Signal.map KeyDown Keyboard.keysDown
+--         -- , Signal.map TimeDelta (Signal.map (\t -> t / 20) (fps 30))
+--         , Signal.map TimeDelta (fps 30)
+--         , Signal.map WindowSizeChange Window.dimensions
+--         ]
 
 grad : Float -> Float -> Gradient
 grad y h =
@@ -333,8 +329,8 @@ viewSunset model =
     in
         gradient (grad model.sunset.y model.sunset.h) (rect w h)
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
     let
         (mx, my) = (model.x, -model.y)
 
@@ -348,7 +344,7 @@ view address model =
             ++ (displayMouseCursor (mx, my) model)
 
         finalOutput = collage model.windowWidth model.windowHeight things
-            |> Html.fromElement
+            |> Element.toHtml
     in
         Html.div
             [ style [ ("width", (toString model.windowWidth) ++ "px"), ("height", (toString model.windowHeight) ++ "px"), ("border-style", "solid") ] ]
