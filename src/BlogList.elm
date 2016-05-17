@@ -9,7 +9,7 @@ import Json.Decode exposing (..)
 import Markdown
 import Platform.Cmd
 import Task
-import Time
+import Time exposing (..)
 import Utils exposing (..)
 
 (=>) : a -> b -> (a, b)
@@ -186,33 +186,23 @@ viewBlog blog =
     in
         th attributes allContent
 
--- inputs : Signal Msg
--- inputs =
---     Signal.mergeMany
---         [ Signal.map Tick <| Time.every <| Time.minute
---         ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Time.every minute Tick ]
 
--- EFFECTS
+-- CMDS
 
 getBlogList : String -> Cmd Msg
 getBlogList location =
     Http.get decodeBlogList location
-        -- |> Task.perform (x -> msg) (a -> msg) Task.Task x a
-        -- |> Task.toMaybe
-        -- |> Task.map LoadBlogList -- Task never (Maybe LoadBlogList)
         |> Task.perform FetchFail LoadBlogList
-        -- |> performSucceed LoadBlogList
-        -- |> Task.perform (x -> msg) (a -> msg) Task.Task x a
 
 
 getContent : String -> Cmd Msg
 getContent location =
     Http.getString location
-        -- |> Task.toMaybe
-        -- |> Task.map LoadBlogMarkdown
         |> Task.perform FetchFail LoadBlogMarkdown
-        -- |> performSucceed  LoadBlogMarkdown
-        -- |> Cmd.task
 
 decodeBlog : Decoder (Blog)
 decodeBlog =

@@ -111,7 +111,11 @@ viewSummary summary =
             , ul [ style [ ("text-align", "left") ] ] contents
             ]
 
--- EFFECTS
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+-- CMDS
 
 getData : String -> Cmd Msg
 getData location =

@@ -6299,6 +6299,10 @@ return {
 
 }();
 
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
 var _elm_lang$core$Random$onSelfMsg = F3(
 	function (_p1, _p0, seed) {
 		return _elm_lang$core$Task$succeed(seed);
@@ -6826,6 +6830,43 @@ var _elm_lang$core$Set$partition = F2(
 			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
 		};
 	});
+
+var _elm_lang$dom$Native_Dom = function() {
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+return {
+	onDocument: F3(on(document)),
+	onWindow: F3(on(window))
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 
 //import Native.Json //
 
@@ -8452,6 +8493,480 @@ var _elm_lang$html$Html_Events$Options = F2(
 	function (a, b) {
 		return {stopPropagation: a, preventDefault: b};
 	});
+
+var _elm_lang$keyboard$Keyboard$onSelfMsg = F3(
+	function (router, _p0, state) {
+		var _p1 = _p0;
+		var _p2 = A2(_elm_lang$core$Dict$get, _p1.category, state);
+		if (_p2.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p1.keyCode));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p2._0.taggers)),
+				function (_p3) {
+					return _elm_lang$core$Task$succeed(state);
+				});
+		}
+	});
+var _elm_lang$keyboard$Keyboard_ops = _elm_lang$keyboard$Keyboard_ops || {};
+_elm_lang$keyboard$Keyboard_ops['&>'] = F2(
+	function (t1, t2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			t1,
+			function (_p4) {
+				return t2;
+			});
+	});
+var _elm_lang$keyboard$Keyboard$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$keyboard$Keyboard$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p5 = maybeValues;
+		if (_p5.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				_elm_lang$core$Native_List.fromArray(
+					[value]));
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				A2(_elm_lang$core$List_ops['::'], value, _p5._0));
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p6 = subs;
+			if (_p6.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p6._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p6._0._0,
+					_elm_lang$keyboard$Keyboard$categorizeHelpHelp(_p6._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorize = function (subs) {
+	return A2(_elm_lang$keyboard$Keyboard$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$keyboard$Keyboard$keyCode = A2(_elm_lang$core$Json_Decode_ops[':='], 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$keyboard$Keyboard$subscription = _elm_lang$core$Native_Platform.leaf('Keyboard');
+var _elm_lang$keyboard$Keyboard$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$keyboard$Keyboard$Msg = F2(
+	function (a, b) {
+		return {category: a, keyCode: b};
+	});
+var _elm_lang$keyboard$Keyboard$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					task,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							_elm_lang$core$Process$spawn(
+								A3(
+									_elm_lang$dom$Dom_LowLevel$onDocument,
+									category,
+									_elm_lang$keyboard$Keyboard$keyCode,
+									function (_p7) {
+										return A2(
+											_elm_lang$core$Platform$sendToSelf,
+											router,
+											A2(_elm_lang$keyboard$Keyboard$Msg, category, _p7));
+									})),
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, pid),
+										state));
+							});
+					});
+			});
+		var bothStep = F4(
+			function (category, _p8, taggers, task) {
+				var _p9 = _p8;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					task,
+					function (state) {
+						return _elm_lang$core$Task$succeed(
+							A3(
+								_elm_lang$core$Dict$insert,
+								category,
+								A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, _p9.pid),
+								state));
+					});
+			});
+		var leftStep = F3(
+			function (category, _p10, task) {
+				var _p11 = _p10;
+				return A2(
+					_elm_lang$keyboard$Keyboard_ops['&>'],
+					_elm_lang$core$Process$kill(_p11.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$keyboard$Keyboard$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$keyboard$Keyboard$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$keyboard$Keyboard$presses = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keypress', tagger));
+};
+var _elm_lang$keyboard$Keyboard$downs = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keydown', tagger));
+};
+var _elm_lang$keyboard$Keyboard$ups = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keyup', tagger));
+};
+var _elm_lang$keyboard$Keyboard$subMap = F2(
+	function (func, _p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$keyboard$Keyboard$MySub,
+			_p13._0,
+			function (_p14) {
+				return func(
+					_p13._1(_p14));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Keyboard'] = {pkg: 'elm-lang/keyboard', init: _elm_lang$keyboard$Keyboard$init, onEffects: _elm_lang$keyboard$Keyboard$onEffects, onSelfMsg: _elm_lang$keyboard$Keyboard$onSelfMsg, tag: 'sub', subMap: _elm_lang$keyboard$Keyboard$subMap};
+
+var _elm_lang$mouse$Mouse$onSelfMsg = F3(
+	function (router, _p0, state) {
+		var _p1 = _p0;
+		var _p2 = A2(_elm_lang$core$Dict$get, _p1.category, state);
+		if (_p2.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p1.position));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p2._0.taggers)),
+				function (_p3) {
+					return _elm_lang$core$Task$succeed(state);
+				});
+		}
+	});
+var _elm_lang$mouse$Mouse_ops = _elm_lang$mouse$Mouse_ops || {};
+_elm_lang$mouse$Mouse_ops['&>'] = F2(
+	function (t1, t2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			t1,
+			function (_p4) {
+				return t2;
+			});
+	});
+var _elm_lang$mouse$Mouse$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$mouse$Mouse$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p5 = maybeValues;
+		if (_p5.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				_elm_lang$core$Native_List.fromArray(
+					[value]));
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				A2(_elm_lang$core$List_ops['::'], value, _p5._0));
+		}
+	});
+var _elm_lang$mouse$Mouse$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p6 = subs;
+			if (_p6.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p6._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p6._0._0,
+					_elm_lang$mouse$Mouse$categorizeHelpHelp(_p6._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$mouse$Mouse$categorize = function (subs) {
+	return A2(_elm_lang$mouse$Mouse$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$mouse$Mouse$subscription = _elm_lang$core$Native_Platform.leaf('Mouse');
+var _elm_lang$mouse$Mouse$Position = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _elm_lang$mouse$Mouse$position = A3(
+	_elm_lang$core$Json_Decode$object2,
+	_elm_lang$mouse$Mouse$Position,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'pageX', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'pageY', _elm_lang$core$Json_Decode$int));
+var _elm_lang$mouse$Mouse$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$mouse$Mouse$Msg = F2(
+	function (a, b) {
+		return {category: a, position: b};
+	});
+var _elm_lang$mouse$Mouse$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					task,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							_elm_lang$core$Process$spawn(
+								A3(
+									_elm_lang$dom$Dom_LowLevel$onDocument,
+									category,
+									_elm_lang$mouse$Mouse$position,
+									function (_p7) {
+										return A2(
+											_elm_lang$core$Platform$sendToSelf,
+											router,
+											A2(_elm_lang$mouse$Mouse$Msg, category, _p7));
+									})),
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$mouse$Mouse$Watcher, taggers, pid),
+										state));
+							});
+					});
+			});
+		var bothStep = F4(
+			function (category, _p8, taggers, task) {
+				var _p9 = _p8;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					task,
+					function (state) {
+						return _elm_lang$core$Task$succeed(
+							A3(
+								_elm_lang$core$Dict$insert,
+								category,
+								A2(_elm_lang$mouse$Mouse$Watcher, taggers, _p9.pid),
+								state));
+					});
+			});
+		var leftStep = F3(
+			function (category, _p10, task) {
+				var _p11 = _p10;
+				return A2(
+					_elm_lang$mouse$Mouse_ops['&>'],
+					_elm_lang$core$Process$kill(_p11.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$mouse$Mouse$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$mouse$Mouse$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$mouse$Mouse$clicks = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'click', tagger));
+};
+var _elm_lang$mouse$Mouse$moves = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mousemove', tagger));
+};
+var _elm_lang$mouse$Mouse$downs = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mousedown', tagger));
+};
+var _elm_lang$mouse$Mouse$ups = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mouseup', tagger));
+};
+var _elm_lang$mouse$Mouse$subMap = F2(
+	function (func, _p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$mouse$Mouse$MySub,
+			_p13._0,
+			function (_p14) {
+				return func(
+					_p13._1(_p14));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
+
+var _elm_lang$window$Native_Window = function()
+{
+
+var size = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)	{
+	callback(_elm_lang$core$Native_Scheduler.succeed({
+		width: window.innerWidth,
+		height: window.innerHeight
+	}));
+});
+
+return {
+	size: size
+};
+
+}();
+var _elm_lang$window$Window_ops = _elm_lang$window$Window_ops || {};
+_elm_lang$window$Window_ops['&>'] = F2(
+	function (t1, t2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			t1,
+			function (_p0) {
+				return t2;
+			});
+	});
+var _elm_lang$window$Window$onSelfMsg = F3(
+	function (router, dimensions, state) {
+		var _p1 = state;
+		if (_p1.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (_p2) {
+				var _p3 = _p2;
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					_p3._0(dimensions));
+			};
+			return A2(
+				_elm_lang$window$Window_ops['&>'],
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p1._0.subs)),
+				_elm_lang$core$Task$succeed(state));
+		}
+	});
+var _elm_lang$window$Window$init = _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+var _elm_lang$window$Window$size = _elm_lang$window$Native_Window.size;
+var _elm_lang$window$Window$width = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.width;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$height = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.height;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var _p4 = {ctor: '_Tuple2', _0: oldState, _1: newSubs};
+		if (_p4._0.ctor === 'Nothing') {
+			if (_p4._1.ctor === '[]') {
+				return _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+			} else {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					_elm_lang$core$Process$spawn(
+						A3(
+							_elm_lang$dom$Dom_LowLevel$onWindow,
+							'resize',
+							_elm_lang$core$Json_Decode$succeed(
+								{ctor: '_Tuple0'}),
+							function (_p5) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									_elm_lang$window$Window$size,
+									_elm_lang$core$Platform$sendToSelf(router));
+							})),
+					function (pid) {
+						return _elm_lang$core$Task$succeed(
+							_elm_lang$core$Maybe$Just(
+								{subs: newSubs, pid: pid}));
+					});
+			}
+		} else {
+			if (_p4._1.ctor === '[]') {
+				return A2(
+					_elm_lang$window$Window_ops['&>'],
+					_elm_lang$core$Process$kill(_p4._0._0.pid),
+					_elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing));
+			} else {
+				return _elm_lang$core$Task$succeed(
+					_elm_lang$core$Maybe$Just(
+						{subs: newSubs, pid: _p4._0._0.pid}));
+			}
+		}
+	});
+var _elm_lang$window$Window$subscription = _elm_lang$core$Native_Platform.leaf('Window');
+var _elm_lang$window$Window$Size = F2(
+	function (a, b) {
+		return {width: a, height: b};
+	});
+var _elm_lang$window$Window$MySub = function (a) {
+	return {ctor: 'MySub', _0: a};
+};
+var _elm_lang$window$Window$resizes = function (tagger) {
+	return _elm_lang$window$Window$subscription(
+		_elm_lang$window$Window$MySub(tagger));
+};
+var _elm_lang$window$Window$subMap = F2(
+	function (func, _p6) {
+		var _p7 = _p6;
+		return _elm_lang$window$Window$MySub(
+			function (_p8) {
+				return func(
+					_p7._0(_p8));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
 
 var _evancz$elm_graphics$Native_Element = function()
 {
@@ -11418,6 +11933,13 @@ var _user$project$BlogList$Model = F5(
 var _user$project$BlogList$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
+var _user$project$BlogList$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(_elm_lang$core$Time$every, _elm_lang$core$Time$minute, _user$project$BlogList$Tick)
+			]));
+};
 var _user$project$BlogList$FetchFail = function (a) {
 	return {ctor: 'FetchFail', _0: a};
 };
@@ -11878,7 +12400,7 @@ var _user$project$Cityscape$displayModelInfo = function (model) {
 			function (key) {
 				return _elm_lang$core$Char$fromCode(key);
 			},
-			model.keys);
+			_elm_lang$core$Set$toList(model.keys));
 		var dt = _elm_lang$core$Basics$round(model.dt);
 		var t = _elm_lang$core$Basics$round(model.t);
 		var d = {ctor: '_Tuple2', _0: model.dx, _1: model.dy};
@@ -12066,11 +12588,11 @@ var _user$project$Cityscape$view = function (model) {
 		_elm_lang$core$Native_List.fromArray(
 			[finalOutput]));
 };
-var _user$project$Cityscape$timeUpdate = F2(
-	function (dt, model) {
+var _user$project$Cityscape$timeUpdate = F3(
+	function (dt, t, model) {
 		return _elm_lang$core$Native_Utils.update(
 			model,
-			{t: model.t + dt, dt: dt});
+			{dt: dt, t: t});
 	});
 var _user$project$Cityscape$mouseUpdate = F2(
 	function (_p6, model) {
@@ -12164,61 +12686,12 @@ var _user$project$Cityscape$addBuildingsUpdate = function (model) {
 var _user$project$Cityscape$getNumBuildings = function (model) {
 	return _elm_lang$core$List$length(model.buildings);
 };
-var _user$project$Cityscape$keysUpdateModel = F2(
-	function (keys, model) {
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				keys: _elm_lang$core$Set$toList(keys)
-			});
-	});
-var _user$project$Cityscape$isDown = F2(
-	function (keys, keyCode) {
-		return A2(
-			_elm_lang$core$Set$member,
-			_elm_lang$core$Char$toCode(keyCode),
-			keys);
-	});
-var _user$project$Cityscape$keysUpdateToggleInfo = F2(
-	function (keys, model) {
-		return A2(
-			_user$project$Cityscape$isDown,
-			keys,
-			_elm_lang$core$Native_Utils.chr('I')) ? _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				showInfo: _elm_lang$core$Basics$not(model.showInfo)
-			}) : model;
-	});
-var _user$project$Cityscape$increment = function (condition) {
-	var _p11 = condition;
-	if (_p11 === true) {
-		return 1;
-	} else {
-		return 0;
-	}
-};
-var _user$project$Cityscape$keysUpdateAddBuildings = F2(
-	function (keys, model) {
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				numBuildingsToAdd: model.numBuildingsToAdd + _user$project$Cityscape$increment(
-					A2(
-						_user$project$Cityscape$isDown,
-						keys,
-						_elm_lang$core$Native_Utils.chr('1')))
-			});
-	});
-var _user$project$Cityscape$randomUpdate = function (model) {
-	return model;
-};
 var _user$project$Cityscape$updateWindowDimensions = F2(
-	function (_p12, model) {
-		var _p13 = _p12;
+	function (_p11, model) {
+		var _p12 = _p11;
 		return _elm_lang$core$Native_Utils.update(
 			model,
-			{windowWidth: _p13._0, windowHeight: _p13._1});
+			{windowWidth: _p12._0, windowHeight: _p12._1});
 	});
 var _user$project$Cityscape$wrapBuildings = F2(
 	function (widthWrap, buildings) {
@@ -12281,8 +12754,8 @@ var _user$project$Cityscape$updateBuildings = F4(
 		return updatedBuildings;
 	});
 var _user$project$Cityscape$updateBuildingsInModel = function (model) {
-	var _p14 = model.movementType;
-	switch (_p14.ctor) {
+	var _p13 = model.movementType;
+	switch (_p13.ctor) {
 		case 'MouseMove':
 			var updatedBuildings = A4(_user$project$Cityscape$updateBuildings, model.dx, model.dt, model.windowWidth, model.buildings);
 			return _elm_lang$core$Native_Utils.update(
@@ -12344,9 +12817,9 @@ var _user$project$Cityscape$NullMove = {ctor: 'NullMove'};
 var _user$project$Cityscape$StaticMove = {ctor: 'StaticMove'};
 var _user$project$Cityscape$MouseMove = {ctor: 'MouseMove'};
 var _user$project$Cityscape$TimeMove = {ctor: 'TimeMove'};
-var _user$project$Cityscape$init = function (_p15) {
-	var _p16 = _p15;
-	var _p17 = _p16._1;
+var _user$project$Cityscape$init = function (_p14) {
+	var _p15 = _p14;
+	var _p16 = _p15._1;
 	var model = {
 		x: 0,
 		y: 0,
@@ -12354,10 +12827,9 @@ var _user$project$Cityscape$init = function (_p15) {
 		dy: 0,
 		kx: 0,
 		ky: 0,
-		keys: _elm_lang$core$Native_List.fromArray(
-			[]),
+		keys: _elm_lang$core$Set$empty,
 		t: 0,
-		dt: 0,
+		dt: 7,
 		seed: _elm_lang$core$Random$initialSeed(42),
 		buildings: _elm_lang$core$Native_List.fromArray(
 			[]),
@@ -12365,115 +12837,159 @@ var _user$project$Cityscape$init = function (_p15) {
 		randomValues: _elm_lang$core$Array$fromList(
 			_elm_lang$core$Native_List.fromArray(
 				[])),
-		windowWidth: _p16._0,
-		windowHeight: _p17,
+		windowWidth: _p15._0,
+		windowHeight: _p16,
 		movementType: _user$project$Cityscape$TimeMove,
 		sunset: {
-			y: 0 - (_elm_lang$core$Basics$toFloat(_p17) / 3),
-			h: _elm_lang$core$Basics$toFloat(_p17) / 4
+			y: 0 - (_elm_lang$core$Basics$toFloat(_p16) / 3),
+			h: _elm_lang$core$Basics$toFloat(_p16) / 4
 		},
-		showInfo: false
+		showInfo: true
 	};
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 };
-var _user$project$Cityscape$toMovementType = function (code) {
-	var _p18 = _elm_lang$core$Char$fromCode(code);
-	switch (_p18.valueOf()) {
-		case 'M':
-			return _user$project$Cityscape$MouseMove;
-		case 'T':
-			return _user$project$Cityscape$TimeMove;
-		case 'S':
-			return _user$project$Cityscape$StaticMove;
-		default:
-			return _user$project$Cityscape$NullMove;
-	}
+var _user$project$Cityscape$NewRandomValues = function (a) {
+	return {ctor: 'NewRandomValues', _0: a};
 };
-var _user$project$Cityscape$getMovementType = function (keys) {
-	return A2(
-		_elm_lang$core$List$filter,
-		function (a) {
-			return !_elm_lang$core$Native_Utils.eq(a, _user$project$Cityscape$NullMove);
-		},
-		A2(
-			_elm_lang$core$List$map,
-			_user$project$Cityscape$toMovementType,
-			_elm_lang$core$Set$toList(keys)));
-};
-var _user$project$Cityscape$keysUpdateMovementType = F2(
-	function (keys, model) {
-		var processedKeys = _user$project$Cityscape$getMovementType(keys);
-		return _elm_lang$core$List$isEmpty(processedKeys) ? model : _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				movementType: A2(
-					_elm_lang$core$Maybe$withDefault,
-					_user$project$Cityscape$NullMove,
-					_elm_lang$core$List$head(processedKeys))
-			});
-	});
-var _user$project$Cityscape$keysUpdate = F2(
-	function (keys, model) {
-		return A2(
-			_user$project$Cityscape$keysUpdateToggleInfo,
-			keys,
-			A2(
-				_user$project$Cityscape$keysUpdateMovementType,
-				keys,
-				A2(
-					_user$project$Cityscape$keysUpdateAddBuildings,
-					keys,
-					A2(_user$project$Cityscape$keysUpdateModel, keys, model))));
-	});
 var _user$project$Cityscape$update = F2(
 	function (action, model) {
-		var _p19 = action;
-		switch (_p19.ctor) {
+		var _p17 = action;
+		switch (_p17.ctor) {
 			case 'None':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'MouseMoved':
+			case 'Move':
+				var _p18 = _p17._0;
 				return {
 					ctor: '_Tuple2',
 					_0: A2(
 						_user$project$Cityscape$mouseUpdate,
-						{ctor: '_Tuple2', _0: _p19._0._0, _1: _p19._0._1},
+						{ctor: '_Tuple2', _0: _p18.x, _1: _p18.y},
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'KeyDown':
-				return {
-					ctor: '_Tuple2',
-					_0: A2(_user$project$Cityscape$keysUpdate, _p19._0, model),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'WindowSizeChange':
+			case 'Size':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			default:
+			case 'KeyDown':
+				var _p20 = _p17._0;
+				var model$ = _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						keys: A2(_elm_lang$core$Set$insert, _p20, model.keys)
+					});
+				var _p19 = _elm_lang$core$Char$fromCode(_p20);
+				switch (_p19.valueOf()) {
+					case 'B':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model$,
+								{numBuildingsToAdd: 1}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'M':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model$,
+								{movementType: _user$project$Cityscape$MouseMove}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'T':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model$,
+								{movementType: _user$project$Cityscape$TimeMove}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'S':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model$,
+								{movementType: _user$project$Cityscape$StaticMove}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'I':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model$,
+								{
+									showInfo: _elm_lang$core$Basics$not(model$.showInfo)
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					default:
+						return {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			case 'KeyUp':
+				var model$ = _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						keys: A2(_elm_lang$core$Set$remove, _p17._0, model.keys)
+					});
+				return {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Tick':
+				var _p21 = _p17._0;
+				var dt = _p21 - model.t;
 				return {
 					ctor: '_Tuple2',
 					_0: _user$project$Cityscape$resetMouseDelta(
 						_user$project$Cityscape$updateBuildingsInModel(
 							_user$project$Cityscape$addBuildingsUpdate(
-								_user$project$Cityscape$randomUpdate(
-									A2(_user$project$Cityscape$timeUpdate, _p19._0, model))))),
+								A3(_user$project$Cityscape$timeUpdate, dt, _p21, model)))),
+					_1: A2(
+						_elm_lang$core$Random$generate,
+						_user$project$Cityscape$NewRandomValues,
+						A2(
+							_elm_lang$core$Random$list,
+							100,
+							A2(_elm_lang$core$Random$float, 0, 1)))
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							randomValues: _elm_lang$core$Array$fromList(_p17._0)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
-var _user$project$Cityscape$WindowSizeChange = function (a) {
-	return {ctor: 'WindowSizeChange', _0: a};
+var _user$project$Cityscape$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
 };
-var _user$project$Cityscape$MouseMoved = function (a) {
-	return {ctor: 'MouseMoved', _0: a};
+var _user$project$Cityscape$Size = function (a) {
+	return {ctor: 'Size', _0: a};
+};
+var _user$project$Cityscape$Move = function (a) {
+	return {ctor: 'Move', _0: a};
+};
+var _user$project$Cityscape$KeyUp = function (a) {
+	return {ctor: 'KeyUp', _0: a};
 };
 var _user$project$Cityscape$KeyDown = function (a) {
 	return {ctor: 'KeyDown', _0: a};
 };
-var _user$project$Cityscape$TimeDelta = function (a) {
-	return {ctor: 'TimeDelta', _0: a};
+var _user$project$Cityscape$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(_elm_lang$core$Time$every, 20 * _elm_lang$core$Time$millisecond, _user$project$Cityscape$Tick),
+				_elm_lang$mouse$Mouse$moves(_user$project$Cityscape$Move),
+				_elm_lang$window$Window$resizes(_user$project$Cityscape$Size),
+				_elm_lang$keyboard$Keyboard$downs(_user$project$Cityscape$KeyDown),
+				_elm_lang$keyboard$Keyboard$ups(_user$project$Cityscape$KeyUp)
+			]));
 };
 var _user$project$Cityscape$None = {ctor: 'None'};
 
+var _user$project$ProjectList$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
+};
 var _user$project$ProjectList$viewProject = function (project) {
 	var $break = _elm_lang$core$Native_List.fromArray(
 		[
@@ -12824,6 +13340,9 @@ var _user$project$ProjectList$update = F2(
 	});
 var _user$project$ProjectList$RequestRefresh = {ctor: 'RequestRefresh'};
 
+var _user$project$SummaryList$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
+};
 var _user$project$SummaryList$viewSummary = function (summary) {
 	var contents = A2(
 		_elm_lang$core$List$map,
@@ -13004,10 +13523,13 @@ _user$project$Main_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _user$project$Main$Model = F4(
-	function (a, b, c, d) {
-		return {cityscape: a, projectList: b, summaryList: c, blogList: d};
+var _user$project$Main$Model = F5(
+	function (a, b, c, d, e) {
+		return {cityscape: a, projectList: b, summaryList: c, blogList: d, debug: e};
 	});
+var _user$project$Main$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
+};
 var _user$project$Main$BlogListMsgs = function (a) {
 	return {ctor: 'BlogListMsgs', _0: a};
 };
@@ -13037,7 +13559,7 @@ var _user$project$Main$init = F4(
 		var cityscapeFx = _p3._1;
 		return {
 			ctor: '_Tuple2',
-			_0: {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList},
+			_0: {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList, debug: ''},
 			_1: _elm_lang$core$Platform_Cmd$batch(
 				_elm_lang$core$Native_List.fromArray(
 					[
@@ -13109,6 +13631,15 @@ var _user$project$Main$view = function (model) {
 						_elm_lang$html$Html_App$map,
 						_user$project$Main$ProjectListMsgs,
 						_user$project$ProjectList$view(model.projectList))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('debug: '),
+						_elm_lang$html$Html$text(model.debug)
 					]))
 			]));
 };
@@ -13160,19 +13691,57 @@ var _user$project$Main$update = F2(
 						{blogList: blogList}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, fx)
 				};
+			case 'Tick':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							debug: _elm_lang$core$Basics$toString(_p4._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
+var _user$project$Main$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (a) {
+					return _user$project$Main$CityscapeMsgs(a);
+				},
+				_user$project$Cityscape$subscriptions(model.cityscape)),
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (a) {
+					return _user$project$Main$ProjectListMsgs(a);
+				},
+				_user$project$ProjectList$subscriptions(model.projectList)),
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (a) {
+					return _user$project$Main$SummaryListMsgs(a);
+				},
+				_user$project$SummaryList$subscriptions(model.summaryList)),
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (a) {
+					return _user$project$Main$BlogListMsgs(a);
+				},
+				_user$project$BlogList$subscriptions(model.blogList))
+			]));
+};
 var _user$project$Main$main = {
 	main: _elm_lang$html$Html_App$program(
 		{
 			init: A4(_user$project$Main$init, 'assets/1gam_projects/project_list.json', 'assets/summary_data.json', 'assets/blogs/blog_content.json', 'assets/1gam_projects/'),
 			update: _user$project$Main$update,
 			view: _user$project$Main$view,
-			subscriptions: function (_p9) {
-				return _elm_lang$core$Platform_Sub$none;
-			}
+			subscriptions: _user$project$Main$subscriptions
 		})
 };
 var _user$project$Main$NoOp = {ctor: 'NoOp'};

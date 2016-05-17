@@ -4,6 +4,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.App as Html
 import List exposing (map)
+import Platform.Sub
+import Time exposing (..)
 
 import BlogList
 import Cityscape
@@ -19,6 +21,7 @@ type Msg
     | ProjectListMsgs ProjectList.Msg
     | SummaryListMsgs SummaryList.Msg
     | BlogListMsgs BlogList.Msg
+    | Tick Time
 
 
 type alias Model =
@@ -26,6 +29,7 @@ type alias Model =
     , projectList : ProjectList.Model
     , summaryList : SummaryList.Model
     , blogList : BlogList.Model
+    , debug : String
     }
 
 init : String -> String -> String -> String -> (Model, Cmd Msg)
@@ -40,6 +44,7 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
           , projectList = projectList
           , summaryList = summaryList
           , blogList = blogList
+          , debug = ""
           }
         , Cmd.batch
             [ Cmd.map CityscapeMsgs cityscapeFx
@@ -59,29 +64,11 @@ view model =
             [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
         , div [ style [ ("display", "flex") ] ]
             [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
+        , div []
+            [ text "debug: "
+            , text model.debug
+            ]
         ]
-        -- [ Cityscape.view (Signal.forwardTo address CityscapeMsgs) model.cityscape
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ BlogList.view (Signal.forwardTo address BlogListMsgs) model.blogList
-        --     ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ SummaryList.view (Signal.forwardTo address SummaryListMsgs) model.summaryList
-        --     ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ ProjectList.view (Signal.forwardTo address ProjectListMsgs) model.projectList
-        --     ]
-        -- ]
-        -- [ Cityscape.view (Signal.forwardTo address CityscapeMsgs) model.cityscape
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ BlogList.view (Signal.forwardTo address BlogListMsgs) model.blogList
-        --     ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ SummaryList.view (Signal.forwardTo address SummaryListMsgs) model.summaryList
-        --     ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ ProjectList.view (Signal.forwardTo address ProjectListMsgs) model.projectList
-        --     ]
-        -- ]
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
 update action model =
@@ -118,28 +105,33 @@ update action model =
                 , Cmd.map BlogListMsgs fx
                 )
 
+        Tick time ->
+            ( { model | debug = toString time }, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ model.cityscape
+            |> Cityscape.subscriptions
+            |> Sub.map (\a -> CityscapeMsgs a)
+        , model.projectList
+            |> ProjectList.subscriptions
+            |> Sub.map (\a -> ProjectListMsgs a)
+        , model.summaryList
+            |> SummaryList.subscriptions
+            |> Sub.map (\a -> SummaryListMsgs a)
+        , model.blogList
+            |> BlogList.subscriptions
+            |> Sub.map (\a -> BlogListMsgs a)
+        ]
 
 main =
     Html.program
         { init = init "assets/1gam_projects/project_list.json" "assets/summary_data.json" "assets/blogs/blog_content.json" "assets/1gam_projects/"
-        -- , inputs =
-            -- [ (Signal.map (\a -> CityscapeMsgs a) Cityscape.inputs)
-            -- , (Signal.map (\a -> BlogListMsgs a) BlogList.inputs)
-            -- ]
-
-            -- [ (Signal.map (\a -> BlogListMsgs a) BlogList.inputs)
-            -- , (Signal.map (\a -> CityscapeMsgs a) Cityscape.inputs)
-            -- ]
-            -- [
-            --     Signal.mergeMany
-            --         [ (Signal.map (\a -> BlogListMsgs a) BlogList.inputs)
-            --         , (Signal.map (\a -> CityscapeMsgs a) Cityscape.inputs)
-            --         ]
-            -- ]
-
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }

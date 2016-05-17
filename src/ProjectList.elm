@@ -178,7 +178,11 @@ viewProject project =
     in
         th [class "projectlist-item"] content
 
--- EFFECTS
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+-- CMDS
 
 getProjectData : String -> Cmd Msg
 getProjectData location =

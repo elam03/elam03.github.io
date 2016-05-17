@@ -7,9 +7,12 @@ import Collage exposing (..)
 import Element exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Mouse exposing (Position)
+import Keyboard exposing (..)
 import Random
 import Set
 import Time exposing (..)
+import Window exposing (Size)
 
 import Building exposing (..)
 
@@ -29,7 +32,7 @@ type alias Model =
     ,   dy : Float
     ,   kx : Int
     ,   ky : Int
-    ,   keys : List Char.KeyCode
+    ,   keys : Set.Set KeyCode
     ,   t : Float
     ,   dt : Float
     ,   seed : Random.Seed
@@ -52,9 +55,9 @@ init (w, h) =
         , dy = 0
         , kx = 0
         , ky = 0
-        , keys = []
+        , keys = Set.empty
         , t = 0
-        , dt = 0
+        , dt = 7
         , seed = Random.initialSeed 42
         , buildings = []
         , numBuildingsToAdd = 10
@@ -63,7 +66,7 @@ init (w, h) =
         , windowHeight = h
         , movementType = TimeMove
         , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
-        , showInfo = False
+        , showInfo = True
         }
     in
         ( model
@@ -74,24 +77,72 @@ init (w, h) =
 
 type Msg
     = None
-    | TimeDelta Float
-    | KeyDown Keys
-    | MouseMoved (Int, Int)
-    | WindowSizeChange (Int, Int)
+    | KeyDown KeyCode
+    | KeyUp KeyCode
+    | Move Mouse.Position
+    | Size Window.Size
+    | Tick Time
+    | NewRandomValues (List Float)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
         None ->
             ( model, Cmd.none )
-        MouseMoved (mx, my) ->
-            ( model |> mouseUpdate (mx, my), Cmd.none )
-        KeyDown keys ->
-            ( model |> keysUpdate keys, Cmd.none )
-        WindowSizeChange (ww, wh) ->
+        Move xy ->
+            ( model
+                |> mouseUpdate (xy.x, xy.y)
+            , Cmd.none
+            )
+        Size s ->
             ( model, Cmd.none )
-        TimeDelta dt ->
-            ( model |> timeUpdate dt |> randomUpdate |> addBuildingsUpdate |> updateBuildingsInModel |> resetMouseDelta, Cmd.none )
+            -- ( { model
+            --   | windowWidth = s.width
+            --   , windowHeight = s.height
+            --   }
+            -- , Cmd.none
+            -- )
+
+        KeyDown key ->
+            let
+                model' = { model | keys = Set.insert key model.keys }
+            in
+                case Char.fromCode key of
+                    'B' ->
+                        ( { model' | numBuildingsToAdd = 1 }, Cmd.none )
+                    'M' ->
+                        ( { model' | movementType = MouseMove }, Cmd.none )
+                    'T' ->
+                        ( { model' | movementType = TimeMove }, Cmd.none )
+                    'S' ->
+                        ( { model' | movementType = StaticMove }, Cmd.none )
+                    'I' ->
+                        ( { model' | showInfo = not model'.showInfo }, Cmd.none )
+                    _ ->
+                        ( model', Cmd.none )
+
+        KeyUp key ->
+            let
+                model' = { model | keys = Set.remove key model.keys }
+            in
+                ( model', Cmd.none )
+
+        Tick t ->
+            let
+                dt = t - model.t
+            in
+                ( model
+                    |> timeUpdate dt t
+                    |> addBuildingsUpdate
+                    |> updateBuildingsInModel
+                    |> resetMouseDelta
+                , Random.generate NewRandomValues (Random.list 100 (Random.float 0 1))
+                )
+
+        NewRandomValues list ->
+            ( { model | randomValues = Array.fromList list }
+            , Cmd.none
+            )
 
 updateBuildings : Float -> Float -> Int -> List Building -> List Building
 updateBuildings dx dt windowWidth buildings =
@@ -157,77 +208,6 @@ updateWindowDimensions : (Int, Int) -> Model -> Model
 updateWindowDimensions (w, h) model =
     { model | windowWidth = w, windowHeight = h }
 
-randomUpdate : Model -> Model
-randomUpdate model =
-    model
-    -- let generator = Random.list 100 (Random.float 0 1)
-    --     tuple = Random.generate generator model.seed
-    --     vs = Array.fromList (fst tuple)
-    --     newSeed = snd tuple
-    --     modifiedModel =
-    --         { model | seed = newSeed
-    --         ,         randomValues = vs
-    --         }
-    -- in
-    --     modifiedModel
-
-increment : Bool -> Int
-increment condition =
-    case condition of
-        True -> 1
-        False -> 0
-
-isDown : Keys -> Char -> Bool
-isDown keys keyCode =
-    Set.member (Char.toCode keyCode) keys
-
-toMovementType : Char.KeyCode -> MovementType
-toMovementType code =
-    case (Char.fromCode code) of
-        'M' -> MouseMove
-        'T' -> TimeMove
-        'S' -> StaticMove
-        _   -> NullMove
-
-getMovementType : Keys -> List MovementType
-getMovementType keys =
-    Set.toList keys
-        |> List.map toMovementType
-        |> List.filter (\a -> a /= NullMove)
-
-keysUpdateMovementType : Keys -> Model -> Model
-keysUpdateMovementType keys model =
-    let
-        processedKeys = getMovementType keys
-    in
-        if processedKeys |> List.isEmpty then
-            model
-        else
-            { model | movementType = processedKeys |> List.head |> Maybe.withDefault NullMove }
-
-keysUpdateAddBuildings : Keys -> Model -> Model
-keysUpdateAddBuildings keys model =
-    { model | numBuildingsToAdd = model.numBuildingsToAdd + increment (isDown keys '1') }
-
-keysUpdateModel : Keys -> Model -> Model
-keysUpdateModel keys model =
-    { model | keys = Set.toList keys }
-
-keysUpdateToggleInfo : Keys -> Model -> Model
-keysUpdateToggleInfo keys model =
-    if (isDown keys 'I') then
-        { model | showInfo = not model.showInfo }
-    else
-        model
-
-keysUpdate : Keys -> Model -> Model
-keysUpdate keys model =
-    model
-        |> keysUpdateModel keys
-        |> keysUpdateAddBuildings keys
-        |> keysUpdateMovementType keys
-        |> keysUpdateToggleInfo keys
-
 getNumBuildings : Model -> Int
 getNumBuildings model =
     List.length model.buildings
@@ -292,21 +272,21 @@ mouseUpdate (mx, my) model =
         ,         dy = toFloat my - py
         }
 
-timeUpdate : Float -> Model -> Model
-timeUpdate dt model =
-    { model |   t = model.t + dt
-    ,           dt = dt
+timeUpdate : Float -> Float -> Model -> Model
+timeUpdate dt t model =
+    { model | dt = dt
+    ,         t = t
     }
 
--- inputs : Signal Msg
--- inputs =
---     mergeMany
---         [ Signal.map MouseMoved Mouse.position
---         , Signal.map KeyDown Keyboard.keysDown
---         -- , Signal.map TimeDelta (Signal.map (\t -> t / 20) (fps 30))
---         , Signal.map TimeDelta (fps 30)
---         , Signal.map WindowSizeChange Window.dimensions
---         ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Time.every (20 * millisecond) Tick
+        , Mouse.moves Move
+        , Window.resizes Size
+        , Keyboard.downs KeyDown
+        , Keyboard.ups KeyUp
+        ]
 
 grad : Float -> Float -> Gradient
 grad y h =
@@ -364,7 +344,10 @@ displayModelInfo model =
             d = (model.dx, model.dy)
             t = round model.t
             dt = round model.dt
-            keys = List.map (\key -> Char.fromCode key) model.keys
+            keys =
+                model.keys
+                    |> Set.toList
+                    |> List.map (\key -> Char.fromCode key)
             (ww, wh) = (toFloat model.windowWidth, toFloat model.windowHeight)
             firstBuilding = List.head model.buildings |> Maybe.withDefault nullBuilding
             movementType = model.movementType
