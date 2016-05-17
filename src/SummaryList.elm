@@ -26,15 +26,13 @@ type alias Summary =
 type alias Model =
     { file : String
     , summaryData : SummaryData
+    , debug : String
     }
 
 errorSummaryData : SummaryData
 errorSummaryData =
-    { summaries = [errorSummary]
-    }
-    -- { title = "error"
-    -- , contents = ["has", "occurred"]
-    -- }
+    { summaries = [errorSummary] }
+
 
 errorSummary : Summary
 errorSummary =
@@ -44,7 +42,7 @@ errorSummary =
 
 init : String -> (Model, Cmd Msg)
 init fileUrl =
-  ( Model fileUrl errorSummaryData
+  ( Model fileUrl errorSummaryData "debug"
   , getData fileUrl
   )
 
@@ -63,12 +61,14 @@ update action model =
             (model, getData model.file)
 
         Refresh summaryData ->
-            ( Model model.file summaryData
+            ( Model model.file summaryData "Refresh Achieved!"
             , Cmd.none
             )
 
         FetchFail _ ->
-            (model, Cmd.none)
+            ( { model | debug = "FetchFailed..." }
+            , Cmd.none
+            )
 
 -- VIEW
 
@@ -82,8 +82,22 @@ view model =
             model.summaryData.summaries
                 |> List.map (\s -> viewSummary s)
                 |> composeTiledHtml numCols
+
+        debugContents =
+            div []
+                [ text "debug: "
+                , text model.debug
+                ]
+
+        tableContents =
+            table attributes summaryData
+
     in
-        table attributes summaryData
+        div [ style [("border-style", "solid")] ]
+            [ tableContents
+            -- , debugContents
+            ]
+
 
 viewSummary : Summary -> Html Msg
 viewSummary summary =
@@ -103,9 +117,6 @@ getData : String -> Cmd Msg
 getData location =
     Http.get decodeData location
         |> Task.perform FetchFail Refresh
-        -- |> Task.toMaybe
-        -- |> Task.map Refresh
-        -- |> Cmd.task
 
 decodeData : Decoder (SummaryData)
 decodeData =
@@ -117,10 +128,3 @@ decodeData =
                     ("contents" := (list string))
             )
         )
-
--- decodeData : Decoder (List Summary)
--- decodeData =
---     list
---         <| object2 Summary
---             ("title" := string)
---             ("contents" := (list string))

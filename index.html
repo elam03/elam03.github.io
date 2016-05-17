@@ -5,11 +5,10 @@
     <script src="gen/main.js"></script>
   </head>
   <body>
-    <div id="main" class="container"></div>
+    <div id="main" class="main"></div>
     <script>
-      Elm.Main.embed(
-          document.getElementById('main')
-      );
+      var node = document.getElementById('main');
+      var app = Elm.Main.embed(node);
     </script>
   </body>
  </html>

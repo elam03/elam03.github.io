@@ -12874,6 +12874,15 @@ var _user$project$SummaryList$viewSummary = function (summary) {
 			]));
 };
 var _user$project$SummaryList$view = function (model) {
+	var debugContents = A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('debug: '),
+				_elm_lang$html$Html$text(model.debug)
+			]));
 	var attributes = _elm_lang$core$Native_List.fromArray(
 		[
 			_elm_lang$html$Html_Attributes$class('summarylist-table')
@@ -12888,7 +12897,19 @@ var _user$project$SummaryList$view = function (model) {
 				return _user$project$SummaryList$viewSummary(s);
 			},
 			model.summaryData.summaries));
-	return A2(_elm_lang$html$Html$table, attributes, summaryData);
+	var tableContents = A2(_elm_lang$html$Html$table, attributes, summaryData);
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'border-style', _1: 'solid'}
+					]))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[tableContents]));
 };
 var _user$project$SummaryList$errorSummary = {
 	title: 'error',
@@ -12926,9 +12947,9 @@ var _user$project$SummaryList$decodeData = A2(
 					_elm_lang$core$Json_Decode_ops[':='],
 					'contents',
 					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))))));
-var _user$project$SummaryList$Model = F2(
-	function (a, b) {
-		return {file: a, summaryData: b};
+var _user$project$SummaryList$Model = F3(
+	function (a, b, c) {
+		return {file: a, summaryData: b, debug: c};
 	});
 var _user$project$SummaryList$FetchFail = function (a) {
 	return {ctor: 'FetchFail', _0: a};
@@ -12946,7 +12967,7 @@ var _user$project$SummaryList$getData = function (location) {
 var _user$project$SummaryList$init = function (fileUrl) {
 	return {
 		ctor: '_Tuple2',
-		_0: A2(_user$project$SummaryList$Model, fileUrl, _user$project$SummaryList$errorSummaryData),
+		_0: A3(_user$project$SummaryList$Model, fileUrl, _user$project$SummaryList$errorSummaryData, 'debug'),
 		_1: _user$project$SummaryList$getData(fileUrl)
 	};
 };
@@ -12963,11 +12984,17 @@ var _user$project$SummaryList$update = F2(
 			case 'Refresh':
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_user$project$SummaryList$Model, model.file, _p0._0),
+					_0: A3(_user$project$SummaryList$Model, model.file, _p0._0, 'Refresh Achieved!'),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{debug: 'FetchFailed...'}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _user$project$SummaryList$RequestRefresh = {ctor: 'RequestRefresh'};
@@ -13028,7 +13055,6 @@ var _user$project$Main$view = function (model) {
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_elm_lang$html$Html$text('blah'),
 				A2(
 				_elm_lang$html$Html_App$map,
 				_user$project$Main$CityscapeMsgs,

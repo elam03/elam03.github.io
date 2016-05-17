@@ -52,8 +52,7 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
 view : Model -> Html Msg
 view model =
     div []
-        [ text "blah"
-        , Html.map CityscapeMsgs (Cityscape.view model.cityscape)
+        [ Html.map CityscapeMsgs (Cityscape.view model.cityscape)
         , div [ style [ ("display", "flex") ] ]
             [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
         , div [ style [ ("display", "flex") ] ]

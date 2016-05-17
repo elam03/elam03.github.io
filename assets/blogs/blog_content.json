@@ -19,6 +19,17 @@
             ],
             "date": "5/15/2016",
             "url": "assets/blogs/starting_with_a_cityscape.md"
+        },
+        {
+            "title": "Upgrading to 0.17.0",
+            "keywords":
+            [
+                "elm",
+                "upgrade",
+                "0.17.0"
+            ],
+            "date": "5/17/2016",
+            "url": "assets/blogs/upgrading_to_0.17.0.md"
         }
     ]
 }
