@@ -25,8 +25,9 @@ Http was my biggest refactor. I had to explicitly create failure Msgs to handle 
 
 In 0.16 when 'http getting', I was converting that task into an Action with a 'maybe', using an Effect -> Task conversion; 0.17 seems to remove that Effect -> Task conversion, so I was forced to use Task.perform, for which I needed to create the additional failure Msg.
 
-0.16.0
-~~~
+
+*0.16.0*
+```elm
 type Msg
     = ...
     | LoadBlogMarkdown (Maybe String)
@@ -37,21 +38,20 @@ getContent location =
         |> Task.toMaybe
         |> Task.map LoadBlogMarkdown
         |> Effect.task
-~~~
+```
 
-0.17.0
-~~~
+*0.17.0*
+```elm
 type Msg
     = ...
     | LoadBlogMarkdown String
     | FetchFail Http.Error
     | ...
 
--- 0.17.0
 getContent location =
     Http.getString location
         |> Task.perform FetchFail LoadBlogMarkdown
-~~~
+```
 
 I'm still unsure if this explicitly handling of error cases is a good thing or not. In retrospect, the code is slightly cleaner, removing the 'maybe' earlier and having it short-circuit to it's own dedicated Cmd.
 
@@ -61,7 +61,7 @@ The other big issue I encountered was serving my website. I was typically using 
 ### Subscription Troubles ###
 I struggled a little bit with the new subscription system, but it's mostly because I didn't any great examples to view yet! The main sore spot was combining all of the subscriptions from the sub-modules together into Main. I eventually got it and it makes a lot of sense! Just had to pass the right model into the subscription function and map it back out as the Msg in main.
 
-~~~
+```
 type Msg
     = NoOp
     | CityscapeMsgs Cityscape.Msg
@@ -85,7 +85,7 @@ main =
         , subscriptions = subscriptions
         , ...
         }
-~~~
+```
 
 ### Other Subscription Troubles ###
 The last pieces I had to refactor were the keyboard/mouse/size changes I handled inside of my Cityscape. I had to install a few extra packages that wasn't quite obvious:
