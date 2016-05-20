@@ -2,7 +2,7 @@ module BlogList exposing (..)
 
 import Array
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseOver, onMouseOut)
 import Html.Attributes exposing (class, href, src, style)
 import Http
 import Json.Decode exposing (..)
@@ -26,6 +26,7 @@ type alias BlogList =
 type alias Blog =
     { title : String
     , id : ID
+    , hover : Bool
     , date : Maybe String
     , keywords : Maybe (List String)
     , url : Maybe String
@@ -43,6 +44,7 @@ errorBlog : Blog
 errorBlog =
     { title = "error"
     , id = 0
+    , hover = False
     , date = Just ""
     , keywords = Just ["error"]
     , url = Just ""
@@ -61,6 +63,7 @@ type Msg
     | LoadBlogMarkdown String
     | FocusBlog ID
     | HoverBlog ID
+    | UnHoverBlog ID
     | FetchFail Http.Error
     | Tick Float
 
@@ -120,7 +123,20 @@ update action model =
                 )
 
         HoverBlog id ->
-            (model, Cmd.none)
+            let
+                blogs =
+                    model.blogs
+                        |> List.map (\b -> if b.id == id then { b | hover = True } else b)
+            in
+                ( { model | blogs = blogs }, Cmd.none)
+
+        UnHoverBlog id ->
+            let
+                blogs =
+                    model.blogs
+                        |> List.map (\b -> if b.id == id then { b | hover = False } else b)
+            in
+                ( { model | blogs = blogs }, Cmd.none)
 
         FetchFail _ ->
             (model, Cmd.none)
@@ -133,6 +149,12 @@ update action model =
 classStyle : Html.Attribute Msg
 classStyle = class "bloglist"
 
+classHoverStyle : Html.Attribute Msg
+classHoverStyle = class "bloglist-hover"
+
+classBlogHeader : Html.Attribute Msg
+classBlogHeader = class "bloglist-header"
+
 view : Model -> Html Msg
 view model =
     let
@@ -144,22 +166,33 @@ view model =
                 |> composeTiledHtml numCols
 
         viewCurrBlog =
-            div [ style [ ("border-style", "solid") ] ]
+            -- div [ style [ ("border-style", "solid") ] ]
+            div [ classStyle ]
                 [ model.currBlog ]
+
+        blogsHeader =
+            h3 [ classBlogHeader ] [ text "Blogs" ]
     in
-        div []
+        div [ classStyle ]
             [ viewCurrBlog
-            , h3 [] [ text ("debug: " ++ model.debug ++ " currId: " ++ toString model.currId) ]
+            , blogsHeader
             , table [ classStyle ] blogs
             ]
 
 viewBlog : Blog -> Html Msg
 viewBlog blog =
     let
+        attribute =
+            if blog.hover then
+                [ classHoverStyle ]
+            else
+                [ classStyle ]
+
         attributes =
-            [ classStyle
-            , onClick (FocusBlog blog.id)
-            ]
+            [ onClick (FocusBlog blog.id)
+            , onMouseOver (HoverBlog blog.id)
+            , onMouseOut (UnHoverBlog blog.id)
+            ] ++ attribute
 
         titleContent =
             [ h3 [ style [ ("text-align", "center") ] ] [ text blog.title ] ]
@@ -206,9 +239,10 @@ getContent location =
 
 decodeBlog : Decoder (Blog)
 decodeBlog =
-    object5 Blog
+    object6 Blog
         ("title" := string)
         (succeed -1)
+        (succeed False)
         (maybe ("date" := string))
         (maybe ("keywords" := (list string)))
         (maybe ("url" := string))

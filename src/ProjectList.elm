@@ -115,7 +115,7 @@ view : Model -> Html Msg
 view model =
     let
         numCols = 3
-        attributes = [ class "projectlist-table" ]
+        attributes = [ classStyle ]
 
         projects =
             model.projects
@@ -176,11 +176,14 @@ viewProject project =
             ++ break
             ++ previewsContent
     in
-        th [class "projectlist-item"] content
+        th [ classStyle ] content
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+classStyle : Html.Attribute Msg
+classStyle = class "projectlist"
 
 -- CMDS
 

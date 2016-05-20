@@ -1,5 +1,6 @@
 module SummaryList exposing (..)
 
+import Basics.Extra exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, src, style)
 import Http
@@ -50,8 +51,7 @@ init fileUrl =
 
 type Msg
     = RequestRefresh
-    | Refresh SummaryData
-    | FetchFail Http.Error
+    | Refresh (Maybe SummaryData)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -61,14 +61,12 @@ update action model =
             (model, getData model.file)
 
         Refresh summaryData ->
-            ( Model model.file summaryData "Refresh Achieved!"
-            , Cmd.none
-            )
-
-        FetchFail _ ->
-            ( { model | debug = "FetchFailed..." }
-            , Cmd.none
-            )
+            let
+                data = summaryData |> Maybe.withDefault errorSummaryData
+            in
+                ( Model model.file data "Refresh Achieved!"
+                , Cmd.none
+                )
 
 -- VIEW
 
@@ -76,7 +74,7 @@ view : Model -> Html Msg
 view model =
     let
         numCols = 2
-        attributes = [ class "summarylist-table" ]
+        attributes = [ classStyle ]
 
         summaryData =
             model.summaryData.summaries
@@ -106,10 +104,13 @@ viewSummary summary =
             summary.contents
                 |> List.map (\s -> li [] [ text s ])
     in
-        th [ class "summarylist-item" ]
+        th [ classStyle ]
             [ h2 [ style [ ("text-align", "center") ] ] [ text summary.title ]
             , ul [ style [ ("text-align", "left") ] ] contents
             ]
+
+classStyle : Html.Attribute Msg
+classStyle = class "summarylist"
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -120,15 +121,16 @@ subscriptions model =
 getData : String -> Cmd Msg
 getData location =
     Http.get decodeData location
-        |> Task.perform FetchFail Refresh
+        |> Task.toMaybe
+        |> Task.perform never Refresh
 
-decodeData : Decoder (SummaryData)
+decodeData : Decoder SummaryData
 decodeData =
-    object1 SummaryData
-        ( "summaries" :=
-            ( list
-                <| object2 Summary
-                    ("title" := string)
-                    ("contents" := (list string))
+        object1 SummaryData
+            ( "summaries" :=
+                ( list
+                    <| object2 Summary
+                        ("title" := string)
+                        ("contents" := (list string))
+                )
             )
-        )

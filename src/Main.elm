@@ -64,10 +64,10 @@ view model =
             [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
         , div [ style [ ("display", "flex") ] ]
             [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
-        , div []
-            [ text "debug: "
-            , text model.debug
-            ]
+        -- , div []
+        --     [ text "debug: "
+        --     , text model.debug
+        --     ]
         ]
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
