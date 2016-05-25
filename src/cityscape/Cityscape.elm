@@ -160,11 +160,16 @@ update action model =
         NewRandomValues list ->
             let
                 model' = { model | randomValues = Array.fromList list }
+                isInitialized = List.length model'.buildings > 0
             in
-                if List.length model'.buildings == 0 then
-                    ( model' |> addBuildings 10, Cmd.none )
-                else
+                if isInitialized then
                     ( model', Cmd.none )
+                else
+                    ( model'
+                        |> addBuildings 10
+                        |> addTrees 10
+                    , Cmd.none
+                    )
 
 addTrees : Int -> Model -> Model
 addTrees numTrees model =

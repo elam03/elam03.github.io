@@ -13070,13 +13070,17 @@ var _user$project$Cityscape$update = F2(
 					{
 						randomValues: _elm_lang$core$Array$fromList(_p16._0)
 					});
-				return _elm_lang$core$Native_Utils.eq(
+				var isInitialized = _elm_lang$core$Native_Utils.cmp(
 					_elm_lang$core$List$length(model$.buildings),
-					0) ? {
+					0) > 0;
+				return isInitialized ? {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none} : {
 					ctor: '_Tuple2',
-					_0: A2(_user$project$Cityscape$addBuildings, 10, model$),
+					_0: A2(
+						_user$project$Cityscape$addTrees,
+						10,
+						A2(_user$project$Cityscape$addBuildings, 10, model$)),
 					_1: _elm_lang$core$Platform_Cmd$none
-				} : {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
+				};
 		}
 	});
 var _user$project$Cityscape$Tick = function (a) {
