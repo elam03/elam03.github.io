@@ -12541,6 +12541,37 @@ var _user$project$Cityscape$displayMouseCursor = F2(
 						A2(_evancz$elm_graphics$Collage$ngon, 3, 5))))
 			]);
 	});
+var _user$project$Cityscape$viewTree = function (model) {
+	var leaves = _elm_lang$core$Native_List.fromArray(
+		[]);
+	var leafSize = model.height / 4;
+	var trunk = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_evancz$elm_graphics$Collage$move,
+			{ctor: '_Tuple2', _0: model.x, _1: model.y + (model.height / 2)},
+			A2(
+				_evancz$elm_graphics$Collage$filled,
+				_elm_lang$core$Color$brown,
+				A2(_evancz$elm_graphics$Collage$rect, model.w, model.height))),
+			A2(
+			_evancz$elm_graphics$Collage$move,
+			{ctor: '_Tuple2', _0: model.x, _1: model.y + model.height},
+			A2(
+				_evancz$elm_graphics$Collage$filled,
+				_elm_lang$core$Color$green,
+				_evancz$elm_graphics$Collage$polygon(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							{ctor: '_Tuple2', _0: leafSize, _1: leafSize},
+							{ctor: '_Tuple2', _0: leafSize, _1: 0 - leafSize},
+							{ctor: '_Tuple2', _0: 0 - leafSize, _1: 0 - leafSize},
+							{ctor: '_Tuple2', _0: 0 - leafSize, _1: leafSize}
+						]))))
+		]);
+	return _evancz$elm_graphics$Collage$group(
+		A2(_elm_lang$core$Basics_ops['++'], trunk, leaves));
+};
 var _user$project$Cityscape$grad = F2(
 	function (y, h) {
 		var split = 0.75;
@@ -12578,6 +12609,7 @@ var _user$project$Cityscape$viewSunset = function (model) {
 		A2(_evancz$elm_graphics$Collage$rect, w, h));
 };
 var _user$project$Cityscape$view = function (model) {
+	var trees = A2(_elm_lang$core$List$map, _user$project$Cityscape$viewTree, model.trees);
 	var sunset = _user$project$Cityscape$viewSunset(model);
 	var allBuildings = A2(_elm_lang$core$List$map, _user$project$Building$displayBuilding, model.buildings);
 	var _p5 = {ctor: '_Tuple2', _0: model.x, _1: 0 - model.y};
@@ -12589,14 +12621,17 @@ var _user$project$Cityscape$view = function (model) {
 			[sunset]),
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			allBuildings,
+			trees,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				_user$project$Cityscape$displayModelInfo(model),
+				allBuildings,
 				A2(
-					_user$project$Cityscape$displayMouseCursor,
-					{ctor: '_Tuple2', _0: mx, _1: my},
-					model))));
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Cityscape$displayModelInfo(model),
+					A2(
+						_user$project$Cityscape$displayMouseCursor,
+						{ctor: '_Tuple2', _0: mx, _1: my},
+						model)))));
 	var finalOutput = _evancz$elm_graphics$Element$toHtml(
 		A3(_evancz$elm_graphics$Collage$collage, model.windowWidth, model.windowHeight, things));
 	return A2(
@@ -12651,170 +12686,215 @@ var _user$project$Cityscape$mouseUpdate = F2(
 				dy: _elm_lang$core$Basics$toFloat(_p10) - py
 			});
 	});
-var _user$project$Cityscape$pickLayer = function (value) {
-	return (_elm_lang$core$Native_Utils.cmp(value, 66) > -1) ? _user$project$Building$Front : ((_elm_lang$core$Native_Utils.cmp(value, 33) > -1) ? _user$project$Building$Middle : _user$project$Building$Back);
-};
-var _user$project$Cityscape$reduceNewBuildingCount = function (model) {
-	return _elm_lang$core$Native_Utils.update(
-		model,
-		{numBuildingsToAdd: model.numBuildingsToAdd - 1});
-};
-var _user$project$Cityscape$addBuilding = F2(
-	function (model, building) {
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				buildings: A2(
-					_elm_lang$core$Basics_ops['++'],
-					model.buildings,
-					_elm_lang$core$Native_List.fromArray(
-						[building]))
-			});
-	});
-var _user$project$Cityscape$toValue = F3(
-	function (min, max, v) {
-		return (A2(_elm_lang$core$Maybe$withDefault, 0.5, v) * (max - min)) + min;
-	});
-var _user$project$Cityscape$popRandomValues = F2(
-	function (numOfValuesToPop, model) {
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{
-				randomValues: A3(
-					_elm_lang$core$Array$slice,
-					numOfValuesToPop,
-					_elm_lang$core$Array$length(model.randomValues),
-					model.randomValues)
-			});
-	});
-var _user$project$Cityscape$getRandomValues = F2(
-	function (model, numValues) {
-		return A3(_elm_lang$core$Array$slice, 0, numValues, model.randomValues);
-	});
-var _user$project$Cityscape$addBuildingsUpdate = function (model) {
-	if (_elm_lang$core$Native_Utils.cmp(model.numBuildingsToAdd, 0) > 0) {
-		var modifiedModel = A2(_user$project$Cityscape$popRandomValues, 3, model);
-		var y = model.sunset.y;
-		var randomValues = A2(_user$project$Cityscape$getRandomValues, model, 3);
-		var h = A3(
-			_user$project$Cityscape$toValue,
-			25,
-			100,
-			A2(_elm_lang$core$Array$get, 1, randomValues));
-		var l = _user$project$Cityscape$pickLayer(
-			A3(
-				_user$project$Cityscape$toValue,
-				0,
-				100,
-				A2(_elm_lang$core$Array$get, 1, randomValues)));
-		var wh = _elm_lang$core$Basics$toFloat((model.windowHeight / 2) | 0);
-		var ww = _elm_lang$core$Basics$toFloat((model.windowWidth / 2) | 0);
-		var x = A3(
-			_user$project$Cityscape$toValue,
-			0 - ww,
-			ww,
-			A2(_elm_lang$core$Array$get, 0, randomValues));
-		return _user$project$Cityscape$reduceNewBuildingCount(
-			A2(
-				_user$project$Cityscape$addBuilding,
-				modifiedModel,
-				A4(_user$project$Building$newBuilding, x, y, h, l)));
-	} else {
-		return model;
-	}
-};
-var _user$project$Cityscape$getNumBuildings = function (model) {
-	return _elm_lang$core$List$length(model.buildings);
-};
-var _user$project$Cityscape$updateWindowDimensions = F2(
-	function (_p11, model) {
-		var _p12 = _p11;
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{windowWidth: _p12._0, windowHeight: _p12._1});
-	});
-var _user$project$Cityscape$wrapBuildings = F2(
-	function (widthWrap, buildings) {
-		var w = _elm_lang$core$Basics$toFloat(widthWrap);
-		var checkRightEdge = function (b) {
-			return (_elm_lang$core$Native_Utils.cmp(b.x, w / 2) > 0) ? _elm_lang$core$Native_Utils.update(
-				b,
-				{x: (b.x - b.w) - w}) : b;
-		};
-		var checkLeftEdge = function (b) {
-			return (_elm_lang$core$Native_Utils.cmp(b.x, 0 - ((w / 2) + b.w)) < 0) ? _elm_lang$core$Native_Utils.update(
-				b,
-				{x: (b.x + b.w) + w}) : b;
-		};
-		return A2(
-			_elm_lang$core$List$map,
-			checkLeftEdge,
-			A2(_elm_lang$core$List$map, checkRightEdge, buildings));
-	});
 var _user$project$Cityscape$resetMouseDelta = function (model) {
 	return _elm_lang$core$Native_Utils.update(
 		model,
 		{dx: 0, dy: 0});
 };
-var _user$project$Cityscape$updateBuildings = F4(
-	function (dx, dt, windowWidth, buildings) {
-		var staticSpeed = 0;
-		var frontSpeed = 25 * dx;
-		var middleSpeed = frontSpeed * 2;
-		var middleBuildings = A2(
-			_elm_lang$core$List$map,
-			function (b) {
-				return _elm_lang$core$Native_Utils.update(
+var _user$project$Cityscape$updateAllEntitiesInModel = function (model) {
+	var wrapThings = F2(
+		function (widthWrap, things) {
+			var w = _elm_lang$core$Basics$toFloat(widthWrap);
+			var checkRightEdge = function (b) {
+				return (_elm_lang$core$Native_Utils.cmp(b.x, w / 2) > 0) ? _elm_lang$core$Native_Utils.update(
 					b,
-					{x: b.x + (middleSpeed / dt)});
-			},
-			A2(_elm_lang$core$List$filter, _user$project$Building$isMiddle, buildings));
-		var backSpeed = frontSpeed * 3;
-		var backBuildings = A2(
-			_elm_lang$core$List$map,
-			function (b) {
-				return _elm_lang$core$Native_Utils.update(
+					{x: (b.x - b.w) - w}) : b;
+			};
+			var checkLeftEdge = function (b) {
+				return (_elm_lang$core$Native_Utils.cmp(b.x, 0 - ((w / 2) + b.w)) < 0) ? _elm_lang$core$Native_Utils.update(
 					b,
-					{x: b.x + (backSpeed / dt)});
-			},
-			A2(_elm_lang$core$List$filter, _user$project$Building$isBack, buildings));
-		var frontBuildings = A2(
-			_elm_lang$core$List$map,
-			function (b) {
-				return _elm_lang$core$Native_Utils.update(
-					b,
-					{x: b.x + (frontSpeed / dt)});
-			},
-			A2(_elm_lang$core$List$filter, _user$project$Building$isFront, buildings));
-		var allBuildings = A2(
-			_elm_lang$core$Basics_ops['++'],
-			backBuildings,
-			A2(_elm_lang$core$Basics_ops['++'], middleBuildings, frontBuildings));
-		var updatedBuildings = A2(_user$project$Cityscape$wrapBuildings, windowWidth, allBuildings);
-		return updatedBuildings;
-	});
-var _user$project$Cityscape$updateBuildingsInModel = function (model) {
-	var _p13 = model.movementType;
-	switch (_p13.ctor) {
-		case 'MouseMove':
-			var updatedBuildings = A4(_user$project$Cityscape$updateBuildings, model.dx, model.dt, model.windowWidth, model.buildings);
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{buildings: updatedBuildings});
-		case 'TimeMove':
-			var updatedBuildings = A4(_user$project$Cityscape$updateBuildings, 1, model.dt, model.windowWidth, model.buildings);
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{buildings: updatedBuildings});
-		case 'StaticMove':
-			return model;
-		default:
-			return model;
-	}
+					{x: (b.x + b.w) + w}) : b;
+			};
+			return A2(
+				_elm_lang$core$List$map,
+				checkLeftEdge,
+				A2(_elm_lang$core$List$map, checkRightEdge, things));
+		});
+	var toValue = function (layer) {
+		var _p11 = layer;
+		switch (_p11.ctor) {
+			case 'Front':
+				return 0.25;
+			case 'Middle':
+				return 0.5;
+			case 'Back':
+				return 1.0;
+			default:
+				return 0.0;
+		}
+	};
+	var dx = function () {
+		var _p12 = model.movementType;
+		switch (_p12.ctor) {
+			case 'MouseMove':
+				return model.dx;
+			case 'TimeMove':
+				return 5;
+			default:
+				return 0;
+		}
+	}();
+	var moveEntity = function (e) {
+		return _elm_lang$core$Native_Utils.update(
+			e,
+			{
+				x: e.x + (dx * toValue(e.layer))
+			});
+	};
+	var buildings$ = A2(
+		wrapThings,
+		model.windowWidth,
+		A2(_elm_lang$core$List$map, moveEntity, model.buildings));
+	var trees$ = A2(
+		wrapThings,
+		model.windowWidth,
+		A2(_elm_lang$core$List$map, moveEntity, model.trees));
+	return _elm_lang$core$Native_Utils.update(
+		model,
+		{buildings: buildings$, trees: trees$});
 };
+var _user$project$Cityscape$addBuildings = F2(
+	function (numBuildings, model) {
+		addBuildings:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.eq(numBuildings, 0)) {
+				return model;
+			} else {
+				var y = model.sunset.y;
+				var wh = _elm_lang$core$Basics$toFloat((model.windowHeight / 2) | 0);
+				var ww = _elm_lang$core$Basics$toFloat((model.windowWidth / 2) | 0);
+				var toValue = F3(
+					function (min, max, v) {
+						return (A2(_elm_lang$core$Maybe$withDefault, 0.5, v) * (max - min)) + min;
+					});
+				var pickLayer = function (value) {
+					return (_elm_lang$core$Native_Utils.cmp(value, 66) > -1) ? _user$project$Building$Front : ((_elm_lang$core$Native_Utils.cmp(value, 33) > -1) ? _user$project$Building$Middle : _user$project$Building$Back);
+				};
+				var popRandomValues = F2(
+					function (numOfValuesToPop, model) {
+						return _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								randomValues: A3(
+									_elm_lang$core$Array$slice,
+									numOfValuesToPop,
+									_elm_lang$core$Array$length(model.randomValues),
+									model.randomValues)
+							});
+					});
+				var model$ = A2(popRandomValues, 3, model);
+				var getRandomValues = F2(
+					function (model, numValues) {
+						return A3(_elm_lang$core$Array$slice, 0, numValues, model.randomValues);
+					});
+				var randomValues = A2(getRandomValues, model, 3);
+				var x = A3(
+					toValue,
+					0 - ww,
+					ww,
+					A2(_elm_lang$core$Array$get, 0, randomValues));
+				var h = A3(
+					toValue,
+					25,
+					100,
+					A2(_elm_lang$core$Array$get, 1, randomValues));
+				var l = pickLayer(
+					A3(
+						toValue,
+						0,
+						100,
+						A2(_elm_lang$core$Array$get, 1, randomValues)));
+				var building$ = A4(_user$project$Building$newBuilding, x, y, h, l);
+				var _v5 = numBuildings - 1,
+					_v6 = _elm_lang$core$Native_Utils.update(
+					model$,
+					{
+						buildings: A2(
+							_elm_lang$core$Basics_ops['++'],
+							model$.buildings,
+							_elm_lang$core$Native_List.fromArray(
+								[building$]))
+					});
+				numBuildings = _v5;
+				model = _v6;
+				continue addBuildings;
+			}
+		}
+	});
+var _user$project$Cityscape$initTree = F4(
+	function (x, y, h, l) {
+		var model = {x: x, y: y, w: 6, layer: l, height: h, color: _elm_lang$core$Color$green};
+		return model;
+	});
+var _user$project$Cityscape$addTrees = F2(
+	function (numTrees, model) {
+		addTrees:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.eq(numTrees, 0)) {
+				return model;
+			} else {
+				var y = model.sunset.y;
+				var ww = _elm_lang$core$Basics$toFloat(model.windowWidth);
+				var popRandomValues = F2(
+					function (numOfValuesToPop, model) {
+						return _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								randomValues: A3(
+									_elm_lang$core$Array$slice,
+									numOfValuesToPop,
+									_elm_lang$core$Array$length(model.randomValues),
+									model.randomValues)
+							});
+					});
+				var model$ = A2(popRandomValues, 3, model);
+				var pickLayer = function (value) {
+					return (_elm_lang$core$Native_Utils.cmp(value, 66) > -1) ? _user$project$Building$Front : ((_elm_lang$core$Native_Utils.cmp(value, 33) > -1) ? _user$project$Building$Middle : _user$project$Building$Back);
+				};
+				var toValue = F3(
+					function (min, max, v) {
+						return (A2(_elm_lang$core$Maybe$withDefault, 0.5, v) * (max - min)) + min;
+					});
+				var x = A3(
+					toValue,
+					0 - ww,
+					ww,
+					A2(_elm_lang$core$Array$get, 0, model.randomValues));
+				var h = A3(
+					toValue,
+					25,
+					100,
+					A2(_elm_lang$core$Array$get, 1, model.randomValues));
+				var l = pickLayer(
+					A3(
+						toValue,
+						0,
+						100,
+						A2(_elm_lang$core$Array$get, 1, model.randomValues)));
+				var tree$ = A4(_user$project$Cityscape$initTree, x, y, h, l);
+				var _v7 = numTrees - 1,
+					_v8 = _elm_lang$core$Native_Utils.update(
+					model$,
+					{
+						trees: A2(
+							_elm_lang$core$Basics_ops['++'],
+							model.trees,
+							_elm_lang$core$Native_List.fromArray(
+								[tree$]))
+					});
+				numTrees = _v7;
+				model = _v8;
+				continue addTrees;
+			}
+		}
+	});
 var _user$project$Cityscape$Sunset = F2(
 	function (a, b) {
 		return {y: a, h: b};
+	});
+var _user$project$Cityscape$Tree = F6(
+	function (a, b, c, d, e, f) {
+		return {x: a, y: b, w: c, layer: d, height: e, color: f};
 	});
 var _user$project$Cityscape$Model = function (a) {
 	return function (b) {
@@ -12832,11 +12912,7 @@ var _user$project$Cityscape$Model = function (a) {
 													return function (n) {
 														return function (o) {
 															return function (p) {
-																return function (q) {
-																	return function (r) {
-																		return {x: a, y: b, dx: c, dy: d, kx: e, ky: f, keys: g, t: h, dt: i, seed: j, buildings: k, numBuildingsToAdd: l, randomValues: m, windowWidth: n, windowHeight: o, movementType: p, sunset: q, showInfo: r};
-																	};
-																};
+																return {x: a, y: b, dx: c, dy: d, keys: e, t: f, dt: g, seed: h, buildings: i, randomValues: j, windowWidth: k, windowHeight: l, movementType: m, sunset: n, showInfo: o, trees: p};
 															};
 														};
 													};
@@ -12853,38 +12929,36 @@ var _user$project$Cityscape$Model = function (a) {
 		};
 	};
 };
-var _user$project$Cityscape$NullMove = {ctor: 'NullMove'};
 var _user$project$Cityscape$StaticMove = {ctor: 'StaticMove'};
 var _user$project$Cityscape$MouseMove = {ctor: 'MouseMove'};
 var _user$project$Cityscape$TimeMove = {ctor: 'TimeMove'};
-var _user$project$Cityscape$init = function (_p14) {
-	var _p15 = _p14;
-	var _p16 = _p15._1;
+var _user$project$Cityscape$init = function (_p13) {
+	var _p14 = _p13;
+	var _p15 = _p14._1;
 	var model = {
 		x: 0,
 		y: 0,
 		dx: 0,
 		dy: 0,
-		kx: 0,
-		ky: 0,
 		keys: _elm_lang$core$Set$empty,
 		t: 0,
-		dt: 7,
+		dt: 0,
 		seed: _elm_lang$core$Random$initialSeed(42),
 		buildings: _elm_lang$core$Native_List.fromArray(
 			[]),
-		numBuildingsToAdd: 10,
 		randomValues: _elm_lang$core$Array$fromList(
 			_elm_lang$core$Native_List.fromArray(
 				[])),
-		windowWidth: _p15._0,
-		windowHeight: _p16,
+		windowWidth: _p14._0,
+		windowHeight: _p15,
 		movementType: _user$project$Cityscape$TimeMove,
 		sunset: {
-			y: 0 - (_elm_lang$core$Basics$toFloat(_p16) / 3),
-			h: _elm_lang$core$Basics$toFloat(_p16) / 4
+			y: 0 - (_elm_lang$core$Basics$toFloat(_p15) / 3),
+			h: _elm_lang$core$Basics$toFloat(_p15) / 4
 		},
-		showInfo: true
+		showInfo: true,
+		trees: _elm_lang$core$Native_List.fromArray(
+			[])
 	};
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 };
@@ -12893,37 +12967,41 @@ var _user$project$Cityscape$NewRandomValues = function (a) {
 };
 var _user$project$Cityscape$update = F2(
 	function (action, model) {
-		var _p17 = action;
-		switch (_p17.ctor) {
+		var _p16 = action;
+		switch (_p16.ctor) {
 			case 'None':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Move':
-				var _p18 = _p17._0;
+				var _p17 = _p16._0;
 				return {
 					ctor: '_Tuple2',
 					_0: A2(
 						_user$project$Cityscape$mouseUpdate,
-						{ctor: '_Tuple2', _0: _p18.x, _1: _p18.y},
+						{ctor: '_Tuple2', _0: _p17.x, _1: _p17.y},
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Size':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'KeyDown':
-				var _p20 = _p17._0;
+				var _p19 = _p16._0;
 				var model$ = _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						keys: A2(_elm_lang$core$Set$insert, _p20, model.keys)
+						keys: A2(_elm_lang$core$Set$insert, _p19, model.keys)
 					});
-				var _p19 = _elm_lang$core$Char$fromCode(_p20);
-				switch (_p19.valueOf()) {
-					case 'B':
+				var _p18 = _elm_lang$core$Char$fromCode(_p19);
+				switch (_p18.valueOf()) {
+					case '1':
 						return {
 							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model$,
-								{numBuildingsToAdd: 1}),
+							_0: A2(_user$project$Cityscape$addBuildings, 10, model$),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case '2':
+						return {
+							ctor: '_Tuple2',
+							_0: A2(_user$project$Cityscape$addTrees, 10, model$),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					case 'M':
@@ -12967,18 +13045,17 @@ var _user$project$Cityscape$update = F2(
 				var model$ = _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						keys: A2(_elm_lang$core$Set$remove, _p17._0, model.keys)
+						keys: A2(_elm_lang$core$Set$remove, _p16._0, model.keys)
 					});
 				return {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Tick':
-				var _p21 = _p17._0;
-				var dt = _p21 - model.t;
+				var _p20 = _p16._0;
+				var dt = _p20 - model.t;
 				return {
 					ctor: '_Tuple2',
 					_0: _user$project$Cityscape$resetMouseDelta(
-						_user$project$Cityscape$updateBuildingsInModel(
-							_user$project$Cityscape$addBuildingsUpdate(
-								A3(_user$project$Cityscape$timeUpdate, dt, _p21, model)))),
+						_user$project$Cityscape$updateAllEntitiesInModel(
+							A3(_user$project$Cityscape$timeUpdate, dt, _p20, model))),
 					_1: A2(
 						_elm_lang$core$Random$generate,
 						_user$project$Cityscape$NewRandomValues,
@@ -12988,31 +13065,34 @@ var _user$project$Cityscape$update = F2(
 							A2(_elm_lang$core$Random$float, 0, 1)))
 				};
 			default:
-				return {
+				var model$ = _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						randomValues: _elm_lang$core$Array$fromList(_p16._0)
+					});
+				return _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$List$length(model$.buildings),
+					0) ? {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							randomValues: _elm_lang$core$Array$fromList(_p17._0)
-						}),
+					_0: A2(_user$project$Cityscape$addBuildings, 10, model$),
 					_1: _elm_lang$core$Platform_Cmd$none
-				};
+				} : {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _user$project$Cityscape$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
-};
-var _user$project$Cityscape$Size = function (a) {
-	return {ctor: 'Size', _0: a};
-};
-var _user$project$Cityscape$Move = function (a) {
-	return {ctor: 'Move', _0: a};
 };
 var _user$project$Cityscape$KeyUp = function (a) {
 	return {ctor: 'KeyUp', _0: a};
 };
 var _user$project$Cityscape$KeyDown = function (a) {
 	return {ctor: 'KeyDown', _0: a};
+};
+var _user$project$Cityscape$Size = function (a) {
+	return {ctor: 'Size', _0: a};
+};
+var _user$project$Cityscape$Move = function (a) {
+	return {ctor: 'Move', _0: a};
 };
 var _user$project$Cityscape$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
