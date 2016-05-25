@@ -17,33 +17,56 @@ import Window exposing (Size)
 import Building exposing (..)
 
 -- MODEL
-type alias Keys = Set.Set Char.KeyCode
-type MovementType = TimeMove | MouseMove | StaticMove | NullMove
+type MovementType
+    = TimeMove
+    | MouseMove
+    | StaticMove
 
 type alias Sunset =
     { y : Float
     , h : Float
     }
 
+type alias Tree =
+    { x : Float
+    , y : Float
+    , w : Float
+    , layer : Layer
+    , height : Float
+    , color : Color
+    }
+
+initTree : Float -> Float -> Float -> Layer -> Tree
+initTree x y h l =
+    let
+        model =
+            { x = x
+            , y = y
+            , w = 6
+            , layer = l
+            , height = h
+            , color = green
+            }
+    in
+        model
+
 type alias Model =
     {   x : Float
     ,   y : Float
     ,   dx : Float
     ,   dy : Float
-    ,   kx : Int
-    ,   ky : Int
     ,   keys : Set.Set KeyCode
     ,   t : Float
     ,   dt : Float
     ,   seed : Random.Seed
     ,   buildings : List Building
-    ,   numBuildingsToAdd : Int
     ,   randomValues : Array.Array Float
     ,   windowWidth : Int
     ,   windowHeight : Int
     ,   movementType : MovementType
     ,   sunset : Sunset
     ,   showInfo : Bool
+    ,   trees : List Tree
     }
 
 init : (Int, Int) -> (Model, Cmd Msg)
@@ -53,34 +76,31 @@ init (w, h) =
         , y = 0
         , dx = 0
         , dy = 0
-        , kx = 0
-        , ky = 0
         , keys = Set.empty
         , t = 0
-        , dt = 7
+        , dt = 0
         , seed = Random.initialSeed 42
         , buildings = []
-        , numBuildingsToAdd = 10
         , randomValues = Array.fromList []
         , windowWidth = w
         , windowHeight = h
         , movementType = TimeMove
         , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
         , showInfo = True
+        , trees = []
         }
+
     in
-        ( model
-        , Cmd.none
-        )
+        ( model, Cmd.none )
 
 -- UPDATE
 
 type Msg
     = None
-    | KeyDown KeyCode
-    | KeyUp KeyCode
     | Move Mouse.Position
     | Size Window.Size
+    | KeyDown KeyCode
+    | KeyUp KeyCode
     | Tick Time
     | NewRandomValues (List Float)
 
@@ -90,10 +110,7 @@ update action model =
         None ->
             ( model, Cmd.none )
         Move xy ->
-            ( model
-                |> mouseUpdate (xy.x, xy.y)
-            , Cmd.none
-            )
+            ( model |> mouseUpdate (xy.x, xy.y), Cmd.none )
         Size s ->
             ( model, Cmd.none )
             -- ( { model
@@ -108,8 +125,10 @@ update action model =
                 model' = { model | keys = Set.insert key model.keys }
             in
                 case Char.fromCode key of
-                    'B' ->
-                        ( { model' | numBuildingsToAdd = 1 }, Cmd.none )
+                    '1' ->
+                        ( model' |> addBuildings 10, Cmd.none )
+                    '2' ->
+                        ( model' |> addTrees 10, Cmd.none )
                     'M' ->
                         ( { model' | movementType = MouseMove }, Cmd.none )
                     'T' ->
@@ -133,119 +152,75 @@ update action model =
             in
                 ( model
                     |> timeUpdate dt t
-                    |> addBuildingsUpdate
-                    |> updateBuildingsInModel
+                    |> updateAllEntitiesInModel
                     |> resetMouseDelta
                 , Random.generate NewRandomValues (Random.list 100 (Random.float 0 1))
                 )
 
         NewRandomValues list ->
-            ( { model | randomValues = Array.fromList list }
-            , Cmd.none
-            )
-
-updateBuildings : Float -> Float -> Int -> List Building -> List Building
-updateBuildings dx dt windowWidth buildings =
-    let
-        frontSpeed  = 25 * dx -- px/sec
-        middleSpeed = frontSpeed * 2
-        backSpeed   = frontSpeed * 3
-        staticSpeed = 0
-
-        backBuildings = buildings
-                            |> List.filter isBack
-                            |> List.map (\b -> { b | x = b.x + backSpeed / dt } )
-        middleBuildings = buildings
-                            |> List.filter isMiddle
-                            |> List.map (\b -> { b | x = b.x + middleSpeed / dt } )
-        frontBuildings = buildings
-                            |> List.filter isFront
-                            |> List.map (\b -> { b | x = b.x + frontSpeed / dt } )
-
-        allBuildings = (backBuildings ++ middleBuildings ++ frontBuildings)
-
-        updatedBuildings = allBuildings
-            |> wrapBuildings windowWidth
-    in
-        updatedBuildings
-
-resetMouseDelta : Model -> Model
-resetMouseDelta model =
-    { model | dx = 0
-    ,         dy = 0
-    }
-
-updateBuildingsInModel : Model -> Model
-updateBuildingsInModel model =
-    case model.movementType of
-        MouseMove ->
             let
-                updatedBuildings = updateBuildings model.dx model.dt model.windowWidth model.buildings
+                model' = { model | randomValues = Array.fromList list }
             in
-                { model | buildings = updatedBuildings }
-        TimeMove ->
-            let
-                updatedBuildings = updateBuildings 1 model.dt model.windowWidth model.buildings
-            in
-                { model | buildings = updatedBuildings }
-        StaticMove ->
-            model
-        _ ->
-            model
+                if List.length model'.buildings == 0 then
+                    ( model' |> addBuildings 10, Cmd.none )
+                else
+                    ( model', Cmd.none )
 
-wrapBuildings : Int -> List Building -> List Building
-wrapBuildings widthWrap buildings =
-    let
-        w = toFloat widthWrap
-        checkRightEdge b = if b.x >  (w / 2) then { b | x = b.x - b.w - w } else b
-        checkLeftEdge  b = if b.x < -(w / 2 + b.w) then { b | x = b.x + b.w + w } else b
-    in
-        buildings
-            |> List.map checkRightEdge
-            |> List.map checkLeftEdge
-
-updateWindowDimensions : (Int, Int) -> Model -> Model
-updateWindowDimensions (w, h) model =
-    { model | windowWidth = w, windowHeight = h }
-
-getNumBuildings : Model -> Int
-getNumBuildings model =
-    List.length model.buildings
-
-getRandomValues : Model -> Int -> Array.Array Float
-getRandomValues model numValues =
-    Array.slice 0 numValues model.randomValues
-
-popRandomValues : Int -> Model -> Model
-popRandomValues numOfValuesToPop model =
-    { model | randomValues = Array.slice numOfValuesToPop (Array.length model.randomValues) model.randomValues
-    }
-
-toValue : Float -> Float -> Maybe Float -> Float
-toValue min max v =
-    (Maybe.withDefault 0.5 v) * (max - min) + min
-
-addBuilding : Model -> Building -> Model
-addBuilding model building =
-    { model | buildings = model.buildings ++ [ building ] }
-
-reduceNewBuildingCount : Model -> Model
-reduceNewBuildingCount model =
-    { model | numBuildingsToAdd = model.numBuildingsToAdd - 1 }
-
-pickLayer : Float -> Layer
-pickLayer value =
-    if value >= 66 then
-        Front
-    else if value >= 33 then
-        Middle
+addTrees : Int -> Model -> Model
+addTrees numTrees model =
+    if numTrees == 0 then
+        model
     else
-        Back
-
-addBuildingsUpdate : Model -> Model
-addBuildingsUpdate model =
-    if model.numBuildingsToAdd > 0 then
         let
+            toValue min max v =
+                (Maybe.withDefault 0.5 v) * (max - min) + min
+
+            pickLayer value =
+                if value >= 66 then
+                    Front
+                else if value >= 33 then
+                    Middle
+                else
+                    Back
+
+            popRandomValues numOfValuesToPop model =
+                { model | randomValues = Array.slice numOfValuesToPop (Array.length model.randomValues) model.randomValues }
+
+            ww = toFloat model.windowWidth
+            x = toValue -ww ww <| Array.get 0 model.randomValues
+            y = model.sunset.y
+            h = toValue 25 100 <| Array.get 1 model.randomValues
+            l = pickLayer <| toValue 0 100 <| Array.get 1 model.randomValues
+
+            tree' = initTree x y h l
+            model' = popRandomValues 3 model
+        in
+            { model' | trees = model.trees ++ [ tree' ] }
+                |> addTrees (numTrees - 1)
+
+addBuildings : Int -> Model -> Model
+addBuildings numBuildings model =
+    if numBuildings == 0 then
+        model
+    else
+        let
+            getRandomValues model numValues =
+                Array.slice 0 numValues model.randomValues
+
+            popRandomValues numOfValuesToPop model =
+                { model | randomValues = Array.slice numOfValuesToPop (Array.length model.randomValues) model.randomValues }
+
+            pickLayer value =
+                if value >= 66 then
+                    Front
+                else if value >= 33 then
+                    Middle
+                else
+                    Back
+
+            toValue min max v =
+                (Maybe.withDefault 0.5 v) * (max - min) + min
+
             ww = toFloat (model.windowWidth // 2)
             wh = toFloat (model.windowHeight // 2)
             randomValues = getRandomValues model 3
@@ -255,11 +230,66 @@ addBuildingsUpdate model =
             h = toValue 25 100 <| Array.get 1 randomValues
             l = pickLayer <| toValue 0 100 <| Array.get 1 randomValues
 
-            modifiedModel = popRandomValues 3 model
+            model' = popRandomValues 3 model
+            building' = newBuilding x y h l
         in
-            newBuilding x y h l |> addBuilding modifiedModel |> reduceNewBuildingCount
-    else
-        model
+            { model' | buildings = model'.buildings ++ [ building' ] }
+                |> addBuildings (numBuildings - 1)
+
+updateAllEntitiesInModel : Model -> Model
+updateAllEntitiesInModel model =
+    let
+        dx =
+            case model.movementType of
+                MouseMove ->
+                    model.dx
+                TimeMove ->
+                    5
+                StaticMove ->
+                    0
+
+        toValue layer =
+            case layer of
+                Front ->
+                    0.25
+                Middle ->
+                    0.5
+                Back ->
+                    1.0
+                Static ->
+                    0.0
+
+        wrapThings widthWrap things =
+            let
+                w = toFloat widthWrap
+                checkRightEdge b = if b.x >  (w / 2) then { b | x = b.x - b.w - w } else b
+                checkLeftEdge  b = if b.x < -(w / 2 + b.w) then { b | x = b.x + b.w + w } else b
+            in
+                things
+                    |> List.map checkRightEdge
+                    |> List.map checkLeftEdge
+
+        moveEntity e =
+            { e | x = e.x + dx * (e.layer |> toValue) }
+
+        buildings' =
+            model.buildings
+                |> List.map moveEntity
+                |> wrapThings model.windowWidth
+
+        trees' =
+            model.trees
+                |> List.map moveEntity
+                |> wrapThings model.windowWidth
+    in
+        { model
+        | buildings = buildings'
+        , trees = trees'
+        }
+
+resetMouseDelta : Model -> Model
+resetMouseDelta model =
+    { model | dx = 0, dy = 0 }
 
 mouseUpdate : (Int, Int) -> Model -> Model
 mouseUpdate (mx, my) model =
@@ -274,9 +304,7 @@ mouseUpdate (mx, my) model =
 
 timeUpdate : Float -> Float -> Model -> Model
 timeUpdate dt t model =
-    { model | dt = dt
-    ,         t = t
-    }
+    { model | dt = dt, t = t }
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -309,16 +337,46 @@ viewSunset model =
     in
         gradient (grad model.sunset.y model.sunset.h) (rect w h)
 
+viewTree : Tree -> Form
+viewTree model =
+    let
+        leafSize = model.height / 4
+        trunk =
+            [ rect model.w model.height
+                |> filled brown
+                |> move (model.x, model.y + (model.height / 2))
+            , polygon [ (leafSize, leafSize)
+                      , (leafSize, -leafSize)
+                      , (-leafSize, -leafSize)
+                      , (-leafSize, leafSize)
+                      ]
+                |> filled green
+                |> move (model.x, model.y + model.height)
+            ]
+        leaves = []
+    in
+        group <| trunk ++ leaves
+
 view : Model -> Html Msg
 view model =
     let
         (mx, my) = (model.x, -model.y)
 
-        allBuildings = model.buildings |> List.map displayBuilding
-        sunset = model |> viewSunset
+        allBuildings =
+            model.buildings
+                |> List.map displayBuilding
+
+        sunset =
+            model
+                |> viewSunset
+
+        trees =
+            model.trees
+                |> List.map viewTree
 
         things =
             [ sunset ]
+            ++ trees
             ++ allBuildings
             ++ (displayModelInfo model)
             ++ (displayMouseCursor (mx, my) model)
@@ -377,6 +435,7 @@ displayModelInfo model =
 
 displayRandomValue : (Int, Float) -> Form
 displayRandomValue (x', value') =
-    let x = toFloat x'
+    let
+        x = toFloat x'
     in
         traced (solid red) (path [ (x, 0), (x, value' * 100) ])
