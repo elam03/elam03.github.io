@@ -34,18 +34,20 @@ type alias Tree =
     , layer : Layer
     , height : Float
     , color : Color
+    , leafEdgeCount : Int
     }
 
-initTree : Float -> Float -> Float -> Layer -> Tree
-initTree x y h l =
+initTree : Tree
+initTree =
     let
         model =
-            { x = x
-            , y = y
+            { x = 0
+            , y = 0
             , w = 6
-            , layer = l
-            , height = h
-            , color = green
+            , layer = Back
+            , height = 0
+            , color = rgb 255 255 255
+            , leafEdgeCount = 4
             }
     in
         model
@@ -86,7 +88,7 @@ init (w, h) =
         , windowHeight = h
         , movementType = TimeMove
         , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
-        , showInfo = True
+        , showInfo = False
         , trees = []
         }
 
@@ -195,10 +197,34 @@ addTrees numTrees model =
             x = toValue -ww ww <| Array.get 0 model.randomValues
             y = model.sunset.y
             h = toValue 25 100 <| Array.get 1 model.randomValues
-            l = pickLayer <| toValue 0 100 <| Array.get 1 model.randomValues
+            l = pickLayer <| toValue 0 100 <| Array.get 2 model.randomValues
+            leafColor =
+                let
+                    c =
+                        model.randomValues
+                            |> Array.get 3
+                            |> toValue 80 250
+                            |> truncate
+                in
+                    rgba 0 c 0 0.95
 
-            tree' = initTree x y h l
-            model' = popRandomValues 3 model
+            leafEdgeCount =
+                model.randomValues
+                    |> Array.get 4
+                    |> toValue 5 10
+                    |> truncate
+
+            tree' =
+                { initTree
+                | x = x
+                , y = y
+                , height = h
+                , layer = l
+                , color = leafColor
+                , leafEdgeCount = leafEdgeCount
+                }
+
+            model' = popRandomValues 4 model
         in
             { model' | trees = model.trees ++ [ tree' ] }
                 |> addTrees (numTrees - 1)
@@ -233,7 +259,7 @@ addBuildings numBuildings model =
             x = toValue -ww ww <| Array.get 0 randomValues
             y = model.sunset.y
             h = toValue 25 100 <| Array.get 1 randomValues
-            l = pickLayer <| toValue 0 100 <| Array.get 1 randomValues
+            l = pickLayer <| toValue 0 100 <| Array.get 2 randomValues
 
             model' = popRandomValues 3 model
             building' = newBuilding x y h l
@@ -256,11 +282,11 @@ updateAllEntitiesInModel model =
         toValue layer =
             case layer of
                 Front ->
-                    0.25
+                    0.1
                 Middle ->
-                    0.5
+                    0.2
                 Back ->
-                    1.0
+                    0.3
                 Static ->
                     0.0
 
@@ -345,17 +371,13 @@ viewSunset model =
 viewTree : Tree -> Form
 viewTree model =
     let
-        leafSize = model.height / 4
+        leafSize = model.height / 2
         trunk =
             [ rect model.w model.height
                 |> filled brown
                 |> move (model.x, model.y + (model.height / 2))
-            , polygon [ (leafSize, leafSize)
-                      , (leafSize, -leafSize)
-                      , (-leafSize, -leafSize)
-                      , (-leafSize, leafSize)
-                      ]
-                |> filled green
+            , ngon model.leafEdgeCount leafSize
+                |> filled model.color
                 |> move (model.x, model.y + model.height)
             ]
         leaves = []

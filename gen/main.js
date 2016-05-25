@@ -12240,7 +12240,7 @@ var _user$project$BlogList$init = function (blogList) {
 	};
 };
 
-var _user$project$Building$darkGrey = A4(_elm_lang$core$Color$rgba, 50, 50, 50, 0.6);
+var _user$project$Building$darkGrey = A4(_elm_lang$core$Color$rgba, 50, 50, 50, 0.75);
 var _user$project$Building$glassWindowToForm = function (window) {
 	return A2(
 		_evancz$elm_graphics$Collage$move,
@@ -12250,7 +12250,10 @@ var _user$project$Building$glassWindowToForm = function (window) {
 			_user$project$Building$darkGrey,
 			A2(_evancz$elm_graphics$Collage$rect, window.w, window.h)));
 };
-var _user$project$Building$clearGrey = A4(_elm_lang$core$Color$rgba, 111, 111, 111, 0.6);
+var _user$project$Building$clearGrey = function () {
+	var c = 90;
+	return A4(_elm_lang$core$Color$rgba, c, c, c, 0.8);
+}();
 var _user$project$Building$displayBuilding = function (b) {
 	var windows = A2(
 		_elm_lang$core$List$map,
@@ -12544,7 +12547,7 @@ var _user$project$Cityscape$displayMouseCursor = F2(
 var _user$project$Cityscape$viewTree = function (model) {
 	var leaves = _elm_lang$core$Native_List.fromArray(
 		[]);
-	var leafSize = model.height / 4;
+	var leafSize = model.height / 2;
 	var trunk = _elm_lang$core$Native_List.fromArray(
 		[
 			A2(
@@ -12559,15 +12562,8 @@ var _user$project$Cityscape$viewTree = function (model) {
 			{ctor: '_Tuple2', _0: model.x, _1: model.y + model.height},
 			A2(
 				_evancz$elm_graphics$Collage$filled,
-				_elm_lang$core$Color$green,
-				_evancz$elm_graphics$Collage$polygon(
-					_elm_lang$core$Native_List.fromArray(
-						[
-							{ctor: '_Tuple2', _0: leafSize, _1: leafSize},
-							{ctor: '_Tuple2', _0: leafSize, _1: 0 - leafSize},
-							{ctor: '_Tuple2', _0: 0 - leafSize, _1: 0 - leafSize},
-							{ctor: '_Tuple2', _0: 0 - leafSize, _1: leafSize}
-						]))))
+				model.color,
+				A2(_evancz$elm_graphics$Collage$ngon, model.leafEdgeCount, leafSize)))
 		]);
 	return _evancz$elm_graphics$Collage$group(
 		A2(_elm_lang$core$Basics_ops['++'], trunk, leaves));
@@ -12714,11 +12710,11 @@ var _user$project$Cityscape$updateAllEntitiesInModel = function (model) {
 		var _p11 = layer;
 		switch (_p11.ctor) {
 			case 'Front':
-				return 0.25;
+				return 0.1;
 			case 'Middle':
-				return 0.5;
+				return 0.2;
 			case 'Back':
-				return 1.0;
+				return 0.3;
 			default:
 				return 0.0;
 		}
@@ -12803,7 +12799,7 @@ var _user$project$Cityscape$addBuildings = F2(
 						toValue,
 						0,
 						100,
-						A2(_elm_lang$core$Array$get, 1, randomValues)));
+						A2(_elm_lang$core$Array$get, 2, randomValues)));
 				var building$ = A4(_user$project$Building$newBuilding, x, y, h, l);
 				var _v5 = numBuildings - 1,
 					_v6 = _elm_lang$core$Native_Utils.update(
@@ -12821,11 +12817,18 @@ var _user$project$Cityscape$addBuildings = F2(
 			}
 		}
 	});
-var _user$project$Cityscape$initTree = F4(
-	function (x, y, h, l) {
-		var model = {x: x, y: y, w: 6, layer: l, height: h, color: _elm_lang$core$Color$green};
-		return model;
-	});
+var _user$project$Cityscape$initTree = function () {
+	var model = {
+		x: 0,
+		y: 0,
+		w: 6,
+		layer: _user$project$Building$Back,
+		height: 0,
+		color: A3(_elm_lang$core$Color$rgb, 255, 255, 255),
+		leafEdgeCount: 4
+	};
+	return model;
+}();
 var _user$project$Cityscape$addTrees = F2(
 	function (numTrees, model) {
 		addTrees:
@@ -12847,7 +12850,7 @@ var _user$project$Cityscape$addTrees = F2(
 									model.randomValues)
 							});
 					});
-				var model$ = A2(popRandomValues, 3, model);
+				var model$ = A2(popRandomValues, 4, model);
 				var pickLayer = function (value) {
 					return (_elm_lang$core$Native_Utils.cmp(value, 66) > -1) ? _user$project$Building$Front : ((_elm_lang$core$Native_Utils.cmp(value, 33) > -1) ? _user$project$Building$Middle : _user$project$Building$Back);
 				};
@@ -12870,8 +12873,25 @@ var _user$project$Cityscape$addTrees = F2(
 						toValue,
 						0,
 						100,
-						A2(_elm_lang$core$Array$get, 1, model.randomValues)));
-				var tree$ = A4(_user$project$Cityscape$initTree, x, y, h, l);
+						A2(_elm_lang$core$Array$get, 2, model.randomValues)));
+				var leafColor = function () {
+					var c = _elm_lang$core$Basics$truncate(
+						A3(
+							toValue,
+							80,
+							250,
+							A2(_elm_lang$core$Array$get, 3, model.randomValues)));
+					return A4(_elm_lang$core$Color$rgba, 0, c, 0, 0.95);
+				}();
+				var leafEdgeCount = _elm_lang$core$Basics$truncate(
+					A3(
+						toValue,
+						5,
+						10,
+						A2(_elm_lang$core$Array$get, 4, model.randomValues)));
+				var tree$ = _elm_lang$core$Native_Utils.update(
+					_user$project$Cityscape$initTree,
+					{x: x, y: y, height: h, layer: l, color: leafColor, leafEdgeCount: leafEdgeCount});
 				var _v7 = numTrees - 1,
 					_v8 = _elm_lang$core$Native_Utils.update(
 					model$,
@@ -12892,9 +12912,9 @@ var _user$project$Cityscape$Sunset = F2(
 	function (a, b) {
 		return {y: a, h: b};
 	});
-var _user$project$Cityscape$Tree = F6(
-	function (a, b, c, d, e, f) {
-		return {x: a, y: b, w: c, layer: d, height: e, color: f};
+var _user$project$Cityscape$Tree = F7(
+	function (a, b, c, d, e, f, g) {
+		return {x: a, y: b, w: c, layer: d, height: e, color: f, leafEdgeCount: g};
 	});
 var _user$project$Cityscape$Model = function (a) {
 	return function (b) {
@@ -12956,7 +12976,7 @@ var _user$project$Cityscape$init = function (_p13) {
 			y: 0 - (_elm_lang$core$Basics$toFloat(_p15) / 3),
 			h: _elm_lang$core$Basics$toFloat(_p15) / 4
 		},
-		showInfo: true,
+		showInfo: false,
 		trees: _elm_lang$core$Native_List.fromArray(
 			[])
 	};

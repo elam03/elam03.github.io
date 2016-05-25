@@ -100,11 +100,14 @@ nullBuilding =
 
 clearGrey : Color
 clearGrey =
-    rgba 111 111 111 0.6
+    let
+        c = 90
+    in
+        rgba c c c 0.8
 
 darkGrey : Color
 darkGrey =
-    rgba 50 50 50 0.6
+    rgba 50 50 50 0.75
 
 glassWindowToForm : GlassWindow -> Form
 glassWindowToForm window =
