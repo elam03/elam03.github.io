@@ -43,7 +43,7 @@ type alias Model =
 errorBlog : Blog
 errorBlog =
     { title = "error"
-    , id = 0
+    , id = -1
     , hover = False
     , date = Just ""
     , keywords = Just ["error"]
@@ -52,7 +52,7 @@ errorBlog =
 
 init : String -> (Model, Cmd Msg)
 init blogList =
-  ( Model blogList [] (text "") "debug!" 0
+  ( Model blogList [] (text "") "debug!" -1
   , getBlogList blogList
   )
 
@@ -118,7 +118,7 @@ update action model =
                 debug =
                     toString <| List.length model.blogs
             in
-                ( Model model.blogListFile model.blogs model.currBlog debug model.currId
+                ( Model model.blogListFile model.blogs model.currBlog debug id
                 , getContent blogMarkdownFile
                 )
 
@@ -155,6 +155,9 @@ classHoverStyle = class "bloglist-hover"
 classBlogHeader : Html.Attribute Msg
 classBlogHeader = class "bloglist-header"
 
+classCurrBlogStyle : Html.Attribute Msg
+classCurrBlogStyle = class "bloglist-currblog"
+
 view : Model -> Html Msg
 view model =
     let
@@ -166,18 +169,24 @@ view model =
                 |> composeTiledHtml numCols
 
         viewCurrBlog =
-            -- div [ style [ ("border-style", "solid") ] ]
-            div [ classStyle ]
-                [ model.currBlog ]
+            if model.currId >= 0 && model.currId < List.length model.blogs then
+                [ div [ classCurrBlogStyle ] [ model.currBlog ] ]
+            else
+                []
 
         blogsHeader =
-            h3 [ classBlogHeader ] [ text "Blogs" ]
+            [ h3 [ classBlogHeader ] [ text "Blogs" ] ]
+
+        tableOfBlogs =
+            [ table [ classStyle ] blogs ]
+
+        allTheThings =
+            viewCurrBlog
+            ++ blogsHeader
+            ++ tableOfBlogs
+
     in
-        div [ classStyle ]
-            [ viewCurrBlog
-            , blogsHeader
-            , table [ classStyle ] blogs
-            ]
+        div [ classStyle ] allTheThings
 
 viewBlog : Blog -> Html Msg
 viewBlog blog =
@@ -195,20 +204,20 @@ viewBlog blog =
             ] ++ attribute
 
         titleContent =
-            [ h3 [ style [ ("text-align", "center") ] ] [ text blog.title ] ]
+            [ h4 [ style [ ("text-align", "center") ] ] [ text blog.title ] ]
 
-        dateContent =
-            [ h4 [ style [ ("text-align", "center") ] ] [ text <| Maybe.withDefault "" blog.date ] ]
+        dateContent = []
+            -- [ h6 [ style [ ("text-align", "center") ] ] [ text <| Maybe.withDefault "" blog.date ] ]
 
-        keywordContent =
-            let
-                allKeywords =
-                    blog.keywords
-                        |> Maybe.withDefault []
-                        |> List.intersperse ", "
-                        |> List.foldl (++) ""
-            in
-                [ p [] [text allKeywords] ]
+        keywordContent = []
+            -- let
+            --     allKeywords =
+            --         blog.keywords
+            --             |> Maybe.withDefault []
+            --             |> List.intersperse ", "
+            --             |> List.foldl (++) ""
+            -- in
+            --     [ p [] [text allKeywords] ]
 
         break = [ br [] [] ]
 

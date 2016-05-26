@@ -1,85 +1,119 @@
 /*************************************/
 
+div.main {
+    padding-bottom: 10px;
+    display: flex;
+}
+
+/*************************************/
+
+.cityscape {
+    padding: 0px;
+
+    border-style: solid;
+    border-color: #000000;
+    border-width: 2px;
+}
+/*************************************/
+
 table.summarylist  {
     background:#81dbe6;
     padding: 4px;
     width: 600px;
-    border-width: 2px;
+
     border-style: solid;
+    border-color: #000000;
+    border-width: 4px;
+    border-radius: 15px;
 }
 
 th.summarylist {
 	background:#d5daec;
-	border-width: 1px;
-	/*padding: 4px;*/
-	border-style: solid;
     font-family: "Arial";
     font-size: 10px;
+
+    border-style: solid;
+    border-color: #302828;
+    border-width: 2px;
+    border-radius: 15px;
 }
 
 /*************************************/
 
 table.projectlist  {
     background:#b5cfd2;
-    padding: 4px;
+    padding: 2px;
     width: 600px;
-    border-width: 2px;
+
     border-style: solid;
+    border-color: #000000;
+    border-width: 4px;
+    border-radius: 15px;
 }
 
 th.projectlist {
 	background:#8296dd;
-	border-width: 2px;
 	padding: 4px;
-	border-style: solid;
     font-family: "Comic Sans MS";
     font-size: 14px;
+
+    border-style: solid;
+    border-color: #000000;
+    border-width: 2px;
+    border-radius: 15px;
 }
 
 /*************************************/
 
 .bloglist-header {
     text-align: center;
-    /*background:#95dfe8;*/
-    /*padding: 4px;*/
-    /*width: 600px;*/
-    /*border-width: 2px;*/
-    /*border-style: solid;*/
+}
+
+.bloglist-currblog {
+    width: 600px;
+    display: flex;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    border-style: solid;
+    border-color: #535353;
+    border-width: 2px;
+    border-radius: 15px;
 }
 
 table.bloglist {
     background:#bbe4e9;
-    padding: 4px;
+    padding: 2px;
     width: 600px;
-    border-width: 2px;
+
     border-style: solid;
+    border-color: #000000;
+    border-width: 4px;
+    border-radius: 15px;
 }
 
 th.bloglist {
 	background:#d0d1f6;
-	border-width: 1px;
-	/*padding: 4px;*/
-	border-style: solid;
     font-family: "Arial";
-    /*font-size: 12px;*/
+
+    border-style: solid;
+    border-color: #a6a8f2;
+    border-width: 2px;
+    border-radius: 15px;
 }
 
 th.bloglist-hover {
 	background:#b64747;
-	border-width: 1px;
-	/*padding: 4px;*/
-	border-style: groove;
     font-family: "Arial";
-    /*font-size: 12px;*/
+
+    border-style: solid;
+    border-color: #bb1818;
+    border-width: 2px;
+    border-radius: 15px;
 }
 
-h3.bloglist {
+h4.bloglist {
     font-size: 24px;
-}
-
-p.bloglist {
-    /*background:#FF0000;*/
-    font-weight: 900;
 }
 
 /*************************************/

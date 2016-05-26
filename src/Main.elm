@@ -57,18 +57,31 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
 view : Model -> Html Msg
 view model =
     div []
-        [ Html.map CityscapeMsgs (Cityscape.view model.cityscape)
-        , div [ style [ ("display", "flex") ] ]
+        [ div [ classStyle ]
+            [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
+        , div [ classStyle ]
             [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
-        , div [ style [ ("display", "flex") ] ]
+        , div [ classStyle ]
             [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
-        , div [ style [ ("display", "flex") ] ]
+        , div [ classStyle ]
             [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
-        -- , div []
-        --     [ text "debug: "
-        --     , text model.debug
-        --     ]
         ]
+
+        -- [ Html.map CityscapeMsgs (Cityscape.view model.cityscape)
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
+        -- , div [ style [ ("display", "flex") ] ]
+        --     [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
+        -- -- , div []
+        -- --     [ text "debug: "
+        -- --     , text model.debug
+        -- --     ]
+        -- ]
+
+classStyle : Html.Attribute Msg
+classStyle = class "main"
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
 update action model =

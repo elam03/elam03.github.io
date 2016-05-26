@@ -411,9 +411,10 @@ view model =
         finalOutput = collage model.windowWidth model.windowHeight things
             |> Element.toHtml
     in
-        Html.div
-            [ style [ ("width", (toString model.windowWidth) ++ "px"), ("height", (toString model.windowHeight) ++ "px"), ("border-style", "solid") ] ]
-            [ finalOutput ]
+        div [ classStyle ] [ finalOutput ]
+
+classStyle : Attribute Msg
+classStyle = class "cityscape"
 
 displayMouseCursor : (Float, Float) -> Model -> List Form
 displayMouseCursor (x, y) model =

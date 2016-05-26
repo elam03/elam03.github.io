@@ -11892,12 +11892,13 @@ var _user$project$Utils$composeTiledHtml = F2(
 				A2(_user$project$Utils$composeTiledHtml, cols, rest)));
 	});
 
+var _user$project$BlogList$classCurrBlogStyle = _elm_lang$html$Html_Attributes$class('bloglist-currblog');
 var _user$project$BlogList$classBlogHeader = _elm_lang$html$Html_Attributes$class('bloglist-header');
 var _user$project$BlogList$classHoverStyle = _elm_lang$html$Html_Attributes$class('bloglist-hover');
 var _user$project$BlogList$classStyle = _elm_lang$html$Html_Attributes$class('bloglist');
 var _user$project$BlogList$errorBlog = {
 	title: 'error',
-	id: 0,
+	id: -1,
 	hover: false,
 	date: _elm_lang$core$Maybe$Just(''),
 	keywords: _elm_lang$core$Maybe$Just(
@@ -11975,56 +11976,14 @@ var _user$project$BlogList$viewBlog = function (blog) {
 			_elm_lang$core$Native_List.fromArray(
 				[]))
 		]);
-	var keywordContent = function () {
-		var allKeywords = A3(
-			_elm_lang$core$List$foldl,
-			F2(
-				function (x, y) {
-					return A2(_elm_lang$core$Basics_ops['++'], x, y);
-				}),
-			'',
-			A2(
-				_elm_lang$core$List$intersperse,
-				', ',
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					blog.keywords)));
-		return _elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$p,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text(allKeywords)
-					]))
-			]);
-	}();
+	var keywordContent = _elm_lang$core$Native_List.fromArray(
+		[]);
 	var dateContent = _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$h4,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Attributes$style(
-					_elm_lang$core$Native_List.fromArray(
-						[
-							{ctor: '_Tuple2', _0: 'text-align', _1: 'center'}
-						]))
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text(
-					A2(_elm_lang$core$Maybe$withDefault, '', blog.date))
-				]))
-		]);
+		[]);
 	var titleContent = _elm_lang$core$Native_List.fromArray(
 		[
 			A2(
-			_elm_lang$html$Html$h3,
+			_elm_lang$html$Html$h4,
 			_elm_lang$core$Native_List.fromArray(
 				[
 					_elm_lang$html$Html_Attributes$style(
@@ -12060,20 +12019,29 @@ var _user$project$BlogList$viewBlog = function (blog) {
 	return A2(_elm_lang$html$Html$th, attributes, allContent);
 };
 var _user$project$BlogList$view = function (model) {
-	var blogsHeader = A2(
-		_elm_lang$html$Html$h3,
-		_elm_lang$core$Native_List.fromArray(
-			[_user$project$BlogList$classBlogHeader]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html$text('Blogs')
-			]));
-	var viewCurrBlog = A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[_user$project$BlogList$classStyle]),
-		_elm_lang$core$Native_List.fromArray(
-			[model.currBlog]));
+	var blogsHeader = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$h3,
+			_elm_lang$core$Native_List.fromArray(
+				[_user$project$BlogList$classBlogHeader]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text('Blogs')
+				]))
+		]);
+	var viewCurrBlog = ((_elm_lang$core$Native_Utils.cmp(model.currId, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(
+		model.currId,
+		_elm_lang$core$List$length(model.blogs)) < 0)) ? _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[_user$project$BlogList$classCurrBlogStyle]),
+			_elm_lang$core$Native_List.fromArray(
+				[model.currBlog]))
+		]) : _elm_lang$core$Native_List.fromArray(
+		[]);
 	var numCols = 2;
 	var blogs = A2(
 		_user$project$Utils$composeTiledHtml,
@@ -12084,20 +12052,23 @@ var _user$project$BlogList$view = function (model) {
 				return _user$project$BlogList$viewBlog(b);
 			},
 			model.blogs));
+	var tableOfBlogs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$table,
+			_elm_lang$core$Native_List.fromArray(
+				[_user$project$BlogList$classStyle]),
+			blogs)
+		]);
+	var allTheThings = A2(
+		_elm_lang$core$Basics_ops['++'],
+		viewCurrBlog,
+		A2(_elm_lang$core$Basics_ops['++'], blogsHeader, tableOfBlogs));
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[_user$project$BlogList$classStyle]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				viewCurrBlog,
-				blogsHeader,
-				A2(
-				_elm_lang$html$Html$table,
-				_elm_lang$core$Native_List.fromArray(
-					[_user$project$BlogList$classStyle]),
-				blogs)
-			]));
+		allTheThings);
 };
 var _user$project$BlogList$LoadBlogMarkdown = function (a) {
 	return {ctor: 'LoadBlogMarkdown', _0: a};
@@ -12162,6 +12133,7 @@ var _user$project$BlogList$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'FocusBlog':
+				var _p4 = _p0._0;
 				var debug = _elm_lang$core$Basics$toString(
 					_elm_lang$core$List$length(model.blogs));
 				var blog = A2(
@@ -12169,12 +12141,12 @@ var _user$project$BlogList$update = F2(
 					_user$project$BlogList$errorBlog,
 					A2(
 						_elm_lang$core$Array$get,
-						_p0._0,
+						_p4,
 						_elm_lang$core$Array$fromList(model.blogs)));
 				var blogMarkdownFile = A2(_elm_lang$core$Maybe$withDefault, '', blog.url);
 				return {
 					ctor: '_Tuple2',
-					_0: A5(_user$project$BlogList$Model, model.blogListFile, model.blogs, model.currBlog, debug, model.currId),
+					_0: A5(_user$project$BlogList$Model, model.blogListFile, model.blogs, model.currBlog, debug, _p4),
 					_1: _user$project$BlogList$getContent(blogMarkdownFile)
 				};
 			case 'HoverBlog':
@@ -12235,7 +12207,7 @@ var _user$project$BlogList$init = function (blogList) {
 				[]),
 			_elm_lang$html$Html$text(''),
 			'debug!',
-			0),
+			-1),
 		_1: _user$project$BlogList$getBlogList(blogList)
 	};
 };
@@ -12544,6 +12516,7 @@ var _user$project$Cityscape$displayMouseCursor = F2(
 						A2(_evancz$elm_graphics$Collage$ngon, 3, 5))))
 			]);
 	});
+var _user$project$Cityscape$classStyle = _elm_lang$html$Html_Attributes$class('cityscape');
 var _user$project$Cityscape$viewTree = function (model) {
 	var leaves = _elm_lang$core$Native_List.fromArray(
 		[]);
@@ -12633,29 +12606,7 @@ var _user$project$Cityscape$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$style(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						{
-						ctor: '_Tuple2',
-						_0: 'width',
-						_1: A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(model.windowWidth),
-							'px')
-					},
-						{
-						ctor: '_Tuple2',
-						_0: 'height',
-						_1: A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(model.windowHeight),
-							'px')
-					},
-						{ctor: '_Tuple2', _0: 'border-style', _1: 'solid'}
-					]))
-			]),
+			[_user$project$Cityscape$classStyle]),
 		_elm_lang$core$Native_List.fromArray(
 			[finalOutput]));
 };
@@ -13558,13 +13509,7 @@ var _user$project$SummaryList$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$style(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						{ctor: '_Tuple2', _0: 'border-style', _1: 'solid'}
-					]))
-			]),
+			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[tableContents]));
 };
@@ -13646,6 +13591,7 @@ var _user$project$SummaryList$update = F2(
 	});
 var _user$project$SummaryList$RequestRefresh = {ctor: 'RequestRefresh'};
 
+var _user$project$Main$classStyle = _elm_lang$html$Html_Attributes$class('main');
 var _user$project$Main_ops = _user$project$Main_ops || {};
 _user$project$Main_ops['=>'] = F2(
 	function (v0, v1) {
@@ -13706,19 +13652,20 @@ var _user$project$Main$view = function (model) {
 		_elm_lang$core$Native_List.fromArray(
 			[
 				A2(
-				_elm_lang$html$Html_App$map,
-				_user$project$Main$CityscapeMsgs,
-				_user$project$Cityscape$view(model.cityscape)),
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[_user$project$Main$classStyle]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_user$project$Main$CityscapeMsgs,
+						_user$project$Cityscape$view(model.cityscape))
+					])),
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'display', _1: 'flex'}
-							]))
-					]),
+					[_user$project$Main$classStyle]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(
@@ -13729,13 +13676,7 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'display', _1: 'flex'}
-							]))
-					]),
+					[_user$project$Main$classStyle]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(
@@ -13746,13 +13687,7 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'display', _1: 'flex'}
-							]))
-					]),
+					[_user$project$Main$classStyle]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(

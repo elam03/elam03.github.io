@@ -91,7 +91,7 @@ view model =
             table attributes summaryData
 
     in
-        div [ style [("border-style", "solid")] ]
+        div []
             [ tableContents
             -- , debugContents
             ]
