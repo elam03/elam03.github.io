@@ -1,8 +1,3 @@
-Initial Thoughts on elm
-============
-
-**5/12/2016**
-
 Hi there. I'd like to share my thoughts on elm! ☺
 
 What's my motivation to learn elm? It's a totally new programming experience for me! Elm is a learning experience on several fronts.

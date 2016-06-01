@@ -163,27 +163,39 @@ view model =
     let
         numCols = 2
 
+        currBlogSelected =
+            model.currId >= 0 && model.currId < List.length model.blogs
+
+        currBlog =
+            model.blogs
+                |> Array.fromList
+                |> Array.get model.currId
+                |> Maybe.withDefault errorBlog
+
         blogs =
             model.blogs
                 |> List.map (\b -> viewBlog b)
                 |> composeTiledHtml numCols
 
         viewCurrBlog =
-            if model.currId >= 0 && model.currId < List.length model.blogs then
+            if currBlogSelected then
                 [ div [ classCurrBlogStyle ] [ model.currBlog ] ]
             else
                 []
 
         blogsHeader =
-            [ h3 [ classBlogHeader ] [ text "Blogs" ] ]
+            if List.length viewCurrBlog > 0 then
+                [ h1 [ classBlogHeader ] [ text currBlog.title ] ]
+            else
+                []
 
         tableOfBlogs =
             [ table [ classStyle ] blogs ]
 
         allTheThings =
-            viewCurrBlog
+            tableOfBlogs
             ++ blogsHeader
-            ++ tableOfBlogs
+            ++ viewCurrBlog
 
     in
         div [ classStyle ] allTheThings

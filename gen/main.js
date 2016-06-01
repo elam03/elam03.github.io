@@ -12019,20 +12019,17 @@ var _user$project$BlogList$viewBlog = function (blog) {
 	return A2(_elm_lang$html$Html$th, attributes, allContent);
 };
 var _user$project$BlogList$view = function (model) {
-	var blogsHeader = _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$h3,
-			_elm_lang$core$Native_List.fromArray(
-				[_user$project$BlogList$classBlogHeader]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text('Blogs')
-				]))
-		]);
-	var viewCurrBlog = ((_elm_lang$core$Native_Utils.cmp(model.currId, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(
+	var currBlog = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_user$project$BlogList$errorBlog,
+		A2(
+			_elm_lang$core$Array$get,
+			model.currId,
+			_elm_lang$core$Array$fromList(model.blogs)));
+	var currBlogSelected = (_elm_lang$core$Native_Utils.cmp(model.currId, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(
 		model.currId,
-		_elm_lang$core$List$length(model.blogs)) < 0)) ? _elm_lang$core$Native_List.fromArray(
+		_elm_lang$core$List$length(model.blogs)) < 0);
+	var viewCurrBlog = currBlogSelected ? _elm_lang$core$Native_List.fromArray(
 		[
 			A2(
 			_elm_lang$html$Html$div,
@@ -12040,6 +12037,20 @@ var _user$project$BlogList$view = function (model) {
 				[_user$project$BlogList$classCurrBlogStyle]),
 			_elm_lang$core$Native_List.fromArray(
 				[model.currBlog]))
+		]) : _elm_lang$core$Native_List.fromArray(
+		[]);
+	var blogsHeader = (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$List$length(viewCurrBlog),
+		0) > 0) ? _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$h1,
+			_elm_lang$core$Native_List.fromArray(
+				[_user$project$BlogList$classBlogHeader]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(currBlog.title)
+				]))
 		]) : _elm_lang$core$Native_List.fromArray(
 		[]);
 	var numCols = 2;
@@ -12062,8 +12073,8 @@ var _user$project$BlogList$view = function (model) {
 		]);
 	var allTheThings = A2(
 		_elm_lang$core$Basics_ops['++'],
-		viewCurrBlog,
-		A2(_elm_lang$core$Basics_ops['++'], blogsHeader, tableOfBlogs));
+		tableOfBlogs,
+		A2(_elm_lang$core$Basics_ops['++'], blogsHeader, viewCurrBlog));
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(

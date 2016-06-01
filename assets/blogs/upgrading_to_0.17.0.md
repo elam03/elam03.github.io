@@ -1,8 +1,3 @@
-Upgrading to Elm 0.17
-============
-
-**5/17/2016**
-
 I just finished upgrading my site to 0.17. The task seemed daunting after reading [farewell-to-frp](http://elm-lang.org/blog/farewell-to-frp). I'll admit the title mis-led me a bit, I thought perhaps Evan was leaving Elm for something else.
 
 Some of my initial thoughts on Elm 0.17
