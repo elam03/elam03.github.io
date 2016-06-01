@@ -31,8 +31,9 @@ type alias Tree =
     { x : Float
     , y : Float
     , w : Float
+    , h : Float
     , layer : Layer
-    , height : Float
+    , trunkWidth : Float
     , color : Color
     , leafEdgeCount : Int
     }
@@ -43,9 +44,10 @@ initTree =
         model =
             { x = 0
             , y = 0
-            , w = 6
+            , w = 0
+            , h = 0
             , layer = Back
-            , height = 0
+            , trunkWidth = 6
             , color = rgb 255 255 255
             , leafEdgeCount = 4
             }
@@ -116,7 +118,7 @@ update action model =
         Size s ->
             ( model, Cmd.none )
             -- ( { model
-            --   | windowWidth = s.width
+            --   | windowWidth = s.width - 35
             --   , windowHeight = s.height
             --   }
             -- , Cmd.none
@@ -196,8 +198,10 @@ addTrees numTrees model =
             ww = toFloat model.windowWidth
             x = toValue -ww ww <| Array.get 0 model.randomValues
             y = model.sunset.y
-            h = toValue 25 100 <| Array.get 1 model.randomValues
+            h = toValue 25 75 <| Array.get 1 model.randomValues
+            w = h / 2
             l = pickLayer <| toValue 0 100 <| Array.get 2 model.randomValues
+
             leafColor =
                 let
                     c =
@@ -218,7 +222,8 @@ addTrees numTrees model =
                 { initTree
                 | x = x
                 , y = y
-                , height = h
+                , w = w
+                , h = h
                 , layer = l
                 , color = leafColor
                 , leafEdgeCount = leafEdgeCount
@@ -369,19 +374,21 @@ viewSunset model =
         gradient (grad model.sunset.y model.sunset.h) (rect w h)
 
 viewTree : Tree -> Form
-viewTree model =
+viewTree t =
     let
-        leafSize = model.height / 2
         trunk =
-            [ rect model.w model.height
+            [ rect t.trunkWidth t.h
                 |> filled brown
-                |> move (model.x, model.y + (model.height / 2))
-            , ngon model.leafEdgeCount leafSize
-                |> filled model.color
-                |> move (model.x, model.y + model.height)
+                |> move (t.x + t.w / 2, t.y + t.h / 2)
             ]
-        leaves = []
+
+        leaves =
+            [ ngon t.leafEdgeCount t.w
+                |> filled t.color
+                |> move (t.x + t.w / 2, t.y + t.h)
+            ]
     in
+        -- group <| leaves ++ trunk
         group <| trunk ++ leaves
 
 view : Model -> Html Msg
@@ -391,7 +398,7 @@ view model =
 
         allBuildings =
             model.buildings
-                |> List.map displayBuilding
+                |> List.map viewBuilding
 
         sunset =
             model

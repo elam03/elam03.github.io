@@ -115,8 +115,8 @@ glassWindowToForm window =
         |> filled darkGrey
         |> move (window.x + window.w / 2, window.y + window.h / 2)
 
-displayBuilding : Building -> Form
-displayBuilding b =
+viewBuilding : Building -> Form
+viewBuilding b =
     let windows = List.map (\a -> { a | x = a.x + b.x, y = a.y + b.y } ) b.windows
             |> List.map glassWindowToForm
 
