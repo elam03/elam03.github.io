@@ -62,7 +62,7 @@ type alias Model =
     ,   keys : Set.Set KeyCode
     ,   t : Float
     ,   dt : Float
-    ,   seed : Random.Seed
+    ,   initialized : Bool
     ,   buildings : List Building
     ,   randomValues : Array.Array Float
     ,   windowWidth : Int
@@ -83,7 +83,7 @@ init (w, h) =
         , keys = Set.empty
         , t = 0
         , dt = 0
-        , seed = Random.initialSeed 42
+        , initialized = False
         , buildings = []
         , randomValues = Array.fromList []
         , windowWidth = w
@@ -116,13 +116,12 @@ update action model =
         Move xy ->
             ( model |> mouseUpdate (xy.x, xy.y), Cmd.none )
         Size s ->
-            ( model, Cmd.none )
-            -- ( { model
-            --   | windowWidth = s.width - 35
+            ( { model
+              | windowWidth = s.width - 35
             --   , windowHeight = s.height
-            --   }
-            -- , Cmd.none
-            -- )
+              }
+            , Cmd.none
+            )
 
         KeyDown key ->
             let
@@ -163,17 +162,20 @@ update action model =
 
         NewRandomValues list ->
             let
-                model' = { model | randomValues = Array.fromList list }
-                isInitialized = List.length model'.buildings > 0
+                setInitialized model =
+                    { model | initialized = True }
+                model' =
+                    { model | randomValues = Array.fromList list }
             in
-                if isInitialized then
-                    ( model', Cmd.none )
-                else
+                if not model'.initialized then
                     ( model'
                         |> addBuildings 10
                         |> addTrees 10
+                        |> setInitialized
                     , Cmd.none
                     )
+                else
+                    ( model', Cmd.none )
 
 addTrees : Int -> Model -> Model
 addTrees numTrees model =
@@ -199,7 +201,7 @@ addTrees numTrees model =
             x = toValue -ww ww <| Array.get 0 model.randomValues
             y = model.sunset.y
             h = toValue 25 75 <| Array.get 1 model.randomValues
-            w = h / 2
+            w = h
             l = pickLayer <| toValue 0 100 <| Array.get 2 model.randomValues
 
             leafColor =
@@ -298,8 +300,8 @@ updateAllEntitiesInModel model =
         wrapThings widthWrap things =
             let
                 w = toFloat widthWrap
-                checkRightEdge b = if b.x >  (w / 2) then { b | x = b.x - b.w - w } else b
-                checkLeftEdge  b = if b.x < -(w / 2 + b.w) then { b | x = b.x + b.w + w } else b
+                checkRightEdge a = if a.x >  (w / 2) then { a | x = a.x - a.w - w } else a
+                checkLeftEdge  a = if a.x < -(w / 2 + a.w) then { a | x = a.x + a.w + w } else a
             in
                 things
                     |> List.map checkRightEdge
@@ -383,7 +385,7 @@ viewTree t =
             ]
 
         leaves =
-            [ ngon t.leafEdgeCount t.w
+            [ ngon t.leafEdgeCount (t.w / 2)
                 |> filled t.color
                 |> move (t.x + t.w / 2, t.y + t.h)
             ]

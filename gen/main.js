@@ -12537,7 +12537,7 @@ var _user$project$Cityscape$viewTree = function (t) {
 			A2(
 				_evancz$elm_graphics$Collage$filled,
 				t.color,
-				A2(_evancz$elm_graphics$Collage$ngon, t.leafEdgeCount, t.w)))
+				A2(_evancz$elm_graphics$Collage$ngon, t.leafEdgeCount, t.w / 2)))
 		]);
 	var trunk = _elm_lang$core$Native_List.fromArray(
 		[
@@ -12653,15 +12653,15 @@ var _user$project$Cityscape$updateAllEntitiesInModel = function (model) {
 	var wrapThings = F2(
 		function (widthWrap, things) {
 			var w = _elm_lang$core$Basics$toFloat(widthWrap);
-			var checkRightEdge = function (b) {
-				return (_elm_lang$core$Native_Utils.cmp(b.x, w / 2) > 0) ? _elm_lang$core$Native_Utils.update(
-					b,
-					{x: (b.x - b.w) - w}) : b;
+			var checkRightEdge = function (a) {
+				return (_elm_lang$core$Native_Utils.cmp(a.x, w / 2) > 0) ? _elm_lang$core$Native_Utils.update(
+					a,
+					{x: (a.x - a.w) - w}) : a;
 			};
-			var checkLeftEdge = function (b) {
-				return (_elm_lang$core$Native_Utils.cmp(b.x, 0 - ((w / 2) + b.w)) < 0) ? _elm_lang$core$Native_Utils.update(
-					b,
-					{x: (b.x + b.w) + w}) : b;
+			var checkLeftEdge = function (a) {
+				return (_elm_lang$core$Native_Utils.cmp(a.x, 0 - ((w / 2) + a.w)) < 0) ? _elm_lang$core$Native_Utils.update(
+					a,
+					{x: (a.x + a.w) + w}) : a;
 			};
 			return A2(
 				_elm_lang$core$List$map,
@@ -12831,7 +12831,7 @@ var _user$project$Cityscape$addTrees = F2(
 					25,
 					75,
 					A2(_elm_lang$core$Array$get, 1, model.randomValues));
-				var w = h / 2;
+				var w = h;
 				var l = pickLayer(
 					A3(
 						toValue,
@@ -12896,7 +12896,7 @@ var _user$project$Cityscape$Model = function (a) {
 													return function (n) {
 														return function (o) {
 															return function (p) {
-																return {x: a, y: b, dx: c, dy: d, keys: e, t: f, dt: g, seed: h, buildings: i, randomValues: j, windowWidth: k, windowHeight: l, movementType: m, sunset: n, showInfo: o, trees: p};
+																return {x: a, y: b, dx: c, dy: d, keys: e, t: f, dt: g, initialized: h, buildings: i, randomValues: j, windowWidth: k, windowHeight: l, movementType: m, sunset: n, showInfo: o, trees: p};
 															};
 														};
 													};
@@ -12927,7 +12927,7 @@ var _user$project$Cityscape$init = function (_p13) {
 		keys: _elm_lang$core$Set$empty,
 		t: 0,
 		dt: 0,
-		seed: _elm_lang$core$Random$initialSeed(42),
+		initialized: false,
 		buildings: _elm_lang$core$Native_List.fromArray(
 			[]),
 		randomValues: _elm_lang$core$Array$fromList(
@@ -12966,7 +12966,13 @@ var _user$project$Cityscape$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Size':
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{windowWidth: _p16._0.width - 35}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'KeyDown':
 				var _p19 = _p16._0;
 				var model$ = _elm_lang$core$Native_Utils.update(
@@ -13054,17 +13060,20 @@ var _user$project$Cityscape$update = F2(
 					{
 						randomValues: _elm_lang$core$Array$fromList(_p16._0)
 					});
-				var isInitialized = _elm_lang$core$Native_Utils.cmp(
-					_elm_lang$core$List$length(model$.buildings),
-					0) > 0;
-				return isInitialized ? {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none} : {
-					ctor: '_Tuple2',
-					_0: A2(
-						_user$project$Cityscape$addTrees,
-						10,
-						A2(_user$project$Cityscape$addBuildings, 10, model$)),
-					_1: _elm_lang$core$Platform_Cmd$none
+				var setInitialized = function (model) {
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{initialized: true});
 				};
+				return _elm_lang$core$Basics$not(model$.initialized) ? {
+					ctor: '_Tuple2',
+					_0: setInitialized(
+						A2(
+							_user$project$Cityscape$addTrees,
+							10,
+							A2(_user$project$Cityscape$addBuildings, 10, model$))),
+					_1: _elm_lang$core$Platform_Cmd$none
+				} : {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _user$project$Cityscape$Tick = function (a) {
