@@ -149,8 +149,14 @@ update action model =
 classStyle : Html.Attribute Msg
 classStyle = class "bloglist"
 
+classContainerStyle : Html.Attribute Msg
+classContainerStyle = class "bloglist-container"
+
+classItemStyle : Html.Attribute Msg
+classItemStyle = class "bloglist-item"
+
 classHoverStyle : Html.Attribute Msg
-classHoverStyle = class "bloglist-hover"
+classHoverStyle = class "bloglist-item-hover"
 
 classBlogHeader : Html.Attribute Msg
 classBlogHeader = class "bloglist-header"
@@ -175,7 +181,7 @@ view model =
         blogs =
             model.blogs
                 |> List.map (\b -> viewBlog b)
-                |> composeTiledHtml numCols
+                -- |> composeTiledHtml numCols
 
         viewCurrBlog =
             if currBlogSelected then
@@ -190,7 +196,7 @@ view model =
                 []
 
         tableOfBlogs =
-            [ table [ classStyle ] blogs ]
+            [ div [ classContainerStyle ] blogs ]
 
         allTheThings =
             tableOfBlogs
@@ -204,10 +210,11 @@ viewBlog : Blog -> Html Msg
 viewBlog blog =
     let
         attribute =
-            if blog.hover then
-                [ classHoverStyle ]
-            else
-                [ classStyle ]
+            [ Html.Attributes.classList
+                [ ("bloglist-item", True)
+                , ("bloglist-item-hover", blog.hover)
+                ]
+            ]
 
         attributes =
             [ onClick (FocusBlog blog.id)
@@ -238,7 +245,7 @@ viewBlog blog =
             ++ dateContent
             ++ keywordContent
     in
-        th attributes allContent
+        div attributes allContent
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

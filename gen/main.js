@@ -11894,7 +11894,9 @@ var _user$project$Utils$composeTiledHtml = F2(
 
 var _user$project$BlogList$classCurrBlogStyle = _elm_lang$html$Html_Attributes$class('bloglist-currblog');
 var _user$project$BlogList$classBlogHeader = _elm_lang$html$Html_Attributes$class('bloglist-header');
-var _user$project$BlogList$classHoverStyle = _elm_lang$html$Html_Attributes$class('bloglist-hover');
+var _user$project$BlogList$classHoverStyle = _elm_lang$html$Html_Attributes$class('bloglist-item-hover');
+var _user$project$BlogList$classItemStyle = _elm_lang$html$Html_Attributes$class('bloglist-item');
+var _user$project$BlogList$classContainerStyle = _elm_lang$html$Html_Attributes$class('bloglist-container');
 var _user$project$BlogList$classStyle = _elm_lang$html$Html_Attributes$class('bloglist');
 var _user$project$BlogList$errorBlog = {
 	title: 'error',
@@ -12001,9 +12003,15 @@ var _user$project$BlogList$viewBlog = function (blog) {
 		_elm_lang$core$Basics_ops['++'],
 		titleContent,
 		A2(_elm_lang$core$Basics_ops['++'], dateContent, keywordContent));
-	var attribute = blog.hover ? _elm_lang$core$Native_List.fromArray(
-		[_user$project$BlogList$classHoverStyle]) : _elm_lang$core$Native_List.fromArray(
-		[_user$project$BlogList$classStyle]);
+	var attribute = _elm_lang$core$Native_List.fromArray(
+		[
+			_elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'bloglist-item', _1: true},
+					{ctor: '_Tuple2', _0: 'bloglist-item-hover', _1: blog.hover}
+				]))
+		]);
 	var attributes = A2(
 		_elm_lang$core$Basics_ops['++'],
 		_elm_lang$core$Native_List.fromArray(
@@ -12016,9 +12024,23 @@ var _user$project$BlogList$viewBlog = function (blog) {
 				_user$project$BlogList$UnHoverBlog(blog.id))
 			]),
 		attribute);
-	return A2(_elm_lang$html$Html$th, attributes, allContent);
+	return A2(_elm_lang$html$Html$div, attributes, allContent);
 };
 var _user$project$BlogList$view = function (model) {
+	var blogs = A2(
+		_elm_lang$core$List$map,
+		function (b) {
+			return _user$project$BlogList$viewBlog(b);
+		},
+		model.blogs);
+	var tableOfBlogs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[_user$project$BlogList$classContainerStyle]),
+			blogs)
+		]);
 	var currBlog = A2(
 		_elm_lang$core$Maybe$withDefault,
 		_user$project$BlogList$errorBlog,
@@ -12053,28 +12075,11 @@ var _user$project$BlogList$view = function (model) {
 				]))
 		]) : _elm_lang$core$Native_List.fromArray(
 		[]);
-	var numCols = 2;
-	var blogs = A2(
-		_user$project$Utils$composeTiledHtml,
-		numCols,
-		A2(
-			_elm_lang$core$List$map,
-			function (b) {
-				return _user$project$BlogList$viewBlog(b);
-			},
-			model.blogs));
-	var tableOfBlogs = _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$table,
-			_elm_lang$core$Native_List.fromArray(
-				[_user$project$BlogList$classStyle]),
-			blogs)
-		]);
 	var allTheThings = A2(
 		_elm_lang$core$Basics_ops['++'],
 		tableOfBlogs,
 		A2(_elm_lang$core$Basics_ops['++'], blogsHeader, viewCurrBlog));
+	var numCols = 2;
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
