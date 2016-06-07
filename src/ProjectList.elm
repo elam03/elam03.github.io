@@ -115,19 +115,30 @@ view : Model -> Html Msg
 view model =
     let
         numCols = 3
-        attributes = [ classStyle ]
+        attributes =
+            [ Html.Attributes.classList
+                [ ("projectlist", True)
+                , ("projectlist-container", True)
+                ]
+            ]
 
         projects =
             model.projects
                 |> List.map (\p -> viewProject p)
-                |> composeTiledHtml numCols
 
     in
-        table attributes projects
+        div attributes projects
 
 viewProject : Project -> Html Msg
 viewProject project =
     let
+        attributes =
+            [ Html.Attributes.classList
+                [ ("projectlist", True)
+                , ("projectlist-item", True)
+                ]
+            ]
+
         titleContent =
             [ h3 [] [ text project.title ] ]
 
@@ -176,7 +187,7 @@ viewProject project =
             ++ break
             ++ previewsContent
     in
-        th [ classStyle ] content
+        div attributes content
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

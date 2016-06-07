@@ -13293,26 +13293,35 @@ var _user$project$ProjectList$viewProject = function (project) {
 										_elm_lang$core$Basics_ops['++'],
 										downloadUrlContent,
 										A2(_elm_lang$core$Basics_ops['++'], $break, previewsContent))))))))));
-	return A2(
-		_elm_lang$html$Html$th,
-		_elm_lang$core$Native_List.fromArray(
-			[_user$project$ProjectList$classStyle]),
-		content);
+	var attributes = _elm_lang$core$Native_List.fromArray(
+		[
+			_elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'projectlist', _1: true},
+					{ctor: '_Tuple2', _0: 'projectlist-item', _1: true}
+				]))
+		]);
+	return A2(_elm_lang$html$Html$div, attributes, content);
 };
 var _user$project$ProjectList$view = function (model) {
-	var attributes = _elm_lang$core$Native_List.fromArray(
-		[_user$project$ProjectList$classStyle]);
-	var numCols = 3;
 	var projects = A2(
-		_user$project$Utils$composeTiledHtml,
-		numCols,
-		A2(
-			_elm_lang$core$List$map,
-			function (p) {
-				return _user$project$ProjectList$viewProject(p);
-			},
-			model.projects));
-	return A2(_elm_lang$html$Html$table, attributes, projects);
+		_elm_lang$core$List$map,
+		function (p) {
+			return _user$project$ProjectList$viewProject(p);
+		},
+		model.projects);
+	var attributes = _elm_lang$core$Native_List.fromArray(
+		[
+			_elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'projectlist', _1: true},
+					{ctor: '_Tuple2', _0: 'projectlist-container', _1: true}
+				]))
+		]);
+	var numCols = 3;
+	return A2(_elm_lang$html$Html$div, attributes, projects);
 };
 var _user$project$ProjectList$errorProject = {
 	title: 'error',

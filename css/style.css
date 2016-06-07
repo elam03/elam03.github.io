@@ -3,13 +3,15 @@
 div.main {
     padding-bottom: 10px;
     display: flex;
+    flex-flow: column;
 }
 
 /*************************************/
 
 .cityscape {
-    padding: 0px;
+    display: flex;
 
+    padding: 0px;
     border-style: solid;
     border-color: #000000;
     border-width: 2px;
@@ -44,27 +46,32 @@ div.main {
 
 /*************************************/
 
-table.projectlist  {
-    background:#b5cfd2;
-    padding: 2px;
-    width: 600px;
-
-    border-style: solid;
-    border-color: #000000;
-    border-width: 4px;
-    border-radius: 15px;
-}
-
-th.projectlist {
-	background:#8296dd;
-	padding: 4px;
-    font-family: "Comic Sans MS";
-    font-size: 14px;
-
+.projectlist {
     border-style: solid;
     border-color: #000000;
     border-width: 2px;
     border-radius: 15px;
+}
+
+.projectlist-container  {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: baseline;
+    align-content: center;
+
+    background:#b5cfd2;
+    padding: 2px;
+}
+
+.projectlist-item {
+    flex: auto;
+    margin: auto;
+
+    padding: 4px;
+	background:#8296dd;
+    font-family: "Comic Sans MS";
+    font-size: 14px;
 }
 
 /*************************************/
