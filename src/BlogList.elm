@@ -81,7 +81,6 @@ update action model =
 
                 blogs =
                     blogsList
-                        -- |> Maybe.withDefault (BlogList [])
                         |> .blogs
                         |> populateBlogId
             in
@@ -93,7 +92,6 @@ update action model =
             let
                 currBlog =
                     markdownContent
-                        -- |> Maybe.withDefault "Failed to load!"
                         |> Markdown.toHtml []
 
                 debug =
@@ -167,51 +165,51 @@ classCurrBlogStyle = class "bloglist-currblog"
 view : Model -> Html Msg
 view model =
     let
-        numCols = 2
+        currBlogContent =
+            let
+                currBlogSelected =
+                    model.currId >= 0 && model.currId < List.length model.blogs
 
-        currBlogSelected =
-            model.currId >= 0 && model.currId < List.length model.blogs
+                currBlog =
+                    model.blogs
+                        |> Array.fromList
+                        |> Array.get model.currId
+                        |> Maybe.withDefault errorBlog
+            in
+                if currBlogSelected then
+                    [ h1 [ style [ ("text-align", "center") ] ] [ text currBlog.title ]
+                    , div [] [ model.currBlog ]
+                    ]
+                else
+                    []
 
-        currBlog =
+        blogTileAttributes =
+            Html.Attributes.classList
+                [ ("bloglist", True)
+                , ("bloglist-container", True)
+                ]
+
+        blogTiles =
             model.blogs
-                |> Array.fromList
-                |> Array.get model.currId
-                |> Maybe.withDefault errorBlog
+                |> List.map (\b -> viewBlogTile b)
 
-        blogs =
-            model.blogs
-                |> List.map (\b -> viewBlog b)
-                -- |> composeTiledHtml numCols
-
-        viewCurrBlog =
-            if currBlogSelected then
-                [ div [ classCurrBlogStyle ] [ model.currBlog ] ]
-            else
-                []
-
-        blogsHeader =
-            if List.length viewCurrBlog > 0 then
-                [ h1 [ classBlogHeader ] [ text currBlog.title ] ]
-            else
-                []
-
-        tableOfBlogs =
-            [ div [ classContainerStyle ] blogs ]
+        blogTilesContainer =
+            [ div [ blogTileAttributes ] blogTiles ]
 
         allTheThings =
-            tableOfBlogs
-            ++ blogsHeader
-            ++ viewCurrBlog
+            blogTilesContainer
+            ++ currBlogContent
 
     in
-        div [ classStyle ] allTheThings
+        div [] allTheThings
 
-viewBlog : Blog -> Html Msg
-viewBlog blog =
+viewBlogTile : Blog -> Html Msg
+viewBlogTile blog =
     let
         attribute =
             [ Html.Attributes.classList
-                [ ("bloglist-item", True)
+                [ ("bloglist", True)
+                , ("bloglist-item", True)
                 , ("bloglist-item-hover", blog.hover)
                 ]
             ]
@@ -225,25 +223,8 @@ viewBlog blog =
         titleContent =
             [ h4 [ style [ ("text-align", "center") ] ] [ text blog.title ] ]
 
-        dateContent = []
-            -- [ h6 [ style [ ("text-align", "center") ] ] [ text <| Maybe.withDefault "" blog.date ] ]
-
-        keywordContent = []
-            -- let
-            --     allKeywords =
-            --         blog.keywords
-            --             |> Maybe.withDefault []
-            --             |> List.intersperse ", "
-            --             |> List.foldl (++) ""
-            -- in
-            --     [ p [] [text allKeywords] ]
-
-        break = [ br [] [] ]
-
         allContent =
             titleContent
-            ++ dateContent
-            ++ keywordContent
     in
         div attributes allContent
 

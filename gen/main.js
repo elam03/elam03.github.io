@@ -11968,20 +11968,7 @@ var _user$project$BlogList$HoverBlog = function (a) {
 var _user$project$BlogList$FocusBlog = function (a) {
 	return {ctor: 'FocusBlog', _0: a};
 };
-var _user$project$BlogList$viewBlog = function (blog) {
-	var $break = _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$br,
-			_elm_lang$core$Native_List.fromArray(
-				[]),
-			_elm_lang$core$Native_List.fromArray(
-				[]))
-		]);
-	var keywordContent = _elm_lang$core$Native_List.fromArray(
-		[]);
-	var dateContent = _elm_lang$core$Native_List.fromArray(
-		[]);
+var _user$project$BlogList$viewBlogTile = function (blog) {
 	var titleContent = _elm_lang$core$Native_List.fromArray(
 		[
 			A2(
@@ -11999,15 +11986,13 @@ var _user$project$BlogList$viewBlog = function (blog) {
 					_elm_lang$html$Html$text(blog.title)
 				]))
 		]);
-	var allContent = A2(
-		_elm_lang$core$Basics_ops['++'],
-		titleContent,
-		A2(_elm_lang$core$Basics_ops['++'], dateContent, keywordContent));
+	var allContent = titleContent;
 	var attribute = _elm_lang$core$Native_List.fromArray(
 		[
 			_elm_lang$html$Html_Attributes$classList(
 			_elm_lang$core$Native_List.fromArray(
 				[
+					{ctor: '_Tuple2', _0: 'bloglist', _1: true},
 					{ctor: '_Tuple2', _0: 'bloglist-item', _1: true},
 					{ctor: '_Tuple2', _0: 'bloglist-item-hover', _1: blog.hover}
 				]))
@@ -12027,63 +12012,67 @@ var _user$project$BlogList$viewBlog = function (blog) {
 	return A2(_elm_lang$html$Html$div, attributes, allContent);
 };
 var _user$project$BlogList$view = function (model) {
-	var blogs = A2(
+	var blogTiles = A2(
 		_elm_lang$core$List$map,
 		function (b) {
-			return _user$project$BlogList$viewBlog(b);
+			return _user$project$BlogList$viewBlogTile(b);
 		},
 		model.blogs);
-	var tableOfBlogs = _elm_lang$core$Native_List.fromArray(
+	var blogTileAttributes = _elm_lang$html$Html_Attributes$classList(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'bloglist', _1: true},
+				{ctor: '_Tuple2', _0: 'bloglist-container', _1: true}
+			]));
+	var blogTilesContainer = _elm_lang$core$Native_List.fromArray(
 		[
 			A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
-				[_user$project$BlogList$classContainerStyle]),
-			blogs)
+				[blogTileAttributes]),
+			blogTiles)
 		]);
-	var currBlog = A2(
-		_elm_lang$core$Maybe$withDefault,
-		_user$project$BlogList$errorBlog,
-		A2(
-			_elm_lang$core$Array$get,
+	var currBlogContent = function () {
+		var currBlog = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_user$project$BlogList$errorBlog,
+			A2(
+				_elm_lang$core$Array$get,
+				model.currId,
+				_elm_lang$core$Array$fromList(model.blogs)));
+		var currBlogSelected = (_elm_lang$core$Native_Utils.cmp(model.currId, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(
 			model.currId,
-			_elm_lang$core$Array$fromList(model.blogs)));
-	var currBlogSelected = (_elm_lang$core$Native_Utils.cmp(model.currId, 0) > -1) && (_elm_lang$core$Native_Utils.cmp(
-		model.currId,
-		_elm_lang$core$List$length(model.blogs)) < 0);
-	var viewCurrBlog = currBlogSelected ? _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$div,
-			_elm_lang$core$Native_List.fromArray(
-				[_user$project$BlogList$classCurrBlogStyle]),
-			_elm_lang$core$Native_List.fromArray(
-				[model.currBlog]))
-		]) : _elm_lang$core$Native_List.fromArray(
-		[]);
-	var blogsHeader = (_elm_lang$core$Native_Utils.cmp(
-		_elm_lang$core$List$length(viewCurrBlog),
-		0) > 0) ? _elm_lang$core$Native_List.fromArray(
-		[
-			A2(
-			_elm_lang$html$Html$h1,
-			_elm_lang$core$Native_List.fromArray(
-				[_user$project$BlogList$classBlogHeader]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text(currBlog.title)
-				]))
-		]) : _elm_lang$core$Native_List.fromArray(
-		[]);
-	var allTheThings = A2(
-		_elm_lang$core$Basics_ops['++'],
-		tableOfBlogs,
-		A2(_elm_lang$core$Basics_ops['++'], blogsHeader, viewCurrBlog));
-	var numCols = 2;
+			_elm_lang$core$List$length(model.blogs)) < 0);
+		return currBlogSelected ? _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$h1,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$style(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								{ctor: '_Tuple2', _0: 'text-align', _1: 'center'}
+							]))
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(currBlog.title)
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[model.currBlog]))
+			]) : _elm_lang$core$Native_List.fromArray(
+			[]);
+	}();
+	var allTheThings = A2(_elm_lang$core$Basics_ops['++'], blogTilesContainer, currBlogContent);
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[_user$project$BlogList$classStyle]),
+			[]),
 		allTheThings);
 };
 var _user$project$BlogList$LoadBlogMarkdown = function (a) {
