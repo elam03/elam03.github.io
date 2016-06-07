@@ -2,7 +2,7 @@ module SummaryList exposing (..)
 
 import Basics.Extra exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing (class, href, src, style)
+import Html.Attributes
 import Http
 import Json.Decode exposing (..)
 import Platform.Cmd
@@ -73,44 +73,36 @@ update action model =
 view : Model -> Html Msg
 view model =
     let
-        numCols = 2
-        attributes = [ classStyle ]
+        viewSummary summary =
+            let
+                items =
+                    summary.contents
+                        |> List.map (\s -> li [] [ text s ])
 
-        summaryData =
+                contents =
+                    [ h2 [] [ text summary.title ]
+                    , ul [] items
+                    ]
+
+                attributes =
+                    Html.Attributes.classList
+                        [ ("summarylist", True)
+                        , ("summarylist-item", True)
+                        ]
+            in
+                div [ attributes ] contents
+
+        items =
             model.summaryData.summaries
                 |> List.map (\s -> viewSummary s)
-                |> composeTiledHtml numCols
 
-        debugContents =
-            div []
-                [ text "debug: "
-                , text model.debug
+        attributes =
+            Html.Attributes.classList
+                [ ("summarylist", True)
+                , ("summarylist-container", True)
                 ]
-
-        tableContents =
-            table attributes summaryData
-
     in
-        div []
-            [ tableContents
-            -- , debugContents
-            ]
-
-
-viewSummary : Summary -> Html Msg
-viewSummary summary =
-    let
-        contents =
-            summary.contents
-                |> List.map (\s -> li [] [ text s ])
-    in
-        th [ classStyle ]
-            [ h2 [ style [ ("text-align", "center") ] ] [ text summary.title ]
-            , ul [ style [ ("text-align", "left") ] ] contents
-            ]
-
-classStyle : Html.Attribute Msg
-classStyle = class "summarylist"
+        div [ attributes ] items
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

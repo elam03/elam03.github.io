@@ -16,26 +16,30 @@ div.main {
 }
 /*************************************/
 
-table.summarylist  {
-    background:#81dbe6;
-    padding: 4px;
-    width: 600px;
-
+.summarylist {
     border-style: solid;
     border-color: #000000;
-    border-width: 4px;
+    border-width: 2px;
     border-radius: 15px;
 }
 
-th.summarylist {
-	background:#d5daec;
-    font-family: "Arial";
-    font-size: 10px;
+.summarylist-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: baseline;
+    align-content: center;
 
-    border-style: solid;
-    border-color: #302828;
-    border-width: 2px;
-    border-radius: 15px;
+    padding: 4px;
+    background:#bbe4e9;
+}
+
+.summarylist-item {
+    flex: auto;
+    margin: auto;
+
+    padding: 4px;
+    background:#d5daec;
 }
 
 /*************************************/

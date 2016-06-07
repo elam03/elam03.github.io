@@ -13462,37 +13462,39 @@ var _user$project$ProjectList$RequestRefresh = {ctor: 'RequestRefresh'};
 var _user$project$SummaryList$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$SummaryList$classStyle = _elm_lang$html$Html_Attributes$class('summarylist');
-var _user$project$SummaryList$viewSummary = function (summary) {
-	var contents = A2(
-		_elm_lang$core$List$map,
-		function (s) {
-			return A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text(s)
-					]));
-		},
-		summary.contents);
-	return A2(
-		_elm_lang$html$Html$th,
+var _user$project$SummaryList$view = function (model) {
+	var attributes = _elm_lang$html$Html_Attributes$classList(
 		_elm_lang$core$Native_List.fromArray(
-			[_user$project$SummaryList$classStyle]),
-		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'summarylist', _1: true},
+				{ctor: '_Tuple2', _0: 'summarylist-container', _1: true}
+			]));
+	var viewSummary = function (summary) {
+		var attributes = _elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'summarylist', _1: true},
+					{ctor: '_Tuple2', _0: 'summarylist-item', _1: true}
+				]));
+		var items = A2(
+			_elm_lang$core$List$map,
+			function (s) {
+				return A2(
+					_elm_lang$html$Html$li,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(s)
+						]));
+			},
+			summary.contents);
+		var contents = _elm_lang$core$Native_List.fromArray(
 			[
 				A2(
 				_elm_lang$html$Html$h2,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'text-align', _1: 'center'}
-							]))
-					]),
+					[]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						_elm_lang$html$Html$text(summary.title)
@@ -13500,45 +13502,26 @@ var _user$project$SummaryList$viewSummary = function (summary) {
 				A2(
 				_elm_lang$html$Html$ul,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$style(
-						_elm_lang$core$Native_List.fromArray(
-							[
-								{ctor: '_Tuple2', _0: 'text-align', _1: 'left'}
-							]))
-					]),
-				contents)
-			]));
-};
-var _user$project$SummaryList$view = function (model) {
-	var debugContents = A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html$text('debug: '),
-				_elm_lang$html$Html$text(model.debug)
-			]));
-	var attributes = _elm_lang$core$Native_List.fromArray(
-		[_user$project$SummaryList$classStyle]);
-	var numCols = 2;
-	var summaryData = A2(
-		_user$project$Utils$composeTiledHtml,
-		numCols,
-		A2(
-			_elm_lang$core$List$map,
-			function (s) {
-				return _user$project$SummaryList$viewSummary(s);
-			},
-			model.summaryData.summaries));
-	var tableContents = A2(_elm_lang$html$Html$table, attributes, summaryData);
+					[]),
+				items)
+			]);
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[attributes]),
+			contents);
+	};
+	var items = A2(
+		_elm_lang$core$List$map,
+		function (s) {
+			return viewSummary(s);
+		},
+		model.summaryData.summaries);
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[tableContents]));
+			[attributes]),
+		items);
 };
 var _user$project$SummaryList$errorSummary = {
 	title: 'error',
