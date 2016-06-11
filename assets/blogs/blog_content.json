@@ -30,6 +30,17 @@
             ],
             "date": "5/17/2016",
             "url": "assets/blogs/upgrading_to_0.17.0.md"
+        },
+        {
+            "title": "Initial Window Size",
+            "keywords":
+            [
+                "elm",
+                "task",
+                "size"
+            ],
+            "date": "6/10/2016",
+            "url": "assets/blogs/initial_window_size.md"
         }
     ]
 }
