@@ -35,7 +35,7 @@ type alias Model =
 init : String -> String -> String -> String -> (Model, Cmd Msg)
 init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
     let
-        (cityscape, cityscapeFx) = Cityscape.init (600, 200)
+        (cityscape, cityscapeFx) = Cityscape.init
         (projectList, projectListFx) = ProjectList.init projectListFileLocation assetPath
         (summaryList, summaryListFx) = SummaryList.init summaryFileLocation
         (blogList, blogListFx) = BlogList.init blogFileLocation
@@ -56,32 +56,12 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ classStyle ]
-            [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
-        , div [ classStyle ]
-            [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
-        , div [ classStyle ]
-            [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
-        , div [ classStyle ]
-            [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
+    body []
+        [ div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
+        , div [ class "main" ] [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
+        , div [ class "main" ] [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
+        , div [ class "main" ] [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
         ]
-
-        -- [ Html.map CityscapeMsgs (Cityscape.view model.cityscape)
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
-        -- , div [ style [ ("display", "flex") ] ]
-        --     [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
-        -- -- , div []
-        -- --     [ text "debug: "
-        -- --     , text model.debug
-        -- --     ]
-        -- ]
-
-classStyle : Html.Attribute Msg
-classStyle = class "main"
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
 update action model =

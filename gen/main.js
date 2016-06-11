@@ -12521,7 +12521,6 @@ var _user$project$Cityscape$displayMouseCursor = F2(
 						A2(_evancz$elm_graphics$Collage$ngon, 3, 5))))
 			]);
 	});
-var _user$project$Cityscape$classStyle = _elm_lang$html$Html_Attributes$class('cityscape');
 var _user$project$Cityscape$viewTree = function (t) {
 	var leaves = _elm_lang$core$Native_List.fromArray(
 		[
@@ -12611,7 +12610,9 @@ var _user$project$Cityscape$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[_user$project$Cityscape$classStyle]),
+			[
+				_elm_lang$html$Html_Attributes$class('cityscape')
+			]),
 		_elm_lang$core$Native_List.fromArray(
 			[finalOutput]));
 };
@@ -12910,72 +12911,52 @@ var _user$project$Cityscape$Model = function (a) {
 var _user$project$Cityscape$StaticMove = {ctor: 'StaticMove'};
 var _user$project$Cityscape$MouseMove = {ctor: 'MouseMove'};
 var _user$project$Cityscape$TimeMove = {ctor: 'TimeMove'};
-var _user$project$Cityscape$init = function (_p13) {
-	var _p14 = _p13;
-	var _p15 = _p14._1;
-	var model = {
-		x: 0,
-		y: 0,
-		dx: 0,
-		dy: 0,
-		keys: _elm_lang$core$Set$empty,
-		t: 0,
-		dt: 0,
-		initialized: false,
-		buildings: _elm_lang$core$Native_List.fromArray(
-			[]),
-		randomValues: _elm_lang$core$Array$fromList(
-			_elm_lang$core$Native_List.fromArray(
-				[])),
-		windowWidth: _p14._0,
-		windowHeight: _p15,
-		movementType: _user$project$Cityscape$TimeMove,
-		sunset: {
-			y: 0 - (_elm_lang$core$Basics$toFloat(_p15) / 3),
-			h: _elm_lang$core$Basics$toFloat(_p15) / 4
-		},
-		showInfo: false,
-		trees: _elm_lang$core$Native_List.fromArray(
-			[])
-	};
-	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-};
 var _user$project$Cityscape$NewRandomValues = function (a) {
 	return {ctor: 'NewRandomValues', _0: a};
 };
 var _user$project$Cityscape$update = F2(
 	function (action, model) {
-		var _p16 = action;
-		switch (_p16.ctor) {
+		var _p13 = action;
+		switch (_p13.ctor) {
 			case 'None':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Move':
-				var _p17 = _p16._0;
+				var _p14 = _p13._0;
 				return {
 					ctor: '_Tuple2',
 					_0: A2(
 						_user$project$Cityscape$mouseUpdate,
-						{ctor: '_Tuple2', _0: _p17.x, _1: _p17.y},
+						{ctor: '_Tuple2', _0: _p14.x, _1: _p14.y},
 						model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Size':
+				var margin = 25;
+				var h = 200;
+				var w = _p13._0.width;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{windowWidth: _p16._0.width - 35}),
+						{
+							windowWidth: w - (margin * 2),
+							windowHeight: 200,
+							sunset: {
+								y: 0 - (_elm_lang$core$Basics$toFloat(h) / 3),
+								h: _elm_lang$core$Basics$toFloat(h) / 4
+							}
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'KeyDown':
-				var _p19 = _p16._0;
+				var _p16 = _p13._0;
 				var model$ = _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						keys: A2(_elm_lang$core$Set$insert, _p19, model.keys)
+						keys: A2(_elm_lang$core$Set$insert, _p16, model.keys)
 					});
-				var _p18 = _elm_lang$core$Char$fromCode(_p19);
-				switch (_p18.valueOf()) {
+				var _p15 = _elm_lang$core$Char$fromCode(_p16);
+				switch (_p15.valueOf()) {
 					case '1':
 						return {
 							ctor: '_Tuple2',
@@ -13029,17 +13010,17 @@ var _user$project$Cityscape$update = F2(
 				var model$ = _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						keys: A2(_elm_lang$core$Set$remove, _p16._0, model.keys)
+						keys: A2(_elm_lang$core$Set$remove, _p13._0, model.keys)
 					});
 				return {ctor: '_Tuple2', _0: model$, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Tick':
-				var _p20 = _p16._0;
-				var dt = _p20 - model.t;
+				var _p17 = _p13._0;
+				var dt = _p17 - model.t;
 				return {
 					ctor: '_Tuple2',
 					_0: _user$project$Cityscape$resetMouseDelta(
 						_user$project$Cityscape$updateAllEntitiesInModel(
-							A3(_user$project$Cityscape$timeUpdate, dt, _p20, model))),
+							A3(_user$project$Cityscape$timeUpdate, dt, _p17, model))),
 					_1: A2(
 						_elm_lang$core$Random$generate,
 						_user$project$Cityscape$NewRandomValues,
@@ -13052,7 +13033,7 @@ var _user$project$Cityscape$update = F2(
 				var model$ = _elm_lang$core$Native_Utils.update(
 					model,
 					{
-						randomValues: _elm_lang$core$Array$fromList(_p16._0)
+						randomValues: _elm_lang$core$Array$fromList(_p13._0)
 					});
 				var setInitialized = function (model) {
 					return _elm_lang$core$Native_Utils.update(
@@ -13082,6 +13063,37 @@ var _user$project$Cityscape$KeyDown = function (a) {
 var _user$project$Cityscape$Size = function (a) {
 	return {ctor: 'Size', _0: a};
 };
+var _user$project$Cityscape$init = function () {
+	var h = 200;
+	var w = 300;
+	var model = {
+		x: 0,
+		y: 0,
+		dx: 0,
+		dy: 0,
+		keys: _elm_lang$core$Set$empty,
+		t: 0,
+		dt: 0,
+		initialized: false,
+		buildings: _elm_lang$core$Native_List.fromArray(
+			[]),
+		randomValues: _elm_lang$core$Array$fromList(
+			_elm_lang$core$Native_List.fromArray(
+				[])),
+		windowWidth: w,
+		windowHeight: h,
+		movementType: _user$project$Cityscape$TimeMove,
+		sunset: {y: 0, h: 0},
+		showInfo: true,
+		trees: _elm_lang$core$Native_List.fromArray(
+			[])
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: model,
+		_1: A3(_elm_lang$core$Task$perform, _user$project$Cityscape$Size, _user$project$Cityscape$Size, _elm_lang$window$Window$size)
+	};
+}();
 var _user$project$Cityscape$Move = function (a) {
 	return {ctor: 'Move', _0: a};
 };
@@ -13599,7 +13611,6 @@ var _user$project$SummaryList$update = F2(
 	});
 var _user$project$SummaryList$RequestRefresh = {ctor: 'RequestRefresh'};
 
-var _user$project$Main$classStyle = _elm_lang$html$Html_Attributes$class('main');
 var _user$project$Main_ops = _user$project$Main_ops || {};
 _user$project$Main_ops['=>'] = F2(
 	function (v0, v1) {
@@ -13635,8 +13646,7 @@ var _user$project$Main$init = F4(
 		var _p2 = A2(_user$project$ProjectList$init, projectListFileLocation, assetPath);
 		var projectList = _p2._0;
 		var projectListFx = _p2._1;
-		var _p3 = _user$project$Cityscape$init(
-			{ctor: '_Tuple2', _0: 600, _1: 200});
+		var _p3 = _user$project$Cityscape$init;
 		var cityscape = _p3._0;
 		var cityscapeFx = _p3._1;
 		return {
@@ -13654,7 +13664,7 @@ var _user$project$Main$init = F4(
 	});
 var _user$project$Main$view = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$body,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		_elm_lang$core$Native_List.fromArray(
@@ -13662,7 +13672,9 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[_user$project$Main$classStyle]),
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(
@@ -13673,7 +13685,9 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[_user$project$Main$classStyle]),
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(
@@ -13684,7 +13698,9 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[_user$project$Main$classStyle]),
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(
@@ -13695,7 +13711,9 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[_user$project$Main$classStyle]),
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						A2(

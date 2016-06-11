@@ -11,6 +11,7 @@ import Mouse exposing (Position)
 import Keyboard exposing (..)
 import Random
 import Set
+import Task
 import Time exposing (..)
 import Window exposing (Size)
 
@@ -73,9 +74,13 @@ type alias Model =
     ,   trees : List Tree
     }
 
-init : (Int, Int) -> (Model, Cmd Msg)
-init (w, h) =
-    let model =
+init : (Model, Cmd Msg)
+init =
+    let
+        -- w = Window.width
+        w = 300
+        h = 200
+        model =
         { x = 0
         , y = 0
         , dx = 0
@@ -89,13 +94,13 @@ init (w, h) =
         , windowWidth = w
         , windowHeight = h
         , movementType = TimeMove
-        , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
-        , showInfo = False
+        , sunset = { y = 0, h = 0 }
+        , showInfo = True
         , trees = []
         }
 
     in
-        ( model, Cmd.none )
+        ( model, Task.perform Size Size Window.size )
 
 -- UPDATE
 
@@ -116,12 +121,18 @@ update action model =
         Move xy ->
             ( model |> mouseUpdate (xy.x, xy.y), Cmd.none )
         Size s ->
-            ( { model
-              | windowWidth = s.width - 35
-            --   , windowHeight = s.height
-              }
-            , Cmd.none
-            )
+            let
+                w = s.width
+                h = 200
+                margin = 25 -- This is the margin value for the entire page
+            in
+                ( { model
+                  | windowWidth = w - (margin * 2)
+                  , windowHeight = 200
+                  , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
+                  }
+                , Cmd.none
+                )
 
         KeyDown key ->
             let
@@ -420,10 +431,7 @@ view model =
         finalOutput = collage model.windowWidth model.windowHeight things
             |> Element.toHtml
     in
-        div [ classStyle ] [ finalOutput ]
-
-classStyle : Attribute Msg
-classStyle = class "cityscape"
+        div [ class "cityscape" ] [ finalOutput ]
 
 displayMouseCursor : (Float, Float) -> Model -> List Form
 displayMouseCursor (x, y) model =
