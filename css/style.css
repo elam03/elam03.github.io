@@ -122,4 +122,20 @@ body:focus {
     background:#b47676;
 }
 
+.currblog {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+pre {
+    background:#d2e7e6;
+    padding: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+
+    border-style: solid;
+    border-color: #71c7cf;
+    border-width: 1px;
+}
+
 /*************************************/

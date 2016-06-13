@@ -95,7 +95,7 @@ init =
         , windowHeight = h
         , movementType = TimeMove
         , sunset = { y = 0, h = 0 }
-        , showInfo = True
+        , showInfo = False
         , trees = []
         }
 

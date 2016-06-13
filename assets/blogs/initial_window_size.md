@@ -12,7 +12,7 @@ I found this in the Window package. [link](http://package.elm-lang.org/packages/
 size : Task x Size
 ~~~
 
-Great! So how do I use it? And why is it a Task[^Task]?
+Great! So how do I use it? And why is it a [Task][^1]?
 
 ### How to use ###
 
@@ -67,5 +67,5 @@ I already had the Size Msg to handle window resizes, so I just 'perform' the Win
 So you perform a task with (Task.perform) and it will return a Msg that should map into your application/module's Msg.
 
 
-[^Task]:
+[^1]:
 Tasks: The basic convention is that Tasks are executions that are done in javascript land (http and websockets are other examples of executions that need to be done in javascript land and not in elm native).

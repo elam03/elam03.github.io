@@ -12062,7 +12062,9 @@ var _user$project$BlogList$view = function (model) {
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[]),
+					[
+						_elm_lang$html$Html_Attributes$class('currblog')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[model.currBlog]))
 			]) : _elm_lang$core$Native_List.fromArray(
@@ -12127,8 +12129,10 @@ var _user$project$BlogList$update = F2(
 				};
 			case 'LoadBlogMarkdown':
 				var debug = model.debug;
-				var currBlog = A2(
-					_evancz$elm_markdown$Markdown$toHtml,
+				var options = _evancz$elm_markdown$Markdown$defaultOptions;
+				var currBlog = A3(
+					_evancz$elm_markdown$Markdown$toHtmlWith,
+					options,
 					_elm_lang$core$Native_List.fromArray(
 						[]),
 					_p0._0);
@@ -13084,7 +13088,7 @@ var _user$project$Cityscape$init = function () {
 		windowHeight: h,
 		movementType: _user$project$Cityscape$TimeMove,
 		sunset: {y: 0, h: 0},
-		showInfo: true,
+		showInfo: false,
 		trees: _elm_lang$core$Native_List.fromArray(
 			[])
 	};
