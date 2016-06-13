@@ -56,7 +56,7 @@ The other big issue I encountered was serving my website. I was typically using 
 ### Subscription Troubles ###
 I struggled a little bit with the new subscription system, but it's mostly because I didn't any great examples to view yet! The main sore spot was combining all of the subscriptions from the sub-modules together into Main. I eventually got it and it makes a lot of sense! Just had to pass the right model into the subscription function and map it back out as the Msg in main.
 
-```
+```elm
 type Msg
     = NoOp
     | CityscapeMsgs Cityscape.Msg

@@ -90,9 +90,13 @@ update action model =
 
         LoadBlogMarkdown markdownContent ->
             let
+                options = Markdown.defaultOptions
+
                 currBlog =
                     markdownContent
-                        |> Markdown.toHtml []
+                    -- |> Markdown.toHtmlWith options [class "hljs"]
+                        -- |> Markdown.toHtmlWith options [class "currblog"]
+                        |> Markdown.toHtmlWith options []
 
                 debug =
                     model.debug
@@ -178,7 +182,7 @@ view model =
             in
                 if currBlogSelected then
                     [ h1 [ style [ ("text-align", "center") ] ] [ text currBlog.title ]
-                    , div [] [ model.currBlog ]
+                    , div [class "currblog"] [ model.currBlog ]
                     ]
                 else
                     []
