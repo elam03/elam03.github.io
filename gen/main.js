@@ -12935,7 +12935,7 @@ var _user$project$Cityscape$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Size':
-				var margin = 25;
+				var margin = 16;
 				var h = 200;
 				var w = _p13._0.width;
 				return {
@@ -13668,7 +13668,7 @@ var _user$project$Main$init = F4(
 	});
 var _user$project$Main$view = function (model) {
 	return A2(
-		_elm_lang$html$Html$body,
+		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		_elm_lang$core$Native_List.fromArray(

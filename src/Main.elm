@@ -56,7 +56,7 @@ init projectListFileLocation summaryFileLocation blogFileLocation assetPath =
 
 view : Model -> Html Msg
 view model =
-    body []
+    div []
         [ div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
         , div [ class "main" ] [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
         , div [ class "main" ] [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]

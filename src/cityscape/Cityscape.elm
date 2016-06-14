@@ -124,7 +124,7 @@ update action model =
             let
                 w = s.width
                 h = 200
-                margin = 25 -- This is the margin value for the entire page
+                margin = 16 -- This is the margin value for the entire page
             in
                 ( { model
                   | windowWidth = w - (margin * 2)
