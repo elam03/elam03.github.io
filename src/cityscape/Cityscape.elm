@@ -7,10 +7,14 @@ import Collage exposing (..)
 import Element exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onMouseOver)
 import Mouse exposing (Position)
 import Keyboard exposing (..)
 import Random
 import Set
+import Svg
+import Svg.Attributes
+import Svg.Events
 import Task
 import Time exposing (..)
 import Window exposing (Size)
@@ -384,13 +388,13 @@ viewSunset model =
         w = toFloat model.windowWidth
         h = toFloat model.windowHeight
     in
-        gradient (grad model.sunset.y model.sunset.h) (rect w h)
+        Collage.gradient (grad model.sunset.y model.sunset.h) (Collage.rect w h)
 
 viewTree : Tree -> Form
 viewTree t =
     let
         trunk =
-            [ rect t.trunkWidth t.h
+            [ Collage.rect t.trunkWidth t.h
                 |> filled brown
                 |> move (t.x + t.w / 2, t.y + t.h / 2)
             ]
@@ -406,6 +410,17 @@ viewTree t =
 
 view : Model -> Html Msg
 view model =
+    let
+        html = viewWithHtml model
+        svg = viewWithSvg model
+    in
+        div []
+            [ html
+            -- , svg
+            ]
+
+viewWithHtml : Model -> Html Msg
+viewWithHtml model =
     let
         (mx, my) = (model.x, -model.y)
 
@@ -430,8 +445,20 @@ view model =
 
         finalOutput = collage model.windowWidth model.windowHeight things
             |> Element.toHtml
+
+        attributes =
+            [ class "cityscape"
+            , Html.Events.onMouseDown (Move {x = 42,y = 42})
+            ]
     in
-        div [ class "cityscape" ] [ finalOutput ]
+        div attributes [ finalOutput ]
+
+viewWithSvg : Model -> Html Msg
+viewWithSvg model =
+    Svg.svg [ Svg.Attributes.width "120", Svg.Attributes.height "120", Svg.Attributes.viewBox "0 0 120 120" ]
+        [ Svg.rect [ Svg.Attributes.rotate "45", Svg.Attributes.x "10", Svg.Attributes.y "10", Svg.Attributes.width "100", Svg.Attributes.height "100", Svg.Attributes.rx "15", Svg.Attributes.ry "15" ] []
+        ]
+    -- div [ style [("border-style", "solid")] ] [ Html.text "SVG" ]
 
 displayMouseCursor : (Float, Float) -> Model -> List Form
 displayMouseCursor (x, y) model =
