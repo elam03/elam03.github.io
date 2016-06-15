@@ -65,7 +65,6 @@ type Msg
     | HoverBlog ID
     | UnHoverBlog ID
     | FetchFail Http.Error
-    | Tick Float
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
@@ -141,9 +140,6 @@ update action model =
                 ( { model | blogs = blogs }, Cmd.none)
 
         FetchFail _ ->
-            (model, Cmd.none)
-
-        Tick t ->
             (model, Cmd.none)
 
 -- VIEW
@@ -234,9 +230,7 @@ viewBlogTile blog =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Time.every minute Tick ]
-
+    Sub.none
 -- CMDS
 
 getBlogList : String -> Cmd Msg
