@@ -8882,6 +8882,353 @@ var _elm_lang$mouse$Mouse$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
 
+var _elm_lang$navigation$Native_Navigation = function() {
+
+function go(n)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		if (n !== 0)
+		{
+			history.go(n);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function pushState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.pushState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function replaceState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.replaceState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function getLocation()
+{
+	var location = document.location;
+
+	return {
+		href: location.href,
+		host: location.host,
+		hostname: location.hostname,
+		protocol: location.protocol,
+		origin: location.origin,
+		port_: location.port,
+		pathname: location.pathname,
+		search: location.search,
+		hash: location.hash,
+		username: location.username,
+		password: location.password
+	};
+}
+
+
+return {
+	go: go,
+	pushState: pushState,
+	replaceState: replaceState,
+	getLocation: getLocation
+};
+
+}();
+
+var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
+var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
+var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
+var _elm_lang$navigation$Navigation$spawnPopState = function (router) {
+	return _elm_lang$core$Process$spawn(
+		A3(
+			_elm_lang$dom$Dom_LowLevel$onWindow,
+			'popstate',
+			_elm_lang$core$Json_Decode$value,
+			function (_p0) {
+				return A2(
+					_elm_lang$core$Platform$sendToSelf,
+					router,
+					_elm_lang$navigation$Native_Navigation.getLocation(
+						{ctor: '_Tuple0'}));
+			}));
+};
+var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
+_elm_lang$navigation$Navigation_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			task1,
+			function (_p1) {
+				return task2;
+			});
+	});
+var _elm_lang$navigation$Navigation$notify = F3(
+	function (router, subs, location) {
+		var send = function (_p2) {
+			var _p3 = _p2;
+			return A2(
+				_elm_lang$core$Platform$sendToApp,
+				router,
+				_p3._0(location));
+		};
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(_elm_lang$core$List$map, send, subs)),
+			_elm_lang$core$Task$succeed(
+				{ctor: '_Tuple0'}));
+	});
+var _elm_lang$navigation$Navigation$onSelfMsg = F3(
+	function (router, location, state) {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
+			_elm_lang$core$Task$succeed(state));
+	});
+var _elm_lang$navigation$Navigation$cmdHelp = F3(
+	function (router, subs, cmd) {
+		var _p4 = cmd;
+		switch (_p4.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$go(_p4._0);
+			case 'New':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					_elm_lang$navigation$Navigation$pushState(_p4._0),
+					A2(_elm_lang$navigation$Navigation$notify, router, subs));
+			default:
+				return A2(
+					_elm_lang$core$Task$andThen,
+					_elm_lang$navigation$Navigation$replaceState(_p4._0),
+					A2(_elm_lang$navigation$Navigation$notify, router, subs));
+		}
+	});
+var _elm_lang$navigation$Navigation$updateHelp = F2(
+	function (func, _p5) {
+		var _p6 = _p5;
+		return {
+			ctor: '_Tuple2',
+			_0: _p6._0,
+			_1: A2(_elm_lang$core$Platform_Cmd$map, func, _p6._1)
+		};
+	});
+var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$Location = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _elm_lang$navigation$Navigation$State = F2(
+	function (a, b) {
+		return {subs: a, process: b};
+	});
+var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
+	A2(
+		_elm_lang$navigation$Navigation$State,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Maybe$Nothing));
+var _elm_lang$navigation$Navigation$onEffects = F4(
+	function (router, cmds, subs, _p7) {
+		var _p8 = _p7;
+		var _p10 = _p8.process;
+		var stepState = function () {
+			var _p9 = {ctor: '_Tuple2', _0: subs, _1: _p10};
+			_v4_2:
+			do {
+				if (_p9._0.ctor === '[]') {
+					if (_p9._1.ctor === 'Just') {
+						return A2(
+							_elm_lang$navigation$Navigation_ops['&>'],
+							_elm_lang$core$Process$kill(_p9._1._0),
+							_elm_lang$core$Task$succeed(
+								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
+					} else {
+						break _v4_2;
+					}
+				} else {
+					if (_p9._1.ctor === 'Nothing') {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							_elm_lang$navigation$Navigation$spawnPopState(router),
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A2(
+										_elm_lang$navigation$Navigation$State,
+										subs,
+										_elm_lang$core$Maybe$Just(pid)));
+							});
+					} else {
+						break _v4_2;
+					}
+				}
+			} while(false);
+			return _elm_lang$core$Task$succeed(
+				A2(_elm_lang$navigation$Navigation$State, subs, _p10));
+		}();
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
+					cmds)),
+			stepState);
+	});
+var _elm_lang$navigation$Navigation$UserMsg = function (a) {
+	return {ctor: 'UserMsg', _0: a};
+};
+var _elm_lang$navigation$Navigation$Change = function (a) {
+	return {ctor: 'Change', _0: a};
+};
+var _elm_lang$navigation$Navigation$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _elm_lang$navigation$Navigation$makeParser = _elm_lang$navigation$Navigation$Parser;
+var _elm_lang$navigation$Navigation$Modify = function (a) {
+	return {ctor: 'Modify', _0: a};
+};
+var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Modify(url));
+};
+var _elm_lang$navigation$Navigation$New = function (a) {
+	return {ctor: 'New', _0: a};
+};
+var _elm_lang$navigation$Navigation$newUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$New(url));
+};
+var _elm_lang$navigation$Navigation$Jump = function (a) {
+	return {ctor: 'Jump', _0: a};
+};
+var _elm_lang$navigation$Navigation$back = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(0 - n));
+};
+var _elm_lang$navigation$Navigation$forward = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(n));
+};
+var _elm_lang$navigation$Navigation$cmdMap = F2(
+	function (_p11, myCmd) {
+		var _p12 = myCmd;
+		switch (_p12.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$Jump(_p12._0);
+			case 'New':
+				return _elm_lang$navigation$Navigation$New(_p12._0);
+			default:
+				return _elm_lang$navigation$Navigation$Modify(_p12._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$Monitor = function (a) {
+	return {ctor: 'Monitor', _0: a};
+};
+var _elm_lang$navigation$Navigation$programWithFlags = F2(
+	function (_p13, stuff) {
+		var _p14 = _p13;
+		var _p16 = _p14._0;
+		var location = _elm_lang$navigation$Native_Navigation.getLocation(
+			{ctor: '_Tuple0'});
+		var init = function (flags) {
+			return A2(
+				_elm_lang$navigation$Navigation$updateHelp,
+				_elm_lang$navigation$Navigation$UserMsg,
+				A2(
+					stuff.init,
+					flags,
+					_p16(location)));
+		};
+		var view = function (model) {
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_elm_lang$navigation$Navigation$UserMsg,
+				stuff.view(model));
+		};
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(_elm_lang$navigation$Navigation$Change)),
+						A2(
+						_elm_lang$core$Platform_Sub$map,
+						_elm_lang$navigation$Navigation$UserMsg,
+						stuff.subscriptions(model))
+					]));
+		};
+		var update = F2(
+			function (msg, model) {
+				return A2(
+					_elm_lang$navigation$Navigation$updateHelp,
+					_elm_lang$navigation$Navigation$UserMsg,
+					function () {
+						var _p15 = msg;
+						if (_p15.ctor === 'Change') {
+							return A2(
+								stuff.urlUpdate,
+								_p16(_p15._0),
+								model);
+						} else {
+							return A2(stuff.update, _p15._0, model);
+						}
+					}());
+			});
+		return _elm_lang$html$Html_App$programWithFlags(
+			{init: init, view: view, update: update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$program = F2(
+	function (parser, stuff) {
+		return A2(
+			_elm_lang$navigation$Navigation$programWithFlags,
+			parser,
+			_elm_lang$core$Native_Utils.update(
+				stuff,
+				{
+					init: function (_p17) {
+						return stuff.init;
+					}
+				}));
+	});
+var _elm_lang$navigation$Navigation$subMap = F2(
+	function (func, _p18) {
+		var _p19 = _p18;
+		return _elm_lang$navigation$Navigation$Monitor(
+			function (_p20) {
+				return func(
+					_p19._0(_p20));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
+
 var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
 var _elm_lang$svg$Svg$svgNamespace = A2(
 	_elm_lang$virtual_dom$VirtualDom$property,
@@ -12272,6 +12619,184 @@ var _evancz$elm_markdown$Markdown$Options = F4(
 		return {githubFlavored: a, defaultHighlighting: b, sanitize: c, smartypants: d};
 	});
 
+var _evancz$url_parser$UrlParser$oneOfHelp = F3(
+	function (choices, chunks, formatter) {
+		oneOfHelp:
+		while (true) {
+			var _p0 = choices;
+			if (_p0.ctor === '[]') {
+				return _elm_lang$core$Result$Err('Tried many parsers, but none of them worked!');
+			} else {
+				var _p1 = A2(_p0._0._0, chunks, formatter);
+				if (_p1.ctor === 'Err') {
+					var _v2 = _p0._1,
+						_v3 = chunks,
+						_v4 = formatter;
+					choices = _v2;
+					chunks = _v3;
+					formatter = _v4;
+					continue oneOfHelp;
+				} else {
+					return _elm_lang$core$Result$Ok(_p1._0);
+				}
+			}
+		}
+	});
+var _evancz$url_parser$UrlParser$Chunks = F2(
+	function (a, b) {
+		return {seen: a, rest: b};
+	});
+var _evancz$url_parser$UrlParser$parse = F3(
+	function (input, _p2, url) {
+		var _p3 = _p2;
+		var _p4 = A2(
+			_p3._0,
+			A2(
+				_evancz$url_parser$UrlParser$Chunks,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				A2(_elm_lang$core$String$split, '/', url)),
+			input);
+		if (_p4.ctor === 'Err') {
+			return _elm_lang$core$Result$Err(_p4._0);
+		} else {
+			var _p7 = _p4._0._1;
+			var _p6 = _p4._0._0.rest;
+			var _p5 = _p6;
+			if (_p5.ctor === '[]') {
+				return _elm_lang$core$Result$Ok(_p7);
+			} else {
+				if ((_p5._0 === '') && (_p5._1.ctor === '[]')) {
+					return _elm_lang$core$Result$Ok(_p7);
+				} else {
+					return _elm_lang$core$Result$Err(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'The parser worked, but /',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(_elm_lang$core$String$join, '/', _p6),
+								' was left over.')));
+				}
+			}
+		}
+	});
+var _evancz$url_parser$UrlParser$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _evancz$url_parser$UrlParser$s = function (str) {
+	return _evancz$url_parser$UrlParser$Parser(
+		F2(
+			function (_p8, result) {
+				var _p9 = _p8;
+				var _p12 = _p9.rest;
+				var _p10 = _p12;
+				if (_p10.ctor === '[]') {
+					return _elm_lang$core$Result$Err(
+						A2(_elm_lang$core$Basics_ops['++'], 'Got to the end of the URL but wanted /', str));
+				} else {
+					var _p11 = _p10._0;
+					return _elm_lang$core$Native_Utils.eq(_p11, str) ? _elm_lang$core$Result$Ok(
+						{
+							ctor: '_Tuple2',
+							_0: A2(
+								_evancz$url_parser$UrlParser$Chunks,
+								A2(_elm_lang$core$List_ops['::'], _p11, _p9.seen),
+								_p10._1),
+							_1: result
+						}) : _elm_lang$core$Result$Err(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'Wanted /',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								str,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									' but got /',
+									A2(_elm_lang$core$String$join, '/', _p12)))));
+				}
+			}));
+};
+var _evancz$url_parser$UrlParser$custom = F2(
+	function (tipe, stringToSomething) {
+		return _evancz$url_parser$UrlParser$Parser(
+			F2(
+				function (_p13, func) {
+					var _p14 = _p13;
+					var _p15 = _p14.rest;
+					if (_p15.ctor === '[]') {
+						return _elm_lang$core$Result$Err(
+							A2(_elm_lang$core$Basics_ops['++'], 'Got to the end of the URL but wanted /', tipe));
+					} else {
+						var _p17 = _p15._0;
+						var _p16 = stringToSomething(_p17);
+						if (_p16.ctor === 'Ok') {
+							return _elm_lang$core$Result$Ok(
+								{
+									ctor: '_Tuple2',
+									_0: A2(
+										_evancz$url_parser$UrlParser$Chunks,
+										A2(_elm_lang$core$List_ops['::'], _p17, _p14.seen),
+										_p15._1),
+									_1: func(_p16._0)
+								});
+						} else {
+							return _elm_lang$core$Result$Err(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Parsing `',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_p17,
+										A2(_elm_lang$core$Basics_ops['++'], '` went wrong: ', _p16._0))));
+						}
+					}
+				}));
+	});
+var _evancz$url_parser$UrlParser$string = A2(_evancz$url_parser$UrlParser$custom, 'STRING', _elm_lang$core$Result$Ok);
+var _evancz$url_parser$UrlParser$int = A2(_evancz$url_parser$UrlParser$custom, 'NUMBER', _elm_lang$core$String$toInt);
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['</>'] = F2(
+	function (_p19, _p18) {
+		var _p20 = _p19;
+		var _p21 = _p18;
+		return _evancz$url_parser$UrlParser$Parser(
+			F2(
+				function (chunks, func) {
+					return A2(
+						_elm_lang$core$Result$andThen,
+						A2(_p20._0, chunks, func),
+						function (_p22) {
+							var _p23 = _p22;
+							return A2(_p21._0, _p23._0, _p23._1);
+						});
+				}));
+	});
+var _evancz$url_parser$UrlParser$oneOf = function (choices) {
+	return _evancz$url_parser$UrlParser$Parser(
+		_evancz$url_parser$UrlParser$oneOfHelp(choices));
+};
+var _evancz$url_parser$UrlParser$format = F2(
+	function (input, _p24) {
+		var _p25 = _p24;
+		return _evancz$url_parser$UrlParser$Parser(
+			F2(
+				function (chunks, func) {
+					var _p26 = A2(_p25._0, chunks, input);
+					if (_p26.ctor === 'Err') {
+						return _elm_lang$core$Result$Err(_p26._0);
+					} else {
+						return _elm_lang$core$Result$Ok(
+							{
+								ctor: '_Tuple2',
+								_0: _p26._0._0,
+								_1: func(_p26._0._1)
+							});
+					}
+				}));
+	});
+
 var _user$project$Utils$composeTiledHtml = F2(
 	function (cols, list) {
 		var rest = A2(_elm_lang$core$List$drop, cols, list);
@@ -14050,14 +14575,49 @@ var _user$project$SummaryList$update = F2(
 	});
 var _user$project$SummaryList$RequestRefresh = {ctor: 'RequestRefresh'};
 
+var _user$project$Main$toHash = function (page) {
+	var _p0 = page;
+	if (_p0.ctor === 'Home') {
+		return '#home';
+	} else {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'#blog/',
+			_elm_lang$core$Basics$toString(_p0._0));
+	}
+};
+var _user$project$Main$urlUpdate = F2(
+	function (result, model) {
+		var _p1 = result;
+		if (_p1.ctor === 'Err') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: _elm_lang$navigation$Navigation$modifyUrl(
+					_user$project$Main$toHash(model.page))
+			};
+		} else {
+			var _p2 = _p1._0;
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{
+						page: _p2,
+						debug: _user$project$Main$toHash(_p2)
+					}),
+				_elm_lang$core$Native_List.fromArray(
+					[]));
+		}
+	});
 var _user$project$Main_ops = _user$project$Main_ops || {};
 _user$project$Main_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _user$project$Main$Model = F5(
-	function (a, b, c, d, e) {
-		return {cityscape: a, projectList: b, summaryList: c, blogList: d, debug: e};
+var _user$project$Main$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {cityscape: a, projectList: b, summaryList: c, blogList: d, debug: e, page: f};
 	});
 var _user$project$Main$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
@@ -14074,33 +14634,6 @@ var _user$project$Main$ProjectListMsgs = function (a) {
 var _user$project$Main$CityscapeMsgs = function (a) {
 	return {ctor: 'CityscapeMsgs', _0: a};
 };
-var _user$project$Main$init = F4(
-	function (projectListFileLocation, summaryFileLocation, blogFileLocation, assetPath) {
-		var _p0 = _user$project$BlogList$init(blogFileLocation);
-		var blogList = _p0._0;
-		var blogListFx = _p0._1;
-		var _p1 = _user$project$SummaryList$init(summaryFileLocation);
-		var summaryList = _p1._0;
-		var summaryListFx = _p1._1;
-		var _p2 = A2(_user$project$ProjectList$init, projectListFileLocation, assetPath);
-		var projectList = _p2._0;
-		var projectListFx = _p2._1;
-		var _p3 = _user$project$Cityscape$init;
-		var cityscape = _p3._0;
-		var cityscapeFx = _p3._1;
-		return {
-			ctor: '_Tuple2',
-			_0: {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList, debug: ''},
-			_1: _elm_lang$core$Platform_Cmd$batch(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, cityscapeFx),
-						A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, projectListFx),
-						A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, summaryListFx),
-						A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, blogListFx)
-					]))
-		};
-	});
 var _user$project$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -14108,6 +14641,16 @@ var _user$project$Main$view = function (model) {
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(model.debug)
+					])),
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
@@ -14164,12 +14707,12 @@ var _user$project$Main$view = function (model) {
 };
 var _user$project$Main$update = F2(
 	function (action, model) {
-		var _p4 = A2(_elm_lang$core$Debug$log, 'action', action);
-		switch (_p4.ctor) {
+		var _p3 = A2(_elm_lang$core$Debug$log, 'action', action);
+		switch (_p3.ctor) {
 			case 'CityscapeMsgs':
-				var _p5 = A2(_user$project$Cityscape$update, _p4._0, model.cityscape);
-				var cityscape = _p5._0;
-				var fx = _p5._1;
+				var _p4 = A2(_user$project$Cityscape$update, _p3._0, model.cityscape);
+				var cityscape = _p4._0;
+				var fx = _p4._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -14178,9 +14721,9 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, fx)
 				};
 			case 'ProjectListMsgs':
-				var _p6 = A2(_user$project$ProjectList$update, _p4._0, model.projectList);
-				var projectList = _p6._0;
-				var fx = _p6._1;
+				var _p5 = A2(_user$project$ProjectList$update, _p3._0, model.projectList);
+				var projectList = _p5._0;
+				var fx = _p5._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -14189,9 +14732,9 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, fx)
 				};
 			case 'SummaryListMsgs':
-				var _p7 = A2(_user$project$SummaryList$update, _p4._0, model.summaryList);
-				var summaryList = _p7._0;
-				var fx = _p7._1;
+				var _p6 = A2(_user$project$SummaryList$update, _p3._0, model.summaryList);
+				var summaryList = _p6._0;
+				var fx = _p6._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -14200,9 +14743,9 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, fx)
 				};
 			case 'BlogListMsgs':
-				var _p8 = A2(_user$project$BlogList$update, _p4._0, model.blogList);
-				var blogList = _p8._0;
-				var fx = _p8._1;
+				var _p7 = A2(_user$project$BlogList$update, _p3._0, model.blogList);
+				var blogList = _p7._0;
+				var fx = _p7._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -14216,7 +14759,7 @@ var _user$project$Main$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							debug: _elm_lang$core$Basics$toString(_p4._0)
+							debug: _elm_lang$core$Basics$toString(_p3._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -14254,16 +14797,71 @@ var _user$project$Main$subscriptions = function (model) {
 				_user$project$BlogList$subscriptions(model.blogList))
 			]));
 };
-var _user$project$Main$main = {
-	main: _elm_lang$html$Html_App$program(
-		{
-			init: A4(_user$project$Main$init, 'assets/1gam_projects/project_list.json', 'assets/summary_data.json', 'assets/blogs/blog_content.json', 'assets/1gam_projects/'),
-			update: _user$project$Main$update,
-			view: _user$project$Main$view,
-			subscriptions: _user$project$Main$subscriptions
-		})
-};
 var _user$project$Main$NoOp = {ctor: 'NoOp'};
+var _user$project$Main$Blog = function (a) {
+	return {ctor: 'Blog', _0: a};
+};
+var _user$project$Main$Home = {ctor: 'Home'};
+var _user$project$Main$init = function (result) {
+	var _p8 = _user$project$Cityscape$init;
+	var cityscape = _p8._0;
+	var cityscapeFx = _p8._1;
+	var assetPath = 'assets/1gam_projects/';
+	var blogFileLocation = 'assets/blogs/blog_content.json';
+	var _p9 = _user$project$BlogList$init(blogFileLocation);
+	var blogList = _p9._0;
+	var blogListFx = _p9._1;
+	var summaryFileLocation = 'assets/summary_data.json';
+	var _p10 = _user$project$SummaryList$init(summaryFileLocation);
+	var summaryList = _p10._0;
+	var summaryListFx = _p10._1;
+	var projectListFileLocation = 'assets/1gam_projects/project_list.json';
+	var _p11 = A2(_user$project$ProjectList$init, projectListFileLocation, assetPath);
+	var projectList = _p11._0;
+	var projectListFx = _p11._1;
+	var model = {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList, debug: '', page: _user$project$Main$Home};
+	var _p12 = A2(_user$project$Main$urlUpdate, result, model);
+	var model$ = _p12._0;
+	var cmds = _p12._1;
+	var cmds$ = _elm_lang$core$Platform_Cmd$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, cityscapeFx),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, projectListFx),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, summaryListFx),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, blogListFx),
+				cmds
+			]));
+	return {ctor: '_Tuple2', _0: model$, _1: cmds$};
+};
+var _user$project$Main$pageParser = _evancz$url_parser$UrlParser$oneOf(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_evancz$url_parser$UrlParser$format,
+			_user$project$Main$Home,
+			_evancz$url_parser$UrlParser$s('home')),
+			A2(
+			_evancz$url_parser$UrlParser$format,
+			_user$project$Main$Blog,
+			A2(
+				_evancz$url_parser$UrlParser_ops['</>'],
+				_evancz$url_parser$UrlParser$s('blog'),
+				_evancz$url_parser$UrlParser$int))
+		]));
+var _user$project$Main$hashParser = function (location) {
+	return A3(
+		_evancz$url_parser$UrlParser$parse,
+		_elm_lang$core$Basics$identity,
+		_user$project$Main$pageParser,
+		A2(_elm_lang$core$String$dropLeft, 1, location.hash));
+};
+var _user$project$Main$main = {
+	main: A2(
+		_elm_lang$navigation$Navigation$program,
+		_elm_lang$navigation$Navigation$makeParser(_user$project$Main$hashParser),
+		{init: _user$project$Main$init, view: _user$project$Main$view, update: _user$project$Main$update, urlUpdate: _user$project$Main$urlUpdate, subscriptions: _user$project$Main$subscriptions})
+};
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
