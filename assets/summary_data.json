@@ -2,15 +2,25 @@
     "summaries":
     [
         {
+            "title": "Motivations",
+            "contents":
+            [
+                "I want to draw my vision and my dreams",
+                "I want to mix art and technology",
+                "I love Ultimate Frisbee; I want to run.",
+                "I want to make games which are engaging and make people think abstractly"
+            ]
+        },
+        {
             "title": "Interersts",
             "contents":
             [
-                "Origami",
+                "Ultimate Frisbee",
                 "Game Programming",
-                "Robotics",
                 "Puzzles",
                 "Rubiks Cubes",
-                "Ultimate Frisbee",
+                "Origami",
+                "Robotics",
                 "Physics"
             ]
         },
@@ -22,6 +32,7 @@
                 "C",
                 "JavaScript",
                 "Python",
+                "Elm",
                 "C#",
                 "Lua",
                 "Perl",
@@ -71,19 +82,6 @@
                 "UI Implementation and Design",
                 "Administration experience with JIRA",
                 "Administration experience with Bugzilla"
-            ]
-        },
-        {
-            "title": "Motivations",
-            "contents":
-            [
-                "Explore Android/Java Programming",
-                "Design and create robotic automatons",
-                "Become an excellent Ultimate Frisbee Player",
-                "Explore application development for tablets",
-                "Explore web programming i.e. AJAX, etc...",
-                "Design and develop fun/interesting games",
-                "Become an excellent artist (drawing and/or painting)"
             ]
         }
     ]
