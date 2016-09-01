@@ -8,8 +8,8 @@ This is the repo for my site. I am currently interested in learning elm and this
 Get Started
 -----------
 
-### Install Elm 0.17.0 ###
-This site was created with Elm 0.17.0. You can follow the instructions to download and install Elm from  their main site here:
+### Install Elm 0.17.1 ###
+This site was created with Elm 0.17.1. You can follow the instructions to download and install Elm from  their main site here:
 
 [Elm Install Instructions](http://elm-lang.org/install)
 
@@ -35,4 +35,4 @@ To build the site, you should compile `src/Main.elm` to `gen/main.js` with this:
 ### Run Locally ###
 Finally to run locally on your machine, you can use `http-server`, `elm reactor`, or anything that serves html! There is an `index.html` that contains the embedded compiled main code.
 
-*Note that `elm reactor` is not currently serving html at the moment, but that should be fixed soon.*
+*Note that `elm reactor` is not currently serving html at the moment in 0.17.0, so make sure you are at elm 0.17.1.*
