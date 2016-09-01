@@ -14649,16 +14649,6 @@ var _user$project$Main$view = function (model) {
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html$text(model.debug)
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
 						A2(
 						_elm_lang$html$Html_App$map,
 						_user$project$Main$CityscapeMsgs,

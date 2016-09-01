@@ -79,8 +79,7 @@ init result =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ class "main" ] [ Html.text model.debug ]
-        , div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
+        [ div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
         , div [ class "main" ] [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
         , div [ class "main" ] [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
         , div [ class "main" ] [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
