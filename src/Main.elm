@@ -76,10 +76,27 @@ init result =
         ( model', cmds' )
         -- urlUpdate result model
 
+viewNavBar : Model -> Html Msg
+viewNavBar model =
+    let
+        attributes =
+            Html.Attributes.classList
+                [ ("navbar-item", True)
+                , ("active", True)
+                ]
+    in
+        ul [ class "navbar-container"]
+            [ li [ attributes ] [ a [ class "navbar-item-a", href "#home" ] [ text "Home" ] ]
+            , li [ attributes ] [ a [ class "navbar-item-a", href "#contact" ] [ text "Contact" ] ]
+            , li [ attributes ] [ a [ class "navbar-item-a", href "#blog" ] [ text "Blog" ] ]
+            , li [ attributes ] [ a [ class "navbar-item-a", href "#about" ] [ text "About" ] ]
+            ]
+
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
+        [ viewNavBar model
+        , div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
         , div [ class "main" ] [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
         , div [ class "main" ] [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
         , div [ class "main" ] [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]

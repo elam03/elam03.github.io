@@ -15621,6 +15621,95 @@ var _user$project$Main$urlUpdate = F2(
 					[]));
 		}
 	});
+var _user$project$Main$viewNavBar = function (model) {
+	var attributes = _elm_lang$html$Html_Attributes$classList(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'navbar-item', _1: true},
+				{ctor: '_Tuple2', _0: 'active', _1: true}
+			]));
+	return A2(
+		_elm_lang$html$Html$ul,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('navbar-container')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item'),
+								_elm_lang$html$Html_Attributes$href('#home')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Home')
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item'),
+								_elm_lang$html$Html_Attributes$href('#contact')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Contact')
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item'),
+								_elm_lang$html$Html_Attributes$href('#blog')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Blog')
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item'),
+								_elm_lang$html$Html_Attributes$href('#about')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('About')
+							]))
+					]))
+			]));
+};
 var _user$project$Main_ops = _user$project$Main_ops || {};
 _user$project$Main_ops['=>'] = F2(
 	function (v0, v1) {
@@ -15652,6 +15741,7 @@ var _user$project$Main$view = function (model) {
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
+				_user$project$Main$viewNavBar(model),
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
