@@ -10,6 +10,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onMouseOver)
 import Mouse exposing (Position)
 import Keyboard exposing (..)
+import PageVisibility exposing (..)
 import Random
 import Set
 import Svg
@@ -76,6 +77,7 @@ type alias Model =
     ,   sunset : Sunset
     ,   showInfo : Bool
     ,   trees : List Tree
+    ,   paused : Bool
     }
 
 init : (Model, Cmd Msg)
@@ -101,6 +103,7 @@ init =
         , sunset = { y = 0, h = 0 }
         , showInfo = False
         , trees = []
+        , paused = False
         }
 
     in
@@ -116,6 +119,7 @@ type Msg
     | KeyUp KeyCode
     | Tick Time
     | NewRandomValues (List Float)
+    | VisibilityChange Visibility
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
@@ -153,6 +157,8 @@ update action model =
                         ( { model' | movementType = TimeMove }, Cmd.none )
                     'S' ->
                         ( { model' | movementType = StaticMove }, Cmd.none )
+                    'P' ->
+                        ( { model' | paused = not model.paused }, Cmd.none )
                     'I' ->
                         ( { model' | showInfo = not model'.showInfo }, Cmd.none )
                     _ ->
@@ -168,12 +174,15 @@ update action model =
             let
                 dt = t - model.t
             in
-                ( model
-                    |> timeUpdate dt t
-                    |> updateAllEntitiesInModel
-                    |> resetMouseDelta
-                , Random.generate NewRandomValues (Random.list 100 (Random.float 0 1))
-                )
+                if not model.paused then
+                    ( model
+                        |> timeUpdate dt t
+                        |> updateAllEntitiesInModel
+                        |> resetMouseDelta
+                    , Random.generate NewRandomValues (Random.list 100 (Random.float 0 1))
+                    )
+                else
+                    ( model, Cmd.none )
 
         NewRandomValues list ->
             let
@@ -191,6 +200,16 @@ update action model =
                     )
                 else
                     ( model', Cmd.none )
+
+        VisibilityChange visible ->
+            case visible of
+                Visible ->
+                    ( { model | paused = False }, Cmd.none )
+
+                Hidden ->
+                    ( { model | paused = True }, Cmd.none )
+
+-- , PageVisibility.visibilityChanges
 
 addTrees : Int -> Model -> Model
 addTrees numTrees model =
@@ -362,7 +381,8 @@ timeUpdate dt t model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Time.every (20 * millisecond) Tick
+        [ PageVisibility.visibilityChanges VisibilityChange
+        , Time.every (20 * millisecond) Tick
         , Mouse.moves Move
         , Window.resizes Size
         , Keyboard.downs KeyDown
