@@ -83,6 +83,26 @@
                 "Administration experience with JIRA",
                 "Administration experience with Bugzilla"
             ]
+        },
+        {
+            "title": "Quotes",
+            "contents":
+            [
+                "\"Ultimate does not develop character, it reveals it\"",
+                "\"When a ball dreams, its dreams its a disc\"",
+                "\"Even if you don't like a person, you should respect the human.\" - Megha",
+                "\"Every once in a while the blind squirrel finds the nut.\"",
+                "\"Expectations are like fine pottery. The harder you hold them, the more likely they are to crack.\"",
+                "\"Write something worth reading, or do something worth writing.\" - Benjamin Franklin",
+                "\"If it were easy, everyone would be doing it\"",
+                "\"Programming is our way of encoding thought such that the computer can help us with it.\" - Chris Granger",
+                "\"It's not the broken dreams that break us. It's the ones we don't dare to dream\" - Will Schuester",
+                "\"All we have to decide is what to do with the time that is given to us\" - Gandalf the Grey",
+                "\"A bruise is a lesson... and each lesson makes us better.\" - Arya Stark",
+                "\"The problem is not the problem. The problem is your attitude about the problem.\" - Jack Sparrow",
+                "\"A mind needs books as a sword needs a whetstone if it is to keep its edge\" - Tyrion Lannister",
+                "\"Get busy living or get busy dying.\" - Andy Dufresne"
+            ]
         }
     ]
 }

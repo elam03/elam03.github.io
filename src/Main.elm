@@ -114,7 +114,7 @@ view model =
 
         homeContent =
             model.summaryList
-                |> SummaryList.viewFilter [ "Motivations", "Interests" ]
+                |> SummaryList.viewFilter [ "Motivations", "Interests", "Quotes" ]
                 |> Html.map SummaryListMsgs
 
         skillsContent =
