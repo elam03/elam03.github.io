@@ -15588,13 +15588,15 @@ var _user$project$SummaryList$RequestRefresh = {ctor: 'RequestRefresh'};
 
 var _user$project$Main$toHash = function (page) {
 	var _p0 = page;
-	if (_p0.ctor === 'Home') {
-		return '#home';
-	} else {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'#blog/',
-			_elm_lang$core$Basics$toString(_p0._0));
+	switch (_p0.ctor) {
+		case 'Home':
+			return '#home';
+		case 'Contact':
+			return '#contact';
+		case 'Blog':
+			return '#blog';
+		default:
+			return '#about';
 	}
 };
 var _user$project$Main$urlUpdate = F2(
@@ -15621,95 +15623,6 @@ var _user$project$Main$urlUpdate = F2(
 					[]));
 		}
 	});
-var _user$project$Main$viewNavBar = function (model) {
-	var attributes = _elm_lang$html$Html_Attributes$classList(
-		_elm_lang$core$Native_List.fromArray(
-			[
-				{ctor: '_Tuple2', _0: 'navbar-item', _1: true},
-				{ctor: '_Tuple2', _0: 'active', _1: true}
-			]));
-	return A2(
-		_elm_lang$html$Html$ul,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('navbar-container')
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item'),
-								_elm_lang$html$Html_Attributes$href('#home')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Home')
-							]))
-					])),
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item'),
-								_elm_lang$html$Html_Attributes$href('#contact')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Contact')
-							]))
-					])),
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item'),
-								_elm_lang$html$Html_Attributes$href('#blog')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Blog')
-							]))
-					])),
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item'),
-								_elm_lang$html$Html_Attributes$href('#about')
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('About')
-							]))
-					]))
-			]));
-};
 var _user$project$Main_ops = _user$project$Main_ops || {};
 _user$project$Main_ops['=>'] = F2(
 	function (v0, v1) {
@@ -15719,6 +15632,9 @@ var _user$project$Main$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {cityscape: a, projectList: b, summaryList: c, blogList: d, debug: e, page: f};
 	});
+var _user$project$Main$GotoNavBar = function (a) {
+	return {ctor: 'GotoNavBar', _0: a};
+};
 var _user$project$Main$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
@@ -15733,68 +15649,6 @@ var _user$project$Main$ProjectListMsgs = function (a) {
 };
 var _user$project$Main$CityscapeMsgs = function (a) {
 	return {ctor: 'CityscapeMsgs', _0: a};
-};
-var _user$project$Main$view = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_user$project$Main$viewNavBar(model),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$CityscapeMsgs,
-						_user$project$Cityscape$view(model.cityscape))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$BlogListMsgs,
-						_user$project$BlogList$view(model.blogList))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$SummaryListMsgs,
-						_user$project$SummaryList$view(model.summaryList))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$ProjectListMsgs,
-						_user$project$ProjectList$view(model.projectList))
-					]))
-			]));
 };
 var _user$project$Main$update = F2(
 	function (action, model) {
@@ -15854,6 +15708,16 @@ var _user$project$Main$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'GotoNavBar':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							debug: _elm_lang$core$Basics$toString(_p3._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
@@ -15889,9 +15753,9 @@ var _user$project$Main$subscriptions = function (model) {
 			]));
 };
 var _user$project$Main$NoOp = {ctor: 'NoOp'};
-var _user$project$Main$Blog = function (a) {
-	return {ctor: 'Blog', _0: a};
-};
+var _user$project$Main$About = {ctor: 'About'};
+var _user$project$Main$Blog = {ctor: 'Blog'};
+var _user$project$Main$Contact = {ctor: 'Contact'};
 var _user$project$Main$Home = {ctor: 'Home'};
 var _user$project$Main$init = function (result) {
 	var _p8 = _user$project$Cityscape$init;
@@ -15925,6 +15789,174 @@ var _user$project$Main$init = function (result) {
 			]));
 	return {ctor: '_Tuple2', _0: model$, _1: cmds$};
 };
+var _user$project$Main$viewNavBar = function (model) {
+	var attributes = _elm_lang$html$Html_Attributes$classList(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'navbar-item', _1: true},
+				{ctor: '_Tuple2', _0: 'active', _1: true}
+			]));
+	return A2(
+		_elm_lang$html$Html$ul,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('navbar-container')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
+								_elm_lang$html$Html_Attributes$href('#home'),
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$Main$GotoNavBar(_user$project$Main$Home))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Home')
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
+								_elm_lang$html$Html_Attributes$href('#contact'),
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$Main$GotoNavBar(_user$project$Main$Contact))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Contact')
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
+								_elm_lang$html$Html_Attributes$href('#blog'),
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$Main$GotoNavBar(_user$project$Main$Blog))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Blog')
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[attributes]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
+								_elm_lang$html$Html_Attributes$href('#about'),
+								_elm_lang$html$Html_Events$onClick(
+								_user$project$Main$GotoNavBar(_user$project$Main$About))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('About')
+							]))
+					]))
+			]));
+};
+var _user$project$Main$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$Main$viewNavBar(model),
+				A2(
+				_elm_lang$html$Html$h3,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(model.debug))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_user$project$Main$CityscapeMsgs,
+						_user$project$Cityscape$view(model.cityscape))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_user$project$Main$BlogListMsgs,
+						_user$project$BlogList$view(model.blogList))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_user$project$Main$SummaryListMsgs,
+						_user$project$SummaryList$view(model.summaryList))
+					])),
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('main')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_user$project$Main$ProjectListMsgs,
+						_user$project$ProjectList$view(model.projectList))
+					]))
+			]));
+};
 var _user$project$Main$pageParser = _evancz$url_parser$UrlParser$oneOf(
 	_elm_lang$core$Native_List.fromArray(
 		[
@@ -15934,11 +15966,16 @@ var _user$project$Main$pageParser = _evancz$url_parser$UrlParser$oneOf(
 			_evancz$url_parser$UrlParser$s('home')),
 			A2(
 			_evancz$url_parser$UrlParser$format,
-			_user$project$Main$Blog,
+			_user$project$Main$Contact,
+			_evancz$url_parser$UrlParser$s('contact')),
 			A2(
-				_evancz$url_parser$UrlParser_ops['</>'],
-				_evancz$url_parser$UrlParser$s('blog'),
-				_evancz$url_parser$UrlParser$int))
+			_evancz$url_parser$UrlParser$format,
+			_user$project$Main$Blog,
+			_evancz$url_parser$UrlParser$s('blog')),
+			A2(
+			_evancz$url_parser$UrlParser$format,
+			_user$project$Main$About,
+			_evancz$url_parser$UrlParser$s('about'))
 		]));
 var _user$project$Main$hashParser = function (location) {
 	return A3(

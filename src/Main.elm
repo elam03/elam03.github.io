@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.App as Html
+import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Json exposing ((:=))
 import List exposing (map)
@@ -29,6 +30,7 @@ type Msg
     | SummaryListMsgs SummaryList.Msg
     | BlogListMsgs BlogList.Msg
     | Tick Time
+    | GotoNavBar Page
 
 type alias Model =
     { cityscape : Cityscape.Model
@@ -86,16 +88,17 @@ viewNavBar model =
                 ]
     in
         ul [ class "navbar-container"]
-            [ li [ attributes ] [ a [ class "navbar-item-a", href "#home" ] [ text "Home" ] ]
-            , li [ attributes ] [ a [ class "navbar-item-a", href "#contact" ] [ text "Contact" ] ]
-            , li [ attributes ] [ a [ class "navbar-item-a", href "#blog" ] [ text "Blog" ] ]
-            , li [ attributes ] [ a [ class "navbar-item-a", href "#about" ] [ text "About" ] ]
+            [ li [ attributes ] [ a [ class "navbar-item-a", href "#home", onClick (GotoNavBar Home) ] [ text "Home" ] ]
+            , li [ attributes ] [ a [ class "navbar-item-a", href "#contact", onClick (GotoNavBar Contact) ] [ text "Contact" ] ]
+            , li [ attributes ] [ a [ class "navbar-item-a", href "#blog", onClick (GotoNavBar Blog) ] [ text "Blog" ] ]
+            , li [ attributes ] [ a [ class "navbar-item-a", href "#about", onClick (GotoNavBar About) ] [ text "About" ] ]
             ]
 
 view : Model -> Html Msg
 view model =
     div []
         [ viewNavBar model
+        , h3 [] [ text <| toString model.debug ]
         , div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
         , div [ class "main" ] [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
         , div [ class "main" ] [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
@@ -140,6 +143,9 @@ update action model =
         Tick time ->
             ( { model | debug = toString time }, Cmd.none )
 
+        GotoNavBar page ->
+            ( { model | debug = toString page }, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -152,8 +158,17 @@ toHash page =
         Home ->
             "#home"
 
-        Blog id ->
-            "#blog/" ++ toString id
+        Contact ->
+            "#contact"
+
+        -- Blog id ->
+        --     "#blog/" ++ toString id
+
+        Blog ->
+            "#blog"
+
+        About ->
+            "#about"
 
 hashParser : Navigation.Location -> Result String Page
 hashParser location =
@@ -161,13 +176,18 @@ hashParser location =
 
 type Page
     = Home
-    | Blog Int
+    | Contact
+    | Blog
+    | About
 
 pageParser : Parser (Page -> a) a
 pageParser =
     UrlParser.oneOf
         [ UrlParser.format Home (UrlParser.s "home")
-        , UrlParser.format Blog (UrlParser.s "blog" </> UrlParser.int)
+        , UrlParser.format Contact (UrlParser.s "contact")
+        -- , UrlParser.format Blog (UrlParser.s "blog" </> UrlParser.int)
+        , UrlParser.format Blog (UrlParser.s "blog")
+        , UrlParser.format About (UrlParser.s "about")
         ]
 
 -- URL-PARSER
