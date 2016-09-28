@@ -6,6 +6,7 @@ import Html.Attributes
 import Http
 import Json.Decode exposing (..)
 import Platform.Cmd
+import String exposing (contains)
 import Task
 
 import Utils exposing (..)
@@ -15,13 +16,13 @@ import Utils exposing (..)
 
 -- MODEL
 
-type alias SummaryData =
-    { summaries : List Summary
-    }
-
 type alias Summary =
     { title : String
     , contents : List String
+    }
+
+type alias SummaryData =
+    { summaries : List Summary
     }
 
 type alias Model =
@@ -70,28 +71,29 @@ update action model =
 
 -- VIEW
 
+viewSummary : Summary -> Html Msg
+viewSummary summary =
+    let
+        items =
+            summary.contents
+                |> List.map (\s -> li [] [ text s ])
+
+        contents =
+            [ h2 [] [ text summary.title ]
+            , ul [] items
+            ]
+
+        attributes =
+            Html.Attributes.classList
+                [ ("summarylist", True)
+                , ("summarylist-item", True)
+                ]
+    in
+        div [ attributes ] contents
+
 view : Model -> Html Msg
 view model =
     let
-        viewSummary summary =
-            let
-                items =
-                    summary.contents
-                        |> List.map (\s -> li [] [ text s ])
-
-                contents =
-                    [ h2 [] [ text summary.title ]
-                    , ul [] items
-                    ]
-
-                attributes =
-                    Html.Attributes.classList
-                        [ ("summarylist", True)
-                        , ("summarylist-item", True)
-                        ]
-            in
-                div [ attributes ] contents
-
         items =
             model.summaryData.summaries
                 |> List.map (\s -> viewSummary s)
@@ -101,6 +103,27 @@ view model =
                 [ ("summarylist", True)
                 , ("summarylist-container", True)
                 ]
+    in
+        div [ attributes ] items
+
+viewFilter : List String -> Model -> Html Msg
+viewFilter titleFilters model =
+    let
+        attributes =
+            Html.Attributes.classList
+                [ ("summarylist", True)
+                , ("summarylist-container", True)
+                ]
+
+        getContent titleFilter =
+            model.summaryData.summaries
+                |> List.filter (\summary -> contains titleFilter summary.title)
+                |> List.map (\s -> viewSummary s)
+
+        items =
+            titleFilters
+                |> List.map (\titleFilter -> getContent titleFilter)
+                |> List.concat
     in
         div [ attributes ] items
 

@@ -37,9 +37,13 @@ nav a, button {
 
 /*************************************/
 
-.main {
+.content-block {
     padding-bottom: 10px;
     flex-flow: column;
+}
+
+.hidden {
+    display: none;
 }
 
 /*************************************/
@@ -66,7 +70,12 @@ nav a, button {
 }
 
 .navbar-item a:hover {
-    background-color: #111;
+    background-color: #0075ff;
+}
+
+.active {
+    background-color: #15139d;
+    color: white;
 }
 
 /*************************************/

@@ -49,10 +49,10 @@ init result =
         blogFileLocation        = "assets/blogs/blog_content.json"
         assetPath               = "assets/1gam_projects/"
 
-        (cityscape, cityscapeFx)     = Cityscape.init
-        (projectList, projectListFx) = ProjectList.init projectListFileLocation assetPath
-        (summaryList, summaryListFx) = SummaryList.init summaryFileLocation
-        (blogList, blogListFx)       = BlogList.init blogFileLocation
+        (cityscape, cityscapeCmds)     = Cityscape.init
+        (projectList, projectListCmds) = ProjectList.init projectListFileLocation assetPath
+        (summaryList, summaryListCmds) = SummaryList.init summaryFileLocation
+        (blogList, blogListCmds)       = BlogList.init blogFileLocation
 
         model =
             { cityscape = cityscape
@@ -67,84 +67,131 @@ init result =
 
         cmds' =
             Cmd.batch
-                [ Cmd.map CityscapeMsgs cityscapeFx
-                , Cmd.map ProjectListMsgs projectListFx
-                , Cmd.map SummaryListMsgs summaryListFx
-                , Cmd.map BlogListMsgs blogListFx
+                [ Cmd.map CityscapeMsgs cityscapeCmds
+                , Cmd.map ProjectListMsgs projectListCmds
+                , Cmd.map SummaryListMsgs summaryListCmds
+                , Cmd.map BlogListMsgs blogListCmds
                 , cmds
                 ]
 
     in
         ( model', cmds' )
-        -- urlUpdate result model
 
 viewNavBar : Model -> Html Msg
 viewNavBar model =
     let
-        attributes =
-            Html.Attributes.classList
-                [ ("navbar-item", True)
-                , ("active", True)
-                ]
-    in
-        ul [ class "navbar-container"]
-            [ li [ attributes ] [ a [ class "navbar-item-a", href "#home", onClick (GotoNavBar Home) ] [ text "Home" ] ]
-            , li [ attributes ] [ a [ class "navbar-item-a", href "#contact", onClick (GotoNavBar Contact) ] [ text "Contact" ] ]
-            , li [ attributes ] [ a [ class "navbar-item-a", href "#blog", onClick (GotoNavBar Blog) ] [ text "Blog" ] ]
-            , li [ attributes ] [ a [ class "navbar-item-a", href "#about", onClick (GotoNavBar About) ] [ text "About" ] ]
+        tabsInfo =
+            [ ("#home", Home, "Home")
+            , ("#skills", Skills, "Skills")
+            , ("#projects", Projects, "Projects")
+            , ("#blog/1", Blog 1, "Blog")
             ]
+
+        toLi (a', b', c') =
+            let
+                attributes =
+                    Html.Attributes.classList
+                        [ ("navbar-item", True)
+                        , ("active", model.page == b')
+                        ]
+            in
+                li [ attributes ] [ a [ href a', onClick (GotoNavBar b') ] [ text c' ] ]
+
+        tabs =
+            tabsInfo
+                |> List.map toLi
+    in
+        ul [ class "navbar-container" ]
+            tabs
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ viewNavBar model
-        , h3 [] [ text <| toString model.debug ]
-        , div [ class "main" ] [ Html.map CityscapeMsgs (Cityscape.view model.cityscape) ]
-        , div [ class "main" ] [ Html.map BlogListMsgs (BlogList.view model.blogList) ]
-        , div [ class "main" ] [ Html.map SummaryListMsgs (SummaryList.view model.summaryList) ]
-        , div [ class "main" ] [ Html.map ProjectListMsgs (ProjectList.view model.projectList) ]
-        ]
+    let
+        cityscapeContent   = model.cityscape   |> Cityscape.view   |> Html.map CityscapeMsgs
+        blogListContent    = model.blogList    |> BlogList.view    |> Html.map BlogListMsgs
+        summaryListContent = model.summaryList |> SummaryList.view |> Html.map SummaryListMsgs
+        projectListContent = model.projectList |> ProjectList.view |> Html.map ProjectListMsgs
+
+        homeContent =
+            model.summaryList
+                |> SummaryList.viewFilter [ "Motivations", "Interests" ]
+                |> Html.map SummaryListMsgs
+
+        skillsContent =
+            model.summaryList
+                |> SummaryList.viewFilter [ "Skills", "Languages", "Experiences" ]
+                |> Html.map SummaryListMsgs
+
+        tabsInfo =
+            [ (Home, [ cityscapeContent, homeContent ])
+            , (Skills, [ cityscapeContent, skillsContent ])
+            , (Blog 1, [ cityscapeContent, blogListContent ])
+            , (Projects, [ cityscapeContent, projectListContent ])
+            ]
+
+        toDiv (page, html) =
+            let
+                attributes =
+                    Html.Attributes.classList
+                        [ ("hidden", not (page == model.page))
+                        ]
+
+                divs =
+                    html
+                        |> List.map (\content -> div [ class "content-block" ] [ content ])
+            in
+                div [ attributes ] divs
+
+        divs =
+            tabsInfo
+                |> List.map toDiv
+
+        allDivs =
+            [ viewNavBar model ] ++ divs
+    in
+        div [] allDivs
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
 update action model =
     case Debug.log "action" action of
         CityscapeMsgs act ->
             let
-                (cityscape, fx) = Cityscape.update act model.cityscape
+                (cityscape, cmds) = Cityscape.update act model.cityscape
             in
                 ( { model | cityscape = cityscape }
-                , Cmd.map CityscapeMsgs fx
+                , Cmd.map CityscapeMsgs cmds
                 )
 
         ProjectListMsgs act ->
             let
-                (projectList, fx) = ProjectList.update act model.projectList
+                (projectList, cmds) = ProjectList.update act model.projectList
             in
                 ( { model | projectList = projectList }
-                , Cmd.map ProjectListMsgs fx
+                , Cmd.map ProjectListMsgs cmds
                 )
 
         SummaryListMsgs act ->
             let
-                (summaryList, fx) = SummaryList.update act model.summaryList
+                (summaryList, cmds) = SummaryList.update act model.summaryList
             in
                 ( { model | summaryList = summaryList }
-                , Cmd.map SummaryListMsgs fx
+                , Cmd.map SummaryListMsgs cmds
                 )
 
         BlogListMsgs act ->
             let
-                (blogList, fx) = BlogList.update act model.blogList
+                (blogList, cmds) = BlogList.update act model.blogList
             in
                 ( { model | blogList = blogList }
-                , Cmd.map BlogListMsgs fx
+                , Cmd.map BlogListMsgs cmds
                 )
 
         Tick time ->
             ( { model | debug = toString time }, Cmd.none )
 
-        GotoNavBar page ->
-            ( { model | debug = toString page }, Cmd.none )
+        GotoNavBar newPage ->
+            { model | page = newPage }
+                ! [ Navigation.newUrl (toHash newPage) ]
 
         NoOp ->
             ( model, Cmd.none )
@@ -158,17 +205,14 @@ toHash page =
         Home ->
             "#home"
 
-        Contact ->
-            "#contact"
+        Skills ->
+            "#skills"
 
-        -- Blog id ->
-        --     "#blog/" ++ toString id
+        Projects ->
+            "#projects"
 
-        Blog ->
-            "#blog"
-
-        About ->
-            "#about"
+        Blog id ->
+            "#blog/" ++ toString id
 
 hashParser : Navigation.Location -> Result String Page
 hashParser location =
@@ -176,18 +220,17 @@ hashParser location =
 
 type Page
     = Home
-    | Contact
-    | Blog
-    | About
+    | Skills
+    | Projects
+    | Blog Int
 
 pageParser : Parser (Page -> a) a
 pageParser =
     UrlParser.oneOf
         [ UrlParser.format Home (UrlParser.s "home")
-        , UrlParser.format Contact (UrlParser.s "contact")
-        -- , UrlParser.format Blog (UrlParser.s "blog" </> UrlParser.int)
-        , UrlParser.format Blog (UrlParser.s "blog")
-        , UrlParser.format About (UrlParser.s "about")
+        , UrlParser.format Skills (UrlParser.s "skills")
+        , UrlParser.format Projects (UrlParser.s "projects")
+        , UrlParser.format Blog (UrlParser.s "blog" </> UrlParser.int)
         ]
 
 -- URL-PARSER

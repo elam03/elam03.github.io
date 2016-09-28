@@ -15447,6 +15447,48 @@ var _user$project$ProjectList$RequestRefresh = {ctor: 'RequestRefresh'};
 var _user$project$SummaryList$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
+var _user$project$SummaryList$viewSummary = function (summary) {
+	var attributes = _elm_lang$html$Html_Attributes$classList(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: 'summarylist', _1: true},
+				{ctor: '_Tuple2', _0: 'summarylist-item', _1: true}
+			]));
+	var items = A2(
+		_elm_lang$core$List$map,
+		function (s) {
+			return A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(s)
+					]));
+		},
+		summary.contents);
+	var contents = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$h2,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(summary.title)
+				])),
+			A2(
+			_elm_lang$html$Html$ul,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			items)
+		]);
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[attributes]),
+		contents);
+};
 var _user$project$SummaryList$view = function (model) {
 	var attributes = _elm_lang$html$Html_Attributes$classList(
 		_elm_lang$core$Native_List.fromArray(
@@ -15454,52 +15496,10 @@ var _user$project$SummaryList$view = function (model) {
 				{ctor: '_Tuple2', _0: 'summarylist', _1: true},
 				{ctor: '_Tuple2', _0: 'summarylist-container', _1: true}
 			]));
-	var viewSummary = function (summary) {
-		var attributes = _elm_lang$html$Html_Attributes$classList(
-			_elm_lang$core$Native_List.fromArray(
-				[
-					{ctor: '_Tuple2', _0: 'summarylist', _1: true},
-					{ctor: '_Tuple2', _0: 'summarylist-item', _1: true}
-				]));
-		var items = A2(
-			_elm_lang$core$List$map,
-			function (s) {
-				return A2(
-					_elm_lang$html$Html$li,
-					_elm_lang$core$Native_List.fromArray(
-						[]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text(s)
-						]));
-			},
-			summary.contents);
-		var contents = _elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$h2,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text(summary.title)
-					])),
-				A2(
-				_elm_lang$html$Html$ul,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				items)
-			]);
-		return A2(
-			_elm_lang$html$Html$div,
-			_elm_lang$core$Native_List.fromArray(
-				[attributes]),
-			contents);
-	};
 	var items = A2(
 		_elm_lang$core$List$map,
 		function (s) {
-			return viewSummary(s);
+			return _user$project$SummaryList$viewSummary(s);
 		},
 		model.summaryData.summaries);
 	return A2(
@@ -15508,6 +15508,40 @@ var _user$project$SummaryList$view = function (model) {
 			[attributes]),
 		items);
 };
+var _user$project$SummaryList$viewFilter = F2(
+	function (titleFilters, model) {
+		var getContent = function (titleFilter) {
+			return A2(
+				_elm_lang$core$List$map,
+				function (s) {
+					return _user$project$SummaryList$viewSummary(s);
+				},
+				A2(
+					_elm_lang$core$List$filter,
+					function (summary) {
+						return A2(_elm_lang$core$String$contains, titleFilter, summary.title);
+					},
+					model.summaryData.summaries));
+		};
+		var items = _elm_lang$core$List$concat(
+			A2(
+				_elm_lang$core$List$map,
+				function (titleFilter) {
+					return getContent(titleFilter);
+				},
+				titleFilters));
+		var attributes = _elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'summarylist', _1: true},
+					{ctor: '_Tuple2', _0: 'summarylist-container', _1: true}
+				]));
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[attributes]),
+			items);
+	});
 var _user$project$SummaryList$errorSummary = {
 	title: 'error',
 	contents: _elm_lang$core$Native_List.fromArray(
@@ -15522,13 +15556,13 @@ _user$project$SummaryList_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _user$project$SummaryList$SummaryData = function (a) {
-	return {summaries: a};
-};
 var _user$project$SummaryList$Summary = F2(
 	function (a, b) {
 		return {title: a, contents: b};
 	});
+var _user$project$SummaryList$SummaryData = function (a) {
+	return {summaries: a};
+};
 var _user$project$SummaryList$decodeData = A2(
 	_elm_lang$core$Json_Decode$object1,
 	_user$project$SummaryList$SummaryData,
@@ -15591,12 +15625,15 @@ var _user$project$Main$toHash = function (page) {
 	switch (_p0.ctor) {
 		case 'Home':
 			return '#home';
-		case 'Contact':
-			return '#contact';
-		case 'Blog':
-			return '#blog';
+		case 'Skills':
+			return '#skills';
+		case 'Projects':
+			return '#projects';
 		default:
-			return '#about';
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'#blog/',
+				_elm_lang$core$Basics$toString(_p0._0));
 	}
 };
 var _user$project$Main$urlUpdate = F2(
@@ -15657,46 +15694,46 @@ var _user$project$Main$update = F2(
 			case 'CityscapeMsgs':
 				var _p4 = A2(_user$project$Cityscape$update, _p3._0, model.cityscape);
 				var cityscape = _p4._0;
-				var fx = _p4._1;
+				var cmds = _p4._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{cityscape: cityscape}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, fx)
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, cmds)
 				};
 			case 'ProjectListMsgs':
 				var _p5 = A2(_user$project$ProjectList$update, _p3._0, model.projectList);
 				var projectList = _p5._0;
-				var fx = _p5._1;
+				var cmds = _p5._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{projectList: projectList}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, fx)
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, cmds)
 				};
 			case 'SummaryListMsgs':
 				var _p6 = A2(_user$project$SummaryList$update, _p3._0, model.summaryList);
 				var summaryList = _p6._0;
-				var fx = _p6._1;
+				var cmds = _p6._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{summaryList: summaryList}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, fx)
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, cmds)
 				};
 			case 'BlogListMsgs':
 				var _p7 = A2(_user$project$BlogList$update, _p3._0, model.blogList);
 				var blogList = _p7._0;
-				var fx = _p7._1;
+				var cmds = _p7._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{blogList: blogList}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, fx)
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, cmds)
 				};
 			case 'Tick':
 				return {
@@ -15709,15 +15746,17 @@ var _user$project$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GotoNavBar':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
+				var _p8 = _p3._0;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
 						model,
-						{
-							debug: _elm_lang$core$Basics$toString(_p3._0)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+						{page: _p8}),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$navigation$Navigation$newUrl(
+							_user$project$Main$toHash(_p8))
+						]));
 			default:
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
@@ -15753,209 +15792,203 @@ var _user$project$Main$subscriptions = function (model) {
 			]));
 };
 var _user$project$Main$NoOp = {ctor: 'NoOp'};
-var _user$project$Main$About = {ctor: 'About'};
-var _user$project$Main$Blog = {ctor: 'Blog'};
-var _user$project$Main$Contact = {ctor: 'Contact'};
+var _user$project$Main$Blog = function (a) {
+	return {ctor: 'Blog', _0: a};
+};
+var _user$project$Main$Projects = {ctor: 'Projects'};
+var _user$project$Main$Skills = {ctor: 'Skills'};
 var _user$project$Main$Home = {ctor: 'Home'};
 var _user$project$Main$init = function (result) {
-	var _p8 = _user$project$Cityscape$init;
-	var cityscape = _p8._0;
-	var cityscapeFx = _p8._1;
+	var _p9 = _user$project$Cityscape$init;
+	var cityscape = _p9._0;
+	var cityscapeCmds = _p9._1;
 	var assetPath = 'assets/1gam_projects/';
 	var blogFileLocation = 'assets/blogs/blog_content.json';
-	var _p9 = _user$project$BlogList$init(blogFileLocation);
-	var blogList = _p9._0;
-	var blogListFx = _p9._1;
+	var _p10 = _user$project$BlogList$init(blogFileLocation);
+	var blogList = _p10._0;
+	var blogListCmds = _p10._1;
 	var summaryFileLocation = 'assets/summary_data.json';
-	var _p10 = _user$project$SummaryList$init(summaryFileLocation);
-	var summaryList = _p10._0;
-	var summaryListFx = _p10._1;
+	var _p11 = _user$project$SummaryList$init(summaryFileLocation);
+	var summaryList = _p11._0;
+	var summaryListCmds = _p11._1;
 	var projectListFileLocation = 'assets/1gam_projects/project_list.json';
-	var _p11 = A2(_user$project$ProjectList$init, projectListFileLocation, assetPath);
-	var projectList = _p11._0;
-	var projectListFx = _p11._1;
+	var _p12 = A2(_user$project$ProjectList$init, projectListFileLocation, assetPath);
+	var projectList = _p12._0;
+	var projectListCmds = _p12._1;
 	var model = {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList, debug: '', page: _user$project$Main$Home};
-	var _p12 = A2(_user$project$Main$urlUpdate, result, model);
-	var model$ = _p12._0;
-	var cmds = _p12._1;
+	var _p13 = A2(_user$project$Main$urlUpdate, result, model);
+	var model$ = _p13._0;
+	var cmds = _p13._1;
 	var cmds$ = _elm_lang$core$Platform_Cmd$batch(
 		_elm_lang$core$Native_List.fromArray(
 			[
-				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, cityscapeFx),
-				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, projectListFx),
-				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, summaryListFx),
-				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, blogListFx),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$CityscapeMsgs, cityscapeCmds),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectListMsgs, projectListCmds),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SummaryListMsgs, summaryListCmds),
+				A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$BlogListMsgs, blogListCmds),
 				cmds
 			]));
 	return {ctor: '_Tuple2', _0: model$, _1: cmds$};
 };
 var _user$project$Main$viewNavBar = function (model) {
-	var attributes = _elm_lang$html$Html_Attributes$classList(
-		_elm_lang$core$Native_List.fromArray(
-			[
-				{ctor: '_Tuple2', _0: 'navbar-item', _1: true},
-				{ctor: '_Tuple2', _0: 'active', _1: true}
-			]));
+	var toLi = function (_p14) {
+		var _p15 = _p14;
+		var _p16 = _p15._1;
+		var attributes = _elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'navbar-item', _1: true},
+					{
+					ctor: '_Tuple2',
+					_0: 'active',
+					_1: _elm_lang$core$Native_Utils.eq(model.page, _p16)
+				}
+				]));
+		return A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[attributes]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$href(_p15._0),
+							_elm_lang$html$Html_Events$onClick(
+							_user$project$Main$GotoNavBar(_p16))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(_p15._2)
+						]))
+				]));
+	};
+	var tabsInfo = _elm_lang$core$Native_List.fromArray(
+		[
+			{ctor: '_Tuple3', _0: '#home', _1: _user$project$Main$Home, _2: 'Home'},
+			{ctor: '_Tuple3', _0: '#skills', _1: _user$project$Main$Skills, _2: 'Skills'},
+			{ctor: '_Tuple3', _0: '#projects', _1: _user$project$Main$Projects, _2: 'Projects'},
+			{
+			ctor: '_Tuple3',
+			_0: '#blog/1',
+			_1: _user$project$Main$Blog(1),
+			_2: 'Blog'
+		}
+		]);
+	var tabs = A2(_elm_lang$core$List$map, toLi, tabsInfo);
 	return A2(
 		_elm_lang$html$Html$ul,
 		_elm_lang$core$Native_List.fromArray(
 			[
 				_elm_lang$html$Html_Attributes$class('navbar-container')
 			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
-								_elm_lang$html$Html_Attributes$href('#home'),
-								_elm_lang$html$Html_Events$onClick(
-								_user$project$Main$GotoNavBar(_user$project$Main$Home))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Home')
-							]))
-					])),
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
-								_elm_lang$html$Html_Attributes$href('#contact'),
-								_elm_lang$html$Html_Events$onClick(
-								_user$project$Main$GotoNavBar(_user$project$Main$Contact))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Contact')
-							]))
-					])),
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
-								_elm_lang$html$Html_Attributes$href('#blog'),
-								_elm_lang$html$Html_Events$onClick(
-								_user$project$Main$GotoNavBar(_user$project$Main$Blog))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('Blog')
-							]))
-					])),
-				A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[attributes]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html$a,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$class('navbar-item-a'),
-								_elm_lang$html$Html_Attributes$href('#about'),
-								_elm_lang$html$Html_Events$onClick(
-								_user$project$Main$GotoNavBar(_user$project$Main$About))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html$text('About')
-							]))
-					]))
-			]));
+		tabs);
 };
 var _user$project$Main$view = function (model) {
+	var toDiv = function (_p17) {
+		var _p18 = _p17;
+		var divs = A2(
+			_elm_lang$core$List$map,
+			function (content) {
+				return A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('content-block')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[content]));
+			},
+			_p18._1);
+		var attributes = _elm_lang$html$Html_Attributes$classList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'hidden',
+					_1: _elm_lang$core$Basics$not(
+						_elm_lang$core$Native_Utils.eq(_p18._0, model.page))
+				}
+				]));
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[attributes]),
+			divs);
+	};
+	var skillsContent = A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Main$SummaryListMsgs,
+		A2(
+			_user$project$SummaryList$viewFilter,
+			_elm_lang$core$Native_List.fromArray(
+				['Skills', 'Languages', 'Experiences']),
+			model.summaryList));
+	var homeContent = A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Main$SummaryListMsgs,
+		A2(
+			_user$project$SummaryList$viewFilter,
+			_elm_lang$core$Native_List.fromArray(
+				['Motivations', 'Interests']),
+			model.summaryList));
+	var projectListContent = A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Main$ProjectListMsgs,
+		_user$project$ProjectList$view(model.projectList));
+	var summaryListContent = A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Main$SummaryListMsgs,
+		_user$project$SummaryList$view(model.summaryList));
+	var blogListContent = A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Main$BlogListMsgs,
+		_user$project$BlogList$view(model.blogList));
+	var cityscapeContent = A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Main$CityscapeMsgs,
+		_user$project$Cityscape$view(model.cityscape));
+	var tabsInfo = _elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: _user$project$Main$Home,
+			_1: _elm_lang$core$Native_List.fromArray(
+				[cityscapeContent, homeContent])
+		},
+			{
+			ctor: '_Tuple2',
+			_0: _user$project$Main$Skills,
+			_1: _elm_lang$core$Native_List.fromArray(
+				[cityscapeContent, skillsContent])
+		},
+			{
+			ctor: '_Tuple2',
+			_0: _user$project$Main$Blog(1),
+			_1: _elm_lang$core$Native_List.fromArray(
+				[cityscapeContent, blogListContent])
+		},
+			{
+			ctor: '_Tuple2',
+			_0: _user$project$Main$Projects,
+			_1: _elm_lang$core$Native_List.fromArray(
+				[cityscapeContent, projectListContent])
+		}
+		]);
+	var divs = A2(_elm_lang$core$List$map, toDiv, tabsInfo);
+	var allDivs = A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$Main$viewNavBar(model)
+			]),
+		divs);
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_user$project$Main$viewNavBar(model),
-				A2(
-				_elm_lang$html$Html$h3,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text(
-						_elm_lang$core$Basics$toString(model.debug))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$CityscapeMsgs,
-						_user$project$Cityscape$view(model.cityscape))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$BlogListMsgs,
-						_user$project$BlogList$view(model.blogList))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$SummaryListMsgs,
-						_user$project$SummaryList$view(model.summaryList))
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('main')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						A2(
-						_elm_lang$html$Html_App$map,
-						_user$project$Main$ProjectListMsgs,
-						_user$project$ProjectList$view(model.projectList))
-					]))
-			]));
+		allDivs);
 };
 var _user$project$Main$pageParser = _evancz$url_parser$UrlParser$oneOf(
 	_elm_lang$core$Native_List.fromArray(
@@ -15966,16 +15999,19 @@ var _user$project$Main$pageParser = _evancz$url_parser$UrlParser$oneOf(
 			_evancz$url_parser$UrlParser$s('home')),
 			A2(
 			_evancz$url_parser$UrlParser$format,
-			_user$project$Main$Contact,
-			_evancz$url_parser$UrlParser$s('contact')),
+			_user$project$Main$Skills,
+			_evancz$url_parser$UrlParser$s('skills')),
+			A2(
+			_evancz$url_parser$UrlParser$format,
+			_user$project$Main$Projects,
+			_evancz$url_parser$UrlParser$s('projects')),
 			A2(
 			_evancz$url_parser$UrlParser$format,
 			_user$project$Main$Blog,
-			_evancz$url_parser$UrlParser$s('blog')),
 			A2(
-			_evancz$url_parser$UrlParser$format,
-			_user$project$Main$About,
-			_evancz$url_parser$UrlParser$s('about'))
+				_evancz$url_parser$UrlParser_ops['</>'],
+				_evancz$url_parser$UrlParser$s('blog'),
+				_evancz$url_parser$UrlParser$int))
 		]));
 var _user$project$Main$hashParser = function (location) {
 	return A3(
