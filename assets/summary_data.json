@@ -3,16 +3,18 @@
     [
         {
             "title": "Motivations",
+            "type": "Sentences",
             "contents":
             [
-                "I want to draw my vision and my dreams",
-                "I want to mix art and technology",
+                "I want to draw my vision and my dreams.",
+                "I want to mix art and technology.",
                 "I love Ultimate Frisbee; I want to run.",
-                "I want to make games which are engaging and make people think abstractly"
+                "I want to make games which are engaging and make people think abstractly."
             ]
         },
         {
             "title": "Interests",
+            "type": "Bullets",
             "contents":
             [
                 "Ultimate Frisbee",
@@ -26,6 +28,7 @@
         },
         {
             "title": "Languages",
+            "type": "Bullets",
             "contents":
             [
                 "C++",
@@ -41,6 +44,7 @@
         },
         {
             "title": "Skills",
+            "type": "Bullets",
             "contents":
             [
                 "Windows",
@@ -65,6 +69,7 @@
         },
         {
             "title": "Experiences",
+            "type": "Bullets",
             "contents":
             [
                 "AI and tracking routines",
@@ -86,6 +91,7 @@
         },
         {
             "title": "Quotes",
+            "type": "Bullets",
             "contents":
             [
                 "\"Ultimate does not develop character, it reveals it\"",
