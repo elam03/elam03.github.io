@@ -87,22 +87,25 @@ viewNavBar model =
             , ("#blog/1", Blog 1, "Blog")
             ]
 
-        toLi (a', b', c') =
+        toMenuItem (linkText, page, displayText) =
             let
                 attributes =
                     Html.Attributes.classList
                         [ ("navbar-item", True)
-                        , ("active", model.page == b')
+                        , ("active", model.page == page)
                         ]
             in
-                li [ attributes ] [ a [ href a', onClick (GotoNavBar b') ] [ text c' ] ]
+                a [ attributes, href linkText, onClick (GotoNavBar page) ] [ text displayText ]
 
         tabs =
             tabsInfo
-                |> List.map toLi
+                |> List.map toMenuItem
+
+        logo =
+            [ img [ src "assets/avatars/avatar0.jpg", alt "avatar", class "logo" ] [] ]
     in
-        ul [ class "navbar-container" ]
-            tabs
+        nav [ class "navbar" ]
+            (logo ++ tabs)
 
 view : Model -> Html Msg
 view model =
@@ -142,12 +145,15 @@ view model =
             in
                 div [ attributes ] divs
 
+        navbar =
+            viewNavBar model
+
         divs =
             tabsInfo
                 |> List.map toDiv
 
         allDivs =
-            [ viewNavBar model ] ++ divs
+            [ navbar ] ++ divs
     in
         div [] allDivs
 

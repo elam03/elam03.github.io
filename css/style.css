@@ -48,32 +48,40 @@ nav a, button {
 
 /*************************************/
 
-.navbar-container {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 8px;
-    overflow:  hidden;
+.navbar {
+    width: 100%;
     background-color: #333;
+    list-style-type: none;
+    margin-bottom: 8px;
+
+    /*position: fixed;*/
+    /*top: 0;*/
 }
 
-.navbar-item {
-    float: left;
-}
-
-.navbar-item a {
-    display: block;
+.navbar > a {
+    display: inline-block;
+    vertical-align: top;
+    padding: 0px 20px;
+    line-height: 60px;
     color: white;
+    transition: 0.3s;
     text-align: center;
-    padding: 14px 16px;
     text-decoration: none;
 }
 
-.navbar-item a:hover {
+.navbar .logo {
+    display: inline-block;
+    vertical-align: top;
+    width: 40px;
+    height: 40px;
+    padding: 10px 20px;
+}
+
+.navbar > a:hover {
     background-color: #0075ff;
 }
 
-.active {
+.navbar > a.active {
     background-color: #15139d;
     color: white;
 }

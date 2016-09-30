@@ -15831,7 +15831,20 @@ var _user$project$Main$init = function (result) {
 	return {ctor: '_Tuple2', _0: model$, _1: cmds$};
 };
 var _user$project$Main$viewNavBar = function (model) {
-	var toLi = function (_p14) {
+	var logo = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$img,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$src('assets/avatars/avatar0.jpg'),
+					_elm_lang$html$Html_Attributes$alt('avatar'),
+					_elm_lang$html$Html_Attributes$class('logo')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[]))
+		]);
+	var toMenuItem = function (_p14) {
 		var _p15 = _p14;
 		var _p16 = _p15._1;
 		var attributes = _elm_lang$html$Html_Attributes$classList(
@@ -15845,23 +15858,17 @@ var _user$project$Main$viewNavBar = function (model) {
 				}
 				]));
 		return A2(
-			_elm_lang$html$Html$li,
-			_elm_lang$core$Native_List.fromArray(
-				[attributes]),
+			_elm_lang$html$Html$a,
 			_elm_lang$core$Native_List.fromArray(
 				[
-					A2(
-					_elm_lang$html$Html$a,
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html_Attributes$href(_p15._0),
-							_elm_lang$html$Html_Events$onClick(
-							_user$project$Main$GotoNavBar(_p16))
-						]),
-					_elm_lang$core$Native_List.fromArray(
-						[
-							_elm_lang$html$Html$text(_p15._2)
-						]))
+					attributes,
+					_elm_lang$html$Html_Attributes$href(_p15._0),
+					_elm_lang$html$Html_Events$onClick(
+					_user$project$Main$GotoNavBar(_p16))
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(_p15._2)
 				]));
 	};
 	var tabsInfo = _elm_lang$core$Native_List.fromArray(
@@ -15876,16 +15883,17 @@ var _user$project$Main$viewNavBar = function (model) {
 			_2: 'Blog'
 		}
 		]);
-	var tabs = A2(_elm_lang$core$List$map, toLi, tabsInfo);
+	var tabs = A2(_elm_lang$core$List$map, toMenuItem, tabsInfo);
 	return A2(
-		_elm_lang$html$Html$ul,
+		_elm_lang$html$Html$nav,
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_elm_lang$html$Html_Attributes$class('navbar-container')
+				_elm_lang$html$Html_Attributes$class('navbar')
 			]),
-		tabs);
+		A2(_elm_lang$core$Basics_ops['++'], logo, tabs));
 };
 var _user$project$Main$view = function (model) {
+	var navbar = _user$project$Main$viewNavBar(model);
 	var toDiv = function (_p17) {
 		var _p18 = _p17;
 		var divs = A2(
@@ -15980,9 +15988,7 @@ var _user$project$Main$view = function (model) {
 	var allDivs = A2(
 		_elm_lang$core$Basics_ops['++'],
 		_elm_lang$core$Native_List.fromArray(
-			[
-				_user$project$Main$viewNavBar(model)
-			]),
+			[navbar]),
 		divs);
 	return A2(
 		_elm_lang$html$Html$div,
