@@ -15984,7 +15984,7 @@ var _user$project$Main$view = function (model) {
 		A2(
 			_user$project$SummaryList$viewFilter,
 			_elm_lang$core$Native_List.fromArray(
-				['Motivations', 'Interests', 'Quotes']),
+				['Motivations', 'Interests', 'Quotes', 'Inspirational People']),
 			model.summaryList));
 	var projectListContent = A2(
 		_elm_lang$html$Html_App$map,
