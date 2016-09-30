@@ -109,6 +109,16 @@
                 "\"A mind needs books as a sword needs a whetstone if it is to keep its edge\" - Tyrion Lannister",
                 "\"Get busy living or get busy dying.\" - Andy Dufresne"
             ]
+        },
+        {
+            "title": "Inspirational People",
+            "type": "Bullets",
+            "contents":
+            [
+                "Bret Victor",
+                "Chris Granger",
+                "Neil deGrasse Tyson"
+            ]
         }
     ]
 }

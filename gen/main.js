@@ -15454,19 +15454,61 @@ var _user$project$SummaryList$viewSummary = function (summary) {
 				{ctor: '_Tuple2', _0: 'summarylist', _1: true},
 				{ctor: '_Tuple2', _0: 'summarylist-item', _1: true}
 			]));
-	var items = A2(
-		_elm_lang$core$List$map,
-		function (s) {
-			return A2(
-				_elm_lang$html$Html$li,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
+	var contentsType = function () {
+		var _p0 = summary.contentsType;
+		if (_p0.ctor === 'Just') {
+			return _elm_lang$html$Html$text(_p0._0);
+		} else {
+			return _elm_lang$html$Html$text('No type specified!');
+		}
+	}();
+	var items = function () {
+		var _p1 = summary.contentsType;
+		if (_p1.ctor === 'Just') {
+			if (A2(_elm_lang$core$String$contains, 'Sentences', _p1._0)) {
+				var paragraph = A3(
+					_elm_lang$core$List$foldl,
+					F2(
+						function (x, y) {
+							return A2(_elm_lang$core$Basics_ops['++'], x, y);
+						}),
+					'',
+					A2(_elm_lang$core$List$intersperse, ' ', summary.contents));
+				return _elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html$text(s)
-					]));
-		},
-		summary.contents);
+						_elm_lang$html$Html$text(paragraph)
+					]);
+			} else {
+				return A2(
+					_elm_lang$core$List$map,
+					function (s) {
+						return A2(
+							_elm_lang$html$Html$li,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text(s)
+								]));
+					},
+					summary.contents);
+			}
+		} else {
+			return A2(
+				_elm_lang$core$List$map,
+				function (s) {
+					return A2(
+						_elm_lang$html$Html$li,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(s)
+							]));
+				},
+				summary.contents);
+		}
+	}();
 	var contents = _elm_lang$core$Native_List.fromArray(
 		[
 			A2(
@@ -15544,6 +15586,7 @@ var _user$project$SummaryList$viewFilter = F2(
 	});
 var _user$project$SummaryList$errorSummary = {
 	title: 'error',
+	contentsType: _elm_lang$core$Maybe$Just('contents type'),
 	contents: _elm_lang$core$Native_List.fromArray(
 		['has', 'occurred'])
 };
@@ -15556,9 +15599,9 @@ _user$project$SummaryList_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _user$project$SummaryList$Summary = F2(
-	function (a, b) {
-		return {title: a, contents: b};
+var _user$project$SummaryList$Summary = F3(
+	function (a, b, c) {
+		return {title: a, contentsType: b, contents: c};
 	});
 var _user$project$SummaryList$SummaryData = function (a) {
 	return {summaries: a};
@@ -15570,10 +15613,12 @@ var _user$project$SummaryList$decodeData = A2(
 		_elm_lang$core$Json_Decode_ops[':='],
 		'summaries',
 		_elm_lang$core$Json_Decode$list(
-			A3(
-				_elm_lang$core$Json_Decode$object2,
+			A4(
+				_elm_lang$core$Json_Decode$object3,
 				_user$project$SummaryList$Summary,
 				A2(_elm_lang$core$Json_Decode_ops[':='], 'title', _elm_lang$core$Json_Decode$string),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'type', _elm_lang$core$Json_Decode$string)),
 				A2(
 					_elm_lang$core$Json_Decode_ops[':='],
 					'contents',
@@ -15602,15 +15647,15 @@ var _user$project$SummaryList$init = function (fileUrl) {
 };
 var _user$project$SummaryList$update = F2(
 	function (action, model) {
-		var _p0 = action;
-		if (_p0.ctor === 'RequestRefresh') {
+		var _p2 = action;
+		if (_p2.ctor === 'RequestRefresh') {
 			return {
 				ctor: '_Tuple2',
 				_0: model,
 				_1: _user$project$SummaryList$getData(model.file)
 			};
 		} else {
-			var data = A2(_elm_lang$core$Maybe$withDefault, _user$project$SummaryList$errorSummaryData, _p0._0);
+			var data = A2(_elm_lang$core$Maybe$withDefault, _user$project$SummaryList$errorSummaryData, _p2._0);
 			return {
 				ctor: '_Tuple2',
 				_0: A3(_user$project$SummaryList$Model, model.file, data, 'Refresh Achieved!'),

@@ -18,6 +18,7 @@ import Utils exposing (..)
 
 type alias Summary =
     { title : String
+    , contentsType : Maybe String
     , contents : List String
     }
 
@@ -39,6 +40,7 @@ errorSummaryData =
 errorSummary : Summary
 errorSummary =
     { title = "error"
+    , contentsType = Just "contents type"
     , contents = ["has", "occurred"]
     }
 
@@ -75,11 +77,35 @@ viewSummary : Summary -> Html Msg
 viewSummary summary =
     let
         items =
-            summary.contents
-                |> List.map (\s -> li [] [ text s ])
+            case summary.contentsType of
+                Just t ->
+                    if t |> String.contains "Sentences" then
+                        let
+                            paragraph =
+                                summary.contents
+                                    |> List.intersperse " "
+                                    |> List.foldl (++) ""
+                        in
+                            [ text paragraph ]
+                    else
+                        summary.contents
+                            |> List.map (\s -> li [] [ text s ])
+
+                Nothing ->
+                    summary.contents
+                        |> List.map (\s -> li [] [ text s ])
+
+        contentsType =
+            case summary.contentsType of
+                Just t ->
+                    text t
+
+                Nothing ->
+                    text "No type specified!"
 
         contents =
             [ h2 [] [ text summary.title ]
+            -- , h4 [] [ em [] [ contentsType ] ]
             , ul [] items
             ]
 
@@ -144,8 +170,9 @@ decodeData =
         object1 SummaryData
             ( "summaries" :=
                 ( list
-                    <| object2 Summary
+                    <| object3 Summary
                         ("title" := string)
+                        (maybe ("type" := string))
                         ("contents" := (list string))
                 )
             )
