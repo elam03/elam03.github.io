@@ -7,8 +7,8 @@ import Collage exposing (..)
 import Element exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onMouseOver)
 import Mouse exposing (Position)
+import MouseEvents exposing (MouseEvent, onMouseMove)
 import Keyboard exposing (..)
 import PageVisibility exposing (..)
 import Random
@@ -42,6 +42,11 @@ type alias Tree =
     , trunkWidth : Float
     , color : Color
     , leafEdgeCount : Int
+
+    , currRotationT : Float
+    , currRotation : Float
+    , angularRotation : Float
+    , angularRotationRange : Float
     }
 
 initTree : Tree
@@ -56,6 +61,10 @@ initTree =
             , trunkWidth = 6
             , color = rgb 255 255 255
             , leafEdgeCount = 4
+            , currRotationT = 0
+            , currRotation = 0
+            , angularRotation = 1
+            , angularRotationRange = 25
             }
     in
         model
@@ -113,7 +122,7 @@ init =
 
 type Msg
     = None
-    | Move Mouse.Position
+    | Move MouseEvent
     | Size Window.Size
     | KeyDown KeyCode
     | KeyUp KeyCode
@@ -126,8 +135,12 @@ update action model =
     case action of
         None ->
             ( model, Cmd.none )
-        Move xy ->
-            ( model |> mouseUpdate (xy.x, xy.y), Cmd.none )
+        Move data ->
+            let
+                x = data.clientPos.x - data.targetPos.x
+                y = data.clientPos.y - data.targetPos.y
+            in
+                ( model |> mouseUpdate (x, y), Cmd.none )
         Size s ->
             let
                 w = s.width
@@ -344,6 +357,41 @@ updateAllEntitiesInModel model =
         moveEntity e =
             { e | x = e.x + dx * (e.layer |> toValue) }
 
+        applySway e =
+            let
+                keyFrames =
+                    [ (0.00, -25)
+                    , (0.25, 0)
+                    , (0.50, 25)
+                    , (0.75, 0)
+                    , (1.00, -25)
+                    ]
+
+                t =
+                    let
+                        dt = model.dt / 1000
+                        result = e.currRotationT + dt
+                    in
+                        if result > 1.0 then
+                            result - 1.0
+                        else
+                            result
+
+                lerps keyFrames t =
+                    keyFrames
+                        |> List.map (\(t', value') -> (abs (t - t')) * value' )
+                        |> List.foldl (+) 0
+
+                currRotationT = t
+                currRotation = lerps keyFrames currRotationT
+                angularRotation = 0
+            in
+                { e
+                | currRotation = currRotation
+                , currRotationT = currRotationT
+                , angularRotation = angularRotation
+                }
+
         buildings' =
             model.buildings
                 |> List.map moveEntity
@@ -352,6 +400,7 @@ updateAllEntitiesInModel model =
         trees' =
             model.trees
                 |> List.map moveEntity
+                |> List.map applySway
                 |> wrapThings model.windowWidth
     in
         { model
@@ -383,7 +432,6 @@ subscriptions model =
     Sub.batch
         [ PageVisibility.visibilityChanges VisibilityChange
         , Time.every (20 * millisecond) Tick
-        , Mouse.moves Move
         , Window.resizes Size
         , Keyboard.downs KeyDown
         , Keyboard.ups KeyUp
@@ -422,17 +470,17 @@ viewTree t =
         leaves =
             [ ngon t.leafEdgeCount (t.w / 2)
                 |> filled t.color
+                |> rotate (degrees t.currRotation)
                 |> move (t.x + t.w / 2, t.y + t.h)
             ]
     in
-        -- group <| leaves ++ trunk
         group <| trunk ++ leaves
 
 view : Model -> Html Msg
 view model =
     let
         html = viewWithHtml model
-        svg = viewWithSvg model
+        -- svg = viewWithSvg model
     in
         div []
             [ html
@@ -468,7 +516,7 @@ viewWithHtml model =
 
         attributes =
             [ class "cityscape"
-            , Html.Events.onMouseDown (Move {x = 42,y = 42})
+            , onMouseMove Move
             ]
     in
         div attributes [ finalOutput ]
