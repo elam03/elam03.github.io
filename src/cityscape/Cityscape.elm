@@ -1,5 +1,6 @@
 module Cityscape exposing (..)
 
+import AnimationFrame
 import Array
 import Char
 import Color exposing (..)
@@ -17,7 +18,7 @@ import Svg
 import Svg.Attributes
 import Svg.Events
 import Task
-import Time exposing (..)
+import Time exposing (Time)
 import Window exposing (Size)
 
 import Building exposing (..)
@@ -149,7 +150,7 @@ update action model =
             in
                 ( { model
                   | windowWidth = w - (margin * 2)
-                  , windowHeight = 200
+                  , windowHeight = h
                   , sunset = { y = -(toFloat h / 3), h = (toFloat h / 4) }
                   }
                 , Cmd.none
@@ -205,12 +206,19 @@ update action model =
                     { model | randomValues = Array.fromList list }
             in
                 if not model'.initialized then
-                    ( model'
-                        |> addBuildings 10
-                        |> addTrees 10
-                        |> setInitialized
-                    , Cmd.none
-                    )
+                    let
+                        value =
+                            model'.windowWidth
+
+                        numInitialBuildings = value // 120
+                        numInitialTrees = value // 120
+                    in
+                        ( model'
+                            |> addBuildings numInitialBuildings
+                            |> addTrees numInitialTrees
+                            |> setInitialized
+                        , Cmd.none
+                        )
                 else
                     ( model', Cmd.none )
 
@@ -221,8 +229,6 @@ update action model =
 
                 Hidden ->
                     ( { model | paused = True }, Cmd.none )
-
--- , PageVisibility.visibilityChanges
 
 addTrees : Int -> Model -> Model
 addTrees numTrees model =
@@ -431,7 +437,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ PageVisibility.visibilityChanges VisibilityChange
-        , Time.every (20 * millisecond) Tick
+        , AnimationFrame.times Tick
         , Window.resizes Size
         , Keyboard.downs KeyDown
         , Keyboard.ups KeyUp
