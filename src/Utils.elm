@@ -17,10 +17,10 @@ composeTiledHtml cols list =
         head = List.take cols list
         rest = List.drop cols list
 
-        head' = head
+        head_ = head
 
     in
         if List.isEmpty head then
             []
         else
-            [ (tr [] []) ] ++ head' ++ (composeTiledHtml cols rest)
+            [ (tr [] []) ] ++ head_ ++ (composeTiledHtml cols rest)

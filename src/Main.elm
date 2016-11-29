@@ -3,17 +3,16 @@ module Main exposing (..)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.App as Html
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode as Json exposing ((:=))
+-- import Json.Decode as Json exposing ((:=))
 import List exposing (map)
 import Navigation
 import Platform.Sub
 import String
 import Task
 import Time exposing (..)
-import UrlParser exposing (Parser, (</>), format, int, oneOf, s, string)
+import UrlParser exposing (Parser, (</>), int, map, oneOf, s, string)
 
 import BlogList
 import Cityscape
@@ -31,6 +30,7 @@ type Msg
     | BlogListMsgs BlogList.Msg
     | Tick Time
     | GotoNavBar Page
+    | UrlChange Navigation.Location
 
 type alias Model =
     { cityscape : Cityscape.Model
@@ -41,8 +41,8 @@ type alias Model =
     , page : Page
     }
 
-init : Result String Page -> (Model, Cmd Msg)
-init result =
+init : Navigation.Location -> (Model, Cmd Msg)
+init location =
     let
         projectListFileLocation = "assets/1gam_projects/project_list.json"
         summaryFileLocation     = "assets/summary_data.json"
@@ -54,7 +54,7 @@ init result =
         (summaryList, summaryListCmds) = SummaryList.init summaryFileLocation
         (blogList, blogListCmds)       = BlogList.init blogFileLocation
 
-        model =
+        model_ =
             { cityscape = cityscape
             , projectList = projectList
             , summaryList = summaryList
@@ -63,19 +63,21 @@ init result =
             , page = Home
             }
 
-        (model', cmds) = urlUpdate result model
+        -- (model_, cmds) = (model, cmds)
 
-        cmds' =
+        -- (model_, cmds) = urlUpdate result model
+
+        cmds_ =
             Cmd.batch
                 [ Cmd.map CityscapeMsgs cityscapeCmds
                 , Cmd.map ProjectListMsgs projectListCmds
                 , Cmd.map SummaryListMsgs summaryListCmds
                 , Cmd.map BlogListMsgs blogListCmds
-                , cmds
+                -- , cmds
                 ]
 
     in
-        ( model', cmds' )
+        ( model_, cmds_ )
 
 viewNavBar : Model -> Html Msg
 viewNavBar model =
@@ -199,6 +201,9 @@ update action model =
             { model | page = newPage }
                 ! [ Navigation.newUrl (toHash newPage) ]
 
+        UrlChange location ->
+            ( model, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -220,9 +225,9 @@ toHash page =
         Blog id ->
             "#blog/" ++ toString id
 
-hashParser : Navigation.Location -> Result String Page
-hashParser location =
-    UrlParser.parse identity pageParser (String.dropLeft 1 location.hash)
+-- hashParser : Navigation.Location -> Result String Page
+-- hashParser location =
+--     UrlParser.parse identity pageParser (String.dropLeft 1 location.hash)
 
 type Page
     = Home
@@ -233,10 +238,10 @@ type Page
 pageParser : Parser (Page -> a) a
 pageParser =
     UrlParser.oneOf
-        [ UrlParser.format Home (UrlParser.s "home")
-        , UrlParser.format Skills (UrlParser.s "skills")
-        , UrlParser.format Projects (UrlParser.s "projects")
-        , UrlParser.format Blog (UrlParser.s "blog" </> UrlParser.int)
+        [ UrlParser.map Home (UrlParser.s "home")
+        , UrlParser.map Skills (UrlParser.s "skills")
+        , UrlParser.map Projects (UrlParser.s "projects")
+        , UrlParser.map Blog (UrlParser.s "blog" </> UrlParser.int)
         ]
 
 -- URL-PARSER
@@ -272,10 +277,11 @@ subscriptions model =
         ]
 
 main =
-    Navigation.program (Navigation.makeParser hashParser)
+    -- Navigation.program (Navigation.makeParser hashParser)
+    Navigation.program UrlChange
         { init = init
         , view = view
         , update = update
-        , urlUpdate = urlUpdate
+        -- , urlUpdate = urlUpdate
         , subscriptions = subscriptions
         }

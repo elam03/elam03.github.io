@@ -76,7 +76,7 @@ update action model =
                         |> List.indexedMap (,)
                         |> List.map (\(a, b) -> (a, {b | id = a}))
                         |> List.unzip
-                        |> snd
+                        |> Tuple.second
 
                 blogs =
                     blogsList
@@ -235,26 +235,28 @@ subscriptions model =
 
 getBlogList : String -> Cmd Msg
 getBlogList location =
-    Http.get decodeBlogList location
-        |> Task.perform FetchFail LoadBlogList
+    Cmd.none
+    -- Http.get decodeBlogList location
+    --     |> Task.perform FetchFail LoadBlogList
 
 
 getContent : String -> Cmd Msg
 getContent location =
-    Http.getString location
-        |> Task.perform FetchFail LoadBlogMarkdown
+    Cmd.none
+    -- Http.getString location
+    --     |> Task.perform FetchFail LoadBlogMarkdown
 
 decodeBlog : Decoder (Blog)
 decodeBlog =
-    object6 Blog
-        ("title" := string)
+    map6 Blog
+        (field "title" string)
         (succeed -1)
         (succeed False)
-        (maybe ("date" := string))
-        (maybe ("keywords" := (list string)))
-        (maybe ("url" := string))
+        (maybe (field "date" string))
+        (maybe (field "keywords" (list string)))
+        (maybe (field "url" string))
 
 decodeBlogList : Decoder (BlogList)
 decodeBlogList =
-    object1 BlogList
-        <| "blogs" := (list decodeBlog)
+    Json.Decode.map BlogList
+        <| field "blogs" (list decodeBlog)

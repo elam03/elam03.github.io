@@ -85,12 +85,12 @@ update action model =
 
                 addProjectAssetPath project =
                     let
-                        previews' =
+                        previews_ =
                             project.previews
                                 |> Maybe.withDefault []
                                 |> List.map (\p -> model.assetPath ++ p)
                     in
-                        { project | previews = Just previews' }
+                        { project | previews = Just previews_ }
 
                 projects =
                     projectsList.projects
@@ -200,21 +200,29 @@ classStyle = class "projectlist"
 
 getProjectData : String -> Cmd Msg
 getProjectData location =
-    Http.get decodeData location
-        |> Task.perform FetchFail Refresh
+    Cmd.none
+    -- Http.get location decodeData
+    --     |> Http.toTask
+        -- |> Task.mapError FetchFail
+        -- |> Task.perform Refresh
+        -- |> Task.onError (\msg -> fail "not found")
+        -- |> Task.perform Refresh
+    -- Http.toTask
+    -- Http.get decodeData location
+    --     |> Task.perform FetchFail Refresh
 
 decodeData : Decoder (ProjectList)
 decodeData =
-    object1 ProjectList
-        ( "projects" :=
+    Json.Decode.map ProjectList
+        ( field "projects"
             ( list
-                <| object7 Project
-                    ("title" := string)
-                    (maybe ("category" := string))
-                    (maybe ("keywords" := (list string)))
-                    (maybe ("description" := string))
-                    (maybe ("sourceUrl" := string))
-                    (maybe ("downloadUrl" := string))
-                    (maybe ("previews" := (list string)))
+                <| map7 Project
+                    (field "title" string)
+                    (maybe (field "category" string))
+                    (maybe (field "keywords" (list string)))
+                    (maybe (field "description" string))
+                    (maybe (field "sourceUrl" string))
+                    (maybe (field "downloadUrl" string))
+                    (maybe (field "previews" (list string)))
             )
         )

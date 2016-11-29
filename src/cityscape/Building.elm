@@ -44,11 +44,11 @@ type alias GlassWindow =
     }
 
 newGlassWindow : Float -> Float -> Float -> Float -> GlassWindow
-newGlassWindow x' y' w' h' =
-    {   x = x'
-    ,   y = y'
-    ,   w = w'
-    ,   h = h'
+newGlassWindow x_ y_ w_ h_ =
+    {   x = x_
+    ,   y = y_
+    ,   w = w_
+    ,   h = h_
     }
 
 generateGlassWindows : Float -> Float -> Float -> Float -> Float -> Float -> List GlassWindow -> List GlassWindow
@@ -74,17 +74,17 @@ type alias Building =
     }
 
 newBuilding : Float -> Float -> Float -> Layer -> Building
-newBuilding x' y' h' l' =
+newBuilding x_ y_ h_ l_ =
     let
-        w' = buildingWidth
+        w_ = buildingWidth
     in
         { nullBuilding |
-          x = x'
-        , y = y'
-        , w = w'
-        , h = h'
-        , layer = l'
-        , windows = generateGlassWindows glassWindowSpacing.w glassWindowSpacing.h w' h' glassWindowSpacing.w glassWindowSpacing.h []
+          x = x_
+        , y = y_
+        , w = w_
+        , h = h_
+        , layer = l_
+        , windows = generateGlassWindows glassWindowSpacing.w glassWindowSpacing.h w_ h_ glassWindowSpacing.w glassWindowSpacing.h []
         }
 
 nullBuilding : Building

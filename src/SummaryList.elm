@@ -161,18 +161,21 @@ subscriptions model =
 
 getData : String -> Cmd Msg
 getData location =
-    Http.get decodeData location
-        |> Task.toMaybe
-        |> Task.perform never Refresh
+    Cmd.none
+    -- Http.get decodeData location
+    --   |> Task.perform Refresh
+      -- |> Task.onError never
+        -- |> Task.toMaybe
+        -- |> Task.perform never Refresh
 
 decodeData : Decoder SummaryData
 decodeData =
-        object1 SummaryData
-            ( "summaries" :=
+        Json.Decode.map SummaryData
+            ( field "summaries"
                 ( list
-                    <| object3 Summary
-                        ("title" := string)
-                        (maybe ("type" := string))
-                        ("contents" := (list string))
+                    <| map3 Summary
+                        (field "title" string)
+                        (maybe (field "type" string))
+                        (field "contents" (list string))
                 )
             )

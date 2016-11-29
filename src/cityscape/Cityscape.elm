@@ -9,7 +9,7 @@ import Element exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Mouse exposing (Position)
-import MouseEvents exposing (MouseEvent, onMouseMove)
+-- import MouseEvents exposing (MouseEvent, onMouseMove)
 import Keyboard exposing (..)
 import PageVisibility exposing (..)
 import Random
@@ -116,14 +116,19 @@ init =
         , paused = False
         }
 
+        cmd =
+            Window.size
+              |> Task.perform Size
+
     in
-        ( model, Task.perform Size Size Window.size )
+        ( model, cmd )
+        -- ( model, Task.perform Size Size Window.size )
 
 -- UPDATE
 
 type Msg
     = None
-    | Move MouseEvent
+    -- | Move MouseEvent
     | Size Window.Size
     | KeyDown KeyCode
     | KeyUp KeyCode
@@ -136,12 +141,14 @@ update action model =
     case action of
         None ->
             ( model, Cmd.none )
-        Move data ->
-            let
-                x = data.clientPos.x - data.targetPos.x
-                y = data.clientPos.y - data.targetPos.y
-            in
-                ( model |> mouseUpdate (x, y), Cmd.none )
+
+        -- Move data ->
+        --     -- let
+        --     --     x = data.clientPos.x - data.targetPos.x
+        --     --     y = data.clientPos.y - data.targetPos.y
+        --     -- in
+        --     --     ( model |> mouseUpdate (x, y), Cmd.none )
+
         Size s ->
             let
                 w = s.width
@@ -158,31 +165,31 @@ update action model =
 
         KeyDown key ->
             let
-                model' = { model | keys = Set.insert key model.keys }
+                model_ = { model | keys = Set.insert key model.keys }
             in
                 case Char.fromCode key of
                     '1' ->
-                        ( model' |> addBuildings 10, Cmd.none )
+                        ( model_ |> addBuildings 10, Cmd.none )
                     '2' ->
-                        ( model' |> addTrees 10, Cmd.none )
+                        ( model_ |> addTrees 10, Cmd.none )
                     'M' ->
-                        ( { model' | movementType = MouseMove }, Cmd.none )
-                    'T' ->
-                        ( { model' | movementType = TimeMove }, Cmd.none )
+                        ( { model_ | movementType = MouseMove }, Cmd.none )
+                    't' ->
+                        ( { model_ | movementType = TimeMove }, Cmd.none )
                     'S' ->
-                        ( { model' | movementType = StaticMove }, Cmd.none )
+                        ( { model_ | movementType = StaticMove }, Cmd.none )
                     'P' ->
-                        ( { model' | paused = not model.paused }, Cmd.none )
+                        ( { model_ | paused = not model.paused }, Cmd.none )
                     'I' ->
-                        ( { model' | showInfo = not model'.showInfo }, Cmd.none )
+                        ( { model_ | showInfo = not model_.showInfo }, Cmd.none )
                     _ ->
-                        ( model', Cmd.none )
+                        ( model_, Cmd.none )
 
         KeyUp key ->
             let
-                model' = { model | keys = Set.remove key model.keys }
+                model_ = { model | keys = Set.remove key model.keys }
             in
-                ( model', Cmd.none )
+                ( model_, Cmd.none )
 
         Tick t ->
             let
@@ -202,25 +209,25 @@ update action model =
             let
                 setInitialized model =
                     { model | initialized = True }
-                model' =
+                model_ =
                     { model | randomValues = Array.fromList list }
             in
-                if not model'.initialized then
+                if not model_.initialized then
                     let
                         value =
-                            model'.windowWidth
+                            model_.windowWidth
 
                         numInitialBuildings = value // 120
                         numInitialTrees = value // 120
                     in
-                        ( model'
+                        ( model_
                             |> addBuildings numInitialBuildings
                             |> addTrees numInitialTrees
                             |> setInitialized
                         , Cmd.none
                         )
                 else
-                    ( model', Cmd.none )
+                    ( model_, Cmd.none )
 
         VisibilityChange visible ->
             case visible of
@@ -273,7 +280,7 @@ addTrees numTrees model =
                     |> toValue 5 10
                     |> truncate
 
-            tree' =
+            tree_ =
                 { initTree
                 | x = x
                 , y = y
@@ -284,9 +291,9 @@ addTrees numTrees model =
                 , leafEdgeCount = leafEdgeCount
                 }
 
-            model' = popRandomValues 4 model
+            model_ = popRandomValues 4 model
         in
-            { model' | trees = model.trees ++ [ tree' ] }
+            { model_ | trees = model.trees ++ [ tree_ ] }
                 |> addTrees (numTrees - 1)
 
 addBuildings : Int -> Model -> Model
@@ -321,10 +328,10 @@ addBuildings numBuildings model =
             h = toValue 25 100 <| Array.get 1 randomValues
             l = pickLayer <| toValue 0 100 <| Array.get 2 randomValues
 
-            model' = popRandomValues 3 model
-            building' = newBuilding x y h l
+            model_ = popRandomValues 3 model
+            building_ = newBuilding x y h l
         in
-            { model' | buildings = model'.buildings ++ [ building' ] }
+            { model_ | buildings = model_.buildings ++ [ building_ ] }
                 |> addBuildings (numBuildings - 1)
 
 updateAllEntitiesInModel : Model -> Model
@@ -385,7 +392,7 @@ updateAllEntitiesInModel model =
 
                 lerps keyFrames t =
                     keyFrames
-                        |> List.map (\(t', value') -> (abs (t - t')) * value' )
+                        |> List.map (\(t_, value_) -> (abs (t - t_)) * value_ )
                         |> List.foldl (+) 0
 
                 currRotationT = t
@@ -398,20 +405,20 @@ updateAllEntitiesInModel model =
                 , angularRotation = angularRotation
                 }
 
-        buildings' =
+        buildings_ =
             model.buildings
                 |> List.map moveEntity
                 |> wrapThings model.windowWidth
 
-        trees' =
+        trees_ =
             model.trees
                 |> List.map moveEntity
                 |> List.map applySway
                 |> wrapThings model.windowWidth
     in
         { model
-        | buildings = buildings'
-        , trees = trees'
+        | buildings = buildings_
+        , trees = trees_
         }
 
 resetMouseDelta : Model -> Model
@@ -522,7 +529,7 @@ viewWithHtml model =
 
         attributes =
             [ class "cityscape"
-            , onMouseMove Move
+            -- , onMouseMove Move
             ]
     in
         div attributes [ finalOutput ]
@@ -570,7 +577,7 @@ displayModelInfo model =
 
             randomValues = model.randomValues
                                 |> Array.toList
-                                |> List.map2 (,) [1..(Array.length model.randomValues)]
+                                |> List.map2 (,) (List.range 1 (Array.length model.randomValues))
                                 |> List.map displayRandomValue
 
             formsToDisplay = [ toForm <| flow down allInfo ] ++ randomValues
@@ -580,8 +587,8 @@ displayModelInfo model =
         []
 
 displayRandomValue : (Int, Float) -> Form
-displayRandomValue (x', value') =
+displayRandomValue (x_, value_) =
     let
-        x = toFloat x'
+        x = toFloat x_
     in
-        traced (solid red) (path [ (x, 0), (x, value' * 100) ])
+        traced (solid red) (path [ (x, 0), (x, value_ * 100) ])
