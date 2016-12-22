@@ -52,24 +52,21 @@ init fileUrl =
 
 -- UPDATE
 
+
 type Msg
-    = RequestRefresh
-    | Refresh (Maybe SummaryData)
+    = Refresh (Result Http.Error SummaryData)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
-        RequestRefresh ->
-            (model, getData model.file)
+        Refresh (Ok summaryData) ->
+            ( Model model.file summaryData "Refresh Achieved!"
+            , Cmd.none
+            )
 
-        Refresh summaryData ->
-            let
-                data = summaryData |> Maybe.withDefault errorSummaryData
-            in
-                ( Model model.file data "Refresh Achieved!"
-                , Cmd.none
-                )
+        Refresh (Err _) ->
+            (model, Cmd.none)
 
 -- VIEW
 
@@ -161,12 +158,8 @@ subscriptions model =
 
 getData : String -> Cmd Msg
 getData location =
-    Cmd.none
-    -- Http.get decodeData location
-    --   |> Task.perform Refresh
-      -- |> Task.onError never
-        -- |> Task.toMaybe
-        -- |> Task.perform never Refresh
+    Http.get location decodeData
+        |> Http.send Refresh
 
 decodeData : Decoder SummaryData
 decodeData =

@@ -6,8 +6,8 @@ Some of my initial thoughts on Elm 0.17
 * Signals are gone?! I had just started to get semi-comfortable with them.
 * Easier to use? I hope so!
 
-Upgrading Process
------------------
+Upgrade Process
+---------------
 
 I followed [0.17.0 upgrade guide](https://github.com/elm-lang/elm-platform/blob/master/upgrade-docs/0.17.md) for upgrading and went through my files 1-by-1. Upgrading wasn't as bad as I thought it was going to be.
 

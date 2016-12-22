@@ -59,17 +59,16 @@ init blogList =
 -- UPDATE
 
 type Msg
-    = LoadBlogList BlogList
-    | LoadBlogMarkdown String
+    = LoadBlogList (Result Http.Error BlogList)
+    | LoadBlogMarkdown (Result Http.Error String)
     | FocusBlog ID
     | HoverBlog ID
     | UnHoverBlog ID
-    | FetchFail Http.Error
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
-        LoadBlogList blogsList ->
+        LoadBlogList (Ok blogsList) ->
             let
                 populateBlogId b =
                     b
@@ -87,7 +86,10 @@ update action model =
                 , Cmd.none
                 )
 
-        LoadBlogMarkdown markdownContent ->
+        LoadBlogList (Err _) ->
+            ( model, Cmd.none )
+
+        LoadBlogMarkdown (Ok markdownContent) ->
             let
                 options = Markdown.defaultOptions
 
@@ -103,6 +105,9 @@ update action model =
                 ( Model model.blogListFile model.blogs currBlog debug model.currId
                 , Cmd.none
                 )
+
+        LoadBlogMarkdown (Err _) ->
+            ( model, Cmd.none )
 
         FocusBlog id ->
             let
@@ -138,9 +143,6 @@ update action model =
                         |> List.map (\b -> if b.id == id then { b | hover = False } else b)
             in
                 ( { model | blogs = blogs }, Cmd.none)
-
-        FetchFail _ ->
-            (model, Cmd.none)
 
 -- VIEW
 
@@ -231,20 +233,18 @@ viewBlogTile blog =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
 -- CMDS
 
 getBlogList : String -> Cmd Msg
 getBlogList location =
-    Cmd.none
-    -- Http.get decodeBlogList location
-    --     |> Task.perform FetchFail LoadBlogList
-
+    Http.get location decodeBlogList
+        |> Http.send LoadBlogList
 
 getContent : String -> Cmd Msg
 getContent location =
-    Cmd.none
-    -- Http.getString location
-    --     |> Task.perform FetchFail LoadBlogMarkdown
+    Http.getString location
+        |> Http.send LoadBlogMarkdown
 
 decodeBlog : Decoder (Blog)
 decodeBlog =

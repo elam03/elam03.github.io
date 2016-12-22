@@ -58,21 +58,15 @@ init projectList assetPath =
 
 -- UPDATE
 
+
 type Msg
-    = RequestRefresh
-    | Refresh ProjectList
-    | FetchFail Http.Error
+    = Refresh (Result Http.Error ProjectList)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
     case action of
-        RequestRefresh ->
-            ( model
-            , getProjectData model.file
-            )
-
-        Refresh projectsList ->
+        Refresh (Ok projectsList) ->
             let
                 addProjectDescription project =
                     let
@@ -106,7 +100,7 @@ update action model =
                     , Cmd.none
                     )
 
-        FetchFail _ ->
+        Refresh (Err _) ->
             (model, Cmd.none)
 
 -- VIEW
@@ -200,16 +194,8 @@ classStyle = class "projectlist"
 
 getProjectData : String -> Cmd Msg
 getProjectData location =
-    Cmd.none
-    -- Http.get location decodeData
-    --     |> Http.toTask
-        -- |> Task.mapError FetchFail
-        -- |> Task.perform Refresh
-        -- |> Task.onError (\msg -> fail "not found")
-        -- |> Task.perform Refresh
-    -- Http.toTask
-    -- Http.get decodeData location
-    --     |> Task.perform FetchFail Refresh
+    Http.get location decodeData
+        |> Http.send Refresh
 
 decodeData : Decoder (ProjectList)
 decodeData =

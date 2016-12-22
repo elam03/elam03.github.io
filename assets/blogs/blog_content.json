@@ -41,6 +41,17 @@
             ],
             "date": "6/10/2016",
             "url": "assets/blogs/initial_window_size.md"
+        },
+        {
+            "title": "Upgrading to Elm 0.18.0",
+            "keywords":
+            [
+                "elm",
+                "upgrade",
+                "0.18.0"
+            ],
+            "date": "12/22/2016",
+            "url": "assets/blogs/upgrading_to_0.18.0.md"
         }
     ]
 }
