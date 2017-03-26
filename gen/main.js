@@ -16476,6 +16476,115 @@ var _elam03$elam03_github_io$SummaryList$init = function (fileUrl) {
 	};
 };
 
+var _elam03$elam03_github_io$RandomQuotes$decodeRonSwansonUrl = _elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string);
+var _elam03$elam03_github_io$RandomQuotes$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
+};
+var _elam03$elam03_github_io$RandomQuotes$Model = F2(
+	function (a, b) {
+		return {numQuotesToDisplay: a, quotes: b};
+	});
+var _elam03$elam03_github_io$RandomQuotes$init = function (numQuotesToDisplay) {
+	return {
+		ctor: '_Tuple2',
+		_0: A2(
+			_elam03$elam03_github_io$RandomQuotes$Model,
+			5,
+			{ctor: '[]'}),
+		_1: _elm_lang$core$Platform_Cmd$none
+	};
+};
+var _elam03$elam03_github_io$RandomQuotes$NewQuoteIncoming = function (a) {
+	return {ctor: 'NewQuoteIncoming', _0: a};
+};
+var _elam03$elam03_github_io$RandomQuotes$getAnotherQuote = function (numQuotesToGet) {
+	var url = (_elm_lang$core$Native_Utils.cmp(numQuotesToGet, 1) > 0) ? A2(
+		_elm_lang$core$Basics_ops['++'],
+		'http://ron-swanson-quotes.herokuapp.com/v2/quotes/',
+		_elm_lang$core$Basics$toString(numQuotesToGet)) : 'http://ron-swanson-quotes.herokuapp.com/v2/quotes';
+	return A2(
+		_elm_lang$http$Http$send,
+		_elam03$elam03_github_io$RandomQuotes$NewQuoteIncoming,
+		A2(_elm_lang$http$Http$get, url, _elam03$elam03_github_io$RandomQuotes$decodeRonSwansonUrl));
+};
+var _elam03$elam03_github_io$RandomQuotes$update = F2(
+	function (action, model) {
+		var _p0 = action;
+		if (_p0.ctor === 'GetAnotherQuote') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: _elam03$elam03_github_io$RandomQuotes$getAnotherQuote(_p0._0)
+			};
+		} else {
+			if (_p0._0.ctor === 'Ok') {
+				return {
+					ctor: '_Tuple2',
+					_0: A2(
+						_elam03$elam03_github_io$RandomQuotes$Model,
+						model.numQuotesToDisplay,
+						A2(_elm_lang$core$Basics_ops['++'], model.quotes, _p0._0._0)),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			} else {
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			}
+		}
+	});
+var _elam03$elam03_github_io$RandomQuotes$GetAnotherQuote = function (a) {
+	return {ctor: 'GetAnotherQuote', _0: a};
+};
+var _elam03$elam03_github_io$RandomQuotes$view = function (model) {
+	var quotes = A2(
+		_elm_lang$core$List$take,
+		model.numQuotesToDisplay,
+		_elm_lang$core$List$reverse(
+			A2(
+				_elm_lang$core$List$map,
+				function (quote) {
+					return A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(quote),
+							_1: {ctor: '[]'}
+						});
+				},
+				model.quotes)));
+	var allThings = A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_elam03$elam03_github_io$RandomQuotes$GetAnotherQuote(1)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Manual Quote Add'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				quotes),
+			_1: {ctor: '[]'}
+		});
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		allThings);
+};
+
 var _elam03$elam03_github_io$Main$toHash = function (page) {
 	var _p0 = page;
 	switch (_p0.ctor) {
@@ -16485,11 +16594,13 @@ var _elam03$elam03_github_io$Main$toHash = function (page) {
 			return '#skills';
 		case 'Projects':
 			return '#projects';
-		default:
+		case 'Blog':
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				'#blog/',
 				_elm_lang$core$Basics$toString(_p0._0));
+		default:
+			return '#quotebanner';
 	}
 };
 var _elam03$elam03_github_io$Main$urlUpdate = F2(
@@ -16520,9 +16631,9 @@ _elam03$elam03_github_io$Main_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _elam03$elam03_github_io$Main$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {cityscape: a, projectList: b, summaryList: c, blogList: d, debug: e, page: f};
+var _elam03$elam03_github_io$Main$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {cityscape: a, projectList: b, summaryList: c, blogList: d, randomQuotes: e, debug: f, page: g};
 	});
 var _elam03$elam03_github_io$Main$UrlChange = function (a) {
 	return {ctor: 'UrlChange', _0: a};
@@ -16532,6 +16643,9 @@ var _elam03$elam03_github_io$Main$GotoNavBar = function (a) {
 };
 var _elam03$elam03_github_io$Main$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
+};
+var _elam03$elam03_github_io$Main$RandomQuotesMsgs = function (a) {
+	return {ctor: 'RandomQuotesMsgs', _0: a};
 };
 var _elam03$elam03_github_io$Main$BlogListMsgs = function (a) {
 	return {ctor: 'BlogListMsgs', _0: a};
@@ -16593,6 +16707,17 @@ var _elam03$elam03_github_io$Main$update = F2(
 						{blogList: blogList}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _elam03$elam03_github_io$Main$BlogListMsgs, cmds)
 				};
+			case 'RandomQuotesMsgs':
+				var _p8 = A2(_elam03$elam03_github_io$RandomQuotes$update, _p3._0, model.randomQuotes);
+				var randomQuotes = _p8._0;
+				var cmds = _p8._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{randomQuotes: randomQuotes}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _elam03$elam03_github_io$Main$RandomQuotesMsgs, cmds)
+				};
 			case 'Tick':
 				return {
 					ctor: '_Tuple2',
@@ -16604,16 +16729,16 @@ var _elam03$elam03_github_io$Main$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GotoNavBar':
-				var _p8 = _p3._0;
+				var _p9 = _p3._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{page: _p8}),
+						{page: _p9}),
 					{
 						ctor: '::',
 						_0: _elm_lang$navigation$Navigation$newUrl(
-							_elam03$elam03_github_io$Main$toHash(_p8)),
+							_elam03$elam03_github_io$Main$toHash(_p9)),
 						_1: {ctor: '[]'}
 					});
 			case 'UrlChange':
@@ -16656,13 +16781,23 @@ var _elam03$elam03_github_io$Main$subscriptions = function (model) {
 								return _elam03$elam03_github_io$Main$BlogListMsgs(a);
 							},
 							_elam03$elam03_github_io$BlogList$subscriptions(model.blogList)),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$core$Platform_Sub$map,
+								function (a) {
+									return _elam03$elam03_github_io$Main$RandomQuotesMsgs(a);
+								},
+								_elam03$elam03_github_io$RandomQuotes$subscriptions(model.randomQuotes)),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
 		});
 };
 var _elam03$elam03_github_io$Main$NoOp = {ctor: 'NoOp'};
+var _elam03$elam03_github_io$Main$QuoteBanner = {ctor: 'QuoteBanner'};
 var _elam03$elam03_github_io$Main$Blog = function (a) {
 	return {ctor: 'Blog', _0: a};
 };
@@ -16670,23 +16805,26 @@ var _elam03$elam03_github_io$Main$Projects = {ctor: 'Projects'};
 var _elam03$elam03_github_io$Main$Skills = {ctor: 'Skills'};
 var _elam03$elam03_github_io$Main$Home = {ctor: 'Home'};
 var _elam03$elam03_github_io$Main$init = function (location) {
-	var _p9 = _elam03$elam03_github_io$Cityscape$init;
-	var cityscape = _p9._0;
-	var cityscapeCmds = _p9._1;
+	var _p10 = _elam03$elam03_github_io$RandomQuotes$init(1);
+	var randomQuotes = _p10._0;
+	var randomQuotesCmds = _p10._1;
+	var _p11 = _elam03$elam03_github_io$Cityscape$init;
+	var cityscape = _p11._0;
+	var cityscapeCmds = _p11._1;
 	var assetPath = 'assets/1gam_projects/';
 	var blogFileLocation = 'assets/blogs/blog_content.json';
-	var _p10 = _elam03$elam03_github_io$BlogList$init(blogFileLocation);
-	var blogList = _p10._0;
-	var blogListCmds = _p10._1;
+	var _p12 = _elam03$elam03_github_io$BlogList$init(blogFileLocation);
+	var blogList = _p12._0;
+	var blogListCmds = _p12._1;
 	var summaryFileLocation = 'assets/summary_data.json';
-	var _p11 = _elam03$elam03_github_io$SummaryList$init(summaryFileLocation);
-	var summaryList = _p11._0;
-	var summaryListCmds = _p11._1;
+	var _p13 = _elam03$elam03_github_io$SummaryList$init(summaryFileLocation);
+	var summaryList = _p13._0;
+	var summaryListCmds = _p13._1;
 	var projectListFileLocation = 'assets/1gam_projects/project_list.json';
-	var _p12 = A2(_elam03$elam03_github_io$ProjectList$init, projectListFileLocation, assetPath);
-	var projectList = _p12._0;
-	var projectListCmds = _p12._1;
-	var model_ = {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList, debug: '', page: _elam03$elam03_github_io$Main$Home};
+	var _p14 = A2(_elam03$elam03_github_io$ProjectList$init, projectListFileLocation, assetPath);
+	var projectList = _p14._0;
+	var projectListCmds = _p14._1;
+	var model_ = {cityscape: cityscape, projectList: projectList, summaryList: summaryList, blogList: blogList, randomQuotes: randomQuotes, debug: '', page: _elam03$elam03_github_io$Main$Home};
 	var cmds_ = _elm_lang$core$Platform_Cmd$batch(
 		{
 			ctor: '::',
@@ -16700,7 +16838,11 @@ var _elam03$elam03_github_io$Main$init = function (location) {
 					_1: {
 						ctor: '::',
 						_0: A2(_elm_lang$core$Platform_Cmd$map, _elam03$elam03_github_io$Main$BlogListMsgs, blogListCmds),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$core$Platform_Cmd$map, _elam03$elam03_github_io$Main$RandomQuotesMsgs, randomQuotesCmds),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -16728,9 +16870,9 @@ var _elam03$elam03_github_io$Main$viewNavBar = function (model) {
 			{ctor: '[]'}),
 		_1: {ctor: '[]'}
 	};
-	var toMenuItem = function (_p13) {
-		var _p14 = _p13;
-		var _p15 = _p14._1;
+	var toMenuItem = function (_p15) {
+		var _p16 = _p15;
+		var _p17 = _p16._1;
 		var attributes = _elm_lang$html$Html_Attributes$classList(
 			{
 				ctor: '::',
@@ -16740,7 +16882,7 @@ var _elam03$elam03_github_io$Main$viewNavBar = function (model) {
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'active',
-						_1: _elm_lang$core$Native_Utils.eq(model.page, _p15)
+						_1: _elm_lang$core$Native_Utils.eq(model.page, _p17)
 					},
 					_1: {ctor: '[]'}
 				}
@@ -16752,18 +16894,18 @@ var _elam03$elam03_github_io$Main$viewNavBar = function (model) {
 				_0: attributes,
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$href(_p14._0),
+					_0: _elm_lang$html$Html_Attributes$href(_p16._0),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(
-							_elam03$elam03_github_io$Main$GotoNavBar(_p15)),
+							_elam03$elam03_github_io$Main$GotoNavBar(_p17)),
 						_1: {ctor: '[]'}
 					}
 				}
 			},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text(_p14._2),
+				_0: _elm_lang$html$Html$text(_p16._2),
 				_1: {ctor: '[]'}
 			});
 	};
@@ -16784,7 +16926,11 @@ var _elam03$elam03_github_io$Main$viewNavBar = function (model) {
 						_1: _elam03$elam03_github_io$Main$Blog(1),
 						_2: 'Blog'
 					},
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple3', _0: '#quotebanner', _1: _elam03$elam03_github_io$Main$QuoteBanner, _2: 'QuoteBanner'},
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		}
@@ -16801,8 +16947,8 @@ var _elam03$elam03_github_io$Main$viewNavBar = function (model) {
 };
 var _elam03$elam03_github_io$Main$view = function (model) {
 	var navbar = _elam03$elam03_github_io$Main$viewNavBar(model);
-	var toDiv = function (_p16) {
-		var _p17 = _p16;
+	var toDiv = function (_p18) {
+		var _p19 = _p18;
 		var divs = A2(
 			_elm_lang$core$List$map,
 			function (content) {
@@ -16819,14 +16965,14 @@ var _elam03$elam03_github_io$Main$view = function (model) {
 						_1: {ctor: '[]'}
 					});
 			},
-			_p17._1);
+			_p19._1);
 		var attributes = _elm_lang$html$Html_Attributes$classList(
 			{
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'hidden',
-					_1: !_elm_lang$core$Native_Utils.eq(_p17._0, model.page)
+					_1: !_elm_lang$core$Native_Utils.eq(_p19._0, model.page)
 				},
 				_1: {ctor: '[]'}
 			});
@@ -16881,6 +17027,10 @@ var _elam03$elam03_github_io$Main$view = function (model) {
 				}
 			},
 			model.summaryList));
+	var randomQuotesContent = A2(
+		_elm_lang$html$Html$map,
+		_elam03$elam03_github_io$Main$RandomQuotesMsgs,
+		_elam03$elam03_github_io$RandomQuotes$view(model.randomQuotes));
 	var projectListContent = A2(
 		_elm_lang$html$Html$map,
 		_elam03$elam03_github_io$Main$ProjectListMsgs,
@@ -16957,7 +17107,23 @@ var _elam03$elam03_github_io$Main$view = function (model) {
 							}
 						}
 					},
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: _elam03$elam03_github_io$Main$QuoteBanner,
+							_1: {
+								ctor: '::',
+								_0: cityscapeContent,
+								_1: {
+									ctor: '::',
+									_0: randomQuotesContent,
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		}
@@ -17008,7 +17174,14 @@ var _elam03$elam03_github_io$Main$pageParser = _evancz$url_parser$UrlParser$oneO
 							_evancz$url_parser$UrlParser_ops['</>'],
 							_evancz$url_parser$UrlParser$s('blog'),
 							_evancz$url_parser$UrlParser$int)),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_evancz$url_parser$UrlParser$map,
+							_elam03$elam03_github_io$Main$QuoteBanner,
+							_evancz$url_parser$UrlParser$s('quotebanner')),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		}

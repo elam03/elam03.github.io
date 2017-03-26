@@ -18,6 +18,7 @@ import BlogList
 import Cityscape
 import ProjectList
 import SummaryList
+import RandomQuotes
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -28,6 +29,7 @@ type Msg
     | ProjectListMsgs ProjectList.Msg
     | SummaryListMsgs SummaryList.Msg
     | BlogListMsgs BlogList.Msg
+    | RandomQuotesMsgs RandomQuotes.Msg
     | Tick Time
     | GotoNavBar Page
     | UrlChange Navigation.Location
@@ -37,6 +39,7 @@ type alias Model =
     , projectList : ProjectList.Model
     , summaryList : SummaryList.Model
     , blogList : BlogList.Model
+    , randomQuotes : RandomQuotes.Model
     , debug : String
     , page : Page
     }
@@ -49,16 +52,18 @@ init location =
         blogFileLocation        = "assets/blogs/blog_content.json"
         assetPath               = "assets/1gam_projects/"
 
-        (cityscape, cityscapeCmds)     = Cityscape.init
-        (projectList, projectListCmds) = ProjectList.init projectListFileLocation assetPath
-        (summaryList, summaryListCmds) = SummaryList.init summaryFileLocation
-        (blogList, blogListCmds)       = BlogList.init blogFileLocation
+        (cityscape, cityscapeCmds)       = Cityscape.init
+        (projectList, projectListCmds)   = ProjectList.init projectListFileLocation assetPath
+        (summaryList, summaryListCmds)   = SummaryList.init summaryFileLocation
+        (blogList, blogListCmds)         = BlogList.init blogFileLocation
+        (randomQuotes, randomQuotesCmds) = RandomQuotes.init 1
 
         model_ =
             { cityscape = cityscape
             , projectList = projectList
             , summaryList = summaryList
             , blogList = blogList
+            , randomQuotes = randomQuotes
             , debug = ""
             , page = Home
             }
@@ -73,7 +78,7 @@ init location =
                 , Cmd.map ProjectListMsgs projectListCmds
                 , Cmd.map SummaryListMsgs summaryListCmds
                 , Cmd.map BlogListMsgs blogListCmds
-                -- , cmds
+                , Cmd.map RandomQuotesMsgs randomQuotesCmds
                 ]
 
     in
@@ -87,6 +92,7 @@ viewNavBar model =
             , ("#skills", Skills, "Skills")
             , ("#projects", Projects, "Projects")
             , ("#blog/1", Blog 1, "Blog")
+            , ("#quotebanner", QuoteBanner, "QuoteBanner")
             ]
 
         toMenuItem (linkText, page, displayText) =
@@ -112,10 +118,11 @@ viewNavBar model =
 view : Model -> Html Msg
 view model =
     let
-        cityscapeContent   = model.cityscape   |> Cityscape.view   |> Html.map CityscapeMsgs
-        blogListContent    = model.blogList    |> BlogList.view    |> Html.map BlogListMsgs
-        summaryListContent = model.summaryList |> SummaryList.view |> Html.map SummaryListMsgs
-        projectListContent = model.projectList |> ProjectList.view |> Html.map ProjectListMsgs
+        cityscapeContent    = model.cityscape    |> Cityscape.view    |> Html.map CityscapeMsgs
+        blogListContent     = model.blogList     |> BlogList.view     |> Html.map BlogListMsgs
+        summaryListContent  = model.summaryList  |> SummaryList.view  |> Html.map SummaryListMsgs
+        projectListContent  = model.projectList  |> ProjectList.view  |> Html.map ProjectListMsgs
+        randomQuotesContent = model.randomQuotes |> RandomQuotes.view |> Html.map RandomQuotesMsgs
 
         homeContent =
             model.summaryList
@@ -132,6 +139,7 @@ view model =
             , (Skills, [ cityscapeContent, skillsContent ])
             , (Blog 1, [ cityscapeContent, blogListContent ])
             , (Projects, [ cityscapeContent, projectListContent ])
+            , (QuoteBanner, [ cityscapeContent, randomQuotesContent ] )
             ]
 
         toDiv (page, html) =
@@ -194,6 +202,14 @@ update action model =
                 , Cmd.map BlogListMsgs cmds
                 )
 
+        RandomQuotesMsgs act ->
+            let
+                (randomQuotes, cmds) = RandomQuotes.update act model.randomQuotes
+            in
+                ( { model | randomQuotes = randomQuotes }
+                , Cmd.map RandomQuotesMsgs cmds
+                )
+
         Tick time ->
             ( { model | debug = toString time }, Cmd.none )
 
@@ -225,6 +241,9 @@ toHash page =
         Blog id ->
             "#blog/" ++ toString id
 
+        QuoteBanner ->
+            "#quotebanner"
+
 -- hashParser : Navigation.Location -> Result String Page
 -- hashParser location =
 --     UrlParser.parse identity pageParser (String.dropLeft 1 location.hash)
@@ -234,6 +253,7 @@ type Page
     | Skills
     | Projects
     | Blog Int
+    | QuoteBanner
 
 pageParser : Parser (Page -> a) a
 pageParser =
@@ -242,6 +262,7 @@ pageParser =
         , UrlParser.map Skills (UrlParser.s "skills")
         , UrlParser.map Projects (UrlParser.s "projects")
         , UrlParser.map Blog (UrlParser.s "blog" </> UrlParser.int)
+        , UrlParser.map QuoteBanner (UrlParser.s "quotebanner")
         ]
 
 -- URL-PARSER
@@ -274,6 +295,9 @@ subscriptions model =
         , model.blogList
             |> BlogList.subscriptions
             |> Sub.map (\a -> BlogListMsgs a)
+        , model.randomQuotes
+            |> RandomQuotes.subscriptions
+            |> Sub.map (\a -> RandomQuotesMsgs a)
         ]
 
 main =
