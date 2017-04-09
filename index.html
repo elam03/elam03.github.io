@@ -16,13 +16,14 @@
 
     <body>
         <script>
-            Elm.Main.fullscreen();
+            var app = Elm.Main.fullscreen();
 
             ////////////////////////////////////
-            // var RTM = require('..');
+            // Listen for news updates from satori!
 
-            var endpoint = 'wss://tjpallio.api.satori.com';
-            var appkey = 'ECdF2dD99f6ee1eF6dA0e1fc894712bb';
+            var endpoint = 'wss://open-data.api.satori.com';
+            var appkey = '2B9BeBfbb9f8BD782caEDd3FF88479Cb';
+            var channel = 'newsapi'
 
             var rtm = new RTM(endpoint, appkey);
 
@@ -30,27 +31,34 @@
                 console.log('Connected to RTM!');
             });
 
-            var channel = rtm.subscribe('test-channel', RTM.SubscriptionMode.SIMPLE);
+            var subscription = rtm.subscribe(channel, RTM.SubscriptionMode.SIMPLE);
 
-            /* set callback for state transition */
-            channel.on('enter-subscribed', function () {
-                console.log('Subscribed to: ' + channel.subscriptionId);
-            });
+            // /* set callback for state transition */
+            // subscription.on('enter-subscribed', function () {
+            //     console.log('Subscribed to: ' + channel.subscriptionId);
+            // });
 
             /* set callback for PDU with specific action */
-            channel.on('rtm/subscription/data', function (pdu) {
-                pdu.body.messages.forEach(function (userData) {
-                    console.log('Got message: ' + userData);
-                    console.log('Got message: test: ' + userData.test);
+            subscription.on('rtm/subscription/data', function (pdu) {
+                pdu.body.messages.forEach(function (msg) {
+                    console.log('Got message: ' + msg);
+
+                    // Kind of a wierd hack. Elm doesn't properly 'maybe'-ify a field if it doesn't exist
+                    // at all within the object. It will 'maybe' it correctly if it's set to null.
+                    if (!msg.hasOwnProperty('author')) {
+                        msg.author = null;
+                    }
+
+                    app.ports.newNewsData.send(msg);
                 });
             });
 
-            /* set callback for all subscription PDUs */
-            channel.on('data', function (pdu) {
-                if (pdu.action.endsWith('/error')) {
-                    console.log('Subscription is failed: ', pdu.body);
-                }
-            });
+            // /* set callback for all subscription PDUs */
+            // subscription.on('data', function (pdu) {
+            //     if (pdu.action.endsWith('/error')) {
+            //         console.log('Subscription is failed: ', pdu.body);
+            //     }
+            // });
 
             rtm.start();
 

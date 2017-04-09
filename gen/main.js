@@ -22049,13 +22049,65 @@ var _jinjor$elm_html_parser$HtmlParser_Util$getElementById = F2(
 			nodes);
 	});
 
+var _elam03$elam03_github_io$NewsApi$newNewsData = _elm_lang$core$Native_Platform.incomingPort(
+	'newNewsData',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (author) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (title) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (description) {
+							return A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (url) {
+									return A2(
+										_elm_lang$core$Json_Decode$andThen,
+										function (urlToImage) {
+											return A2(
+												_elm_lang$core$Json_Decode$andThen,
+												function (publishedAt) {
+													return A2(
+														_elm_lang$core$Json_Decode$andThen,
+														function (channel) {
+															return _elm_lang$core$Json_Decode$succeed(
+																{author: author, title: title, description: description, url: url, urlToImage: urlToImage, publishedAt: publishedAt, channel: channel});
+														},
+														A2(_elm_lang$core$Json_Decode$field, 'channel', _elm_lang$core$Json_Decode$string));
+												},
+												A2(_elm_lang$core$Json_Decode$field, 'publishedAt', _elm_lang$core$Json_Decode$string));
+										},
+										A2(_elm_lang$core$Json_Decode$field, 'urlToImage', _elm_lang$core$Json_Decode$string));
+								},
+								A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'description', _elm_lang$core$Json_Decode$string));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string));
+		},
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'author',
+			_elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+						_1: {ctor: '[]'}
+					}
+				}))));
+var _elam03$elam03_github_io$NewsApi$NewsData = F7(
+	function (a, b, c, d, e, f, g) {
+		return {author: a, title: b, description: c, url: d, urlToImage: e, publishedAt: f, channel: g};
+	});
+
 var _elam03$elam03_github_io$RandomQuotes$decodeQuoteOnDesignUrl = _elm_lang$core$Json_Decode$list(
 	A2(_elm_lang$core$Json_Decode$field, 'content', _elm_lang$core$Json_Decode$string));
 var _elam03$elam03_github_io$RandomQuotes$decodeRonSwansonUrl = _elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string);
-var _elam03$elam03_github_io$RandomQuotes$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		{ctor: '[]'});
-};
 var _elam03$elam03_github_io$RandomQuotes$Model = F3(
 	function (a, b, c) {
 		return {numQuotesToDisplay: a, quotes: b, timeForNextQuote: c};
@@ -22073,6 +22125,17 @@ var _elam03$elam03_github_io$RandomQuotes$init = function (numQuotesToDisplay) {
 };
 var _elam03$elam03_github_io$RandomQuotes$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
+};
+var _elam03$elam03_github_io$RandomQuotes$NewNewsData = function (a) {
+	return {ctor: 'NewNewsData', _0: a};
+};
+var _elam03$elam03_github_io$RandomQuotes$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: _elam03$elam03_github_io$NewsApi$newNewsData(_elam03$elam03_github_io$RandomQuotes$NewNewsData),
+			_1: {ctor: '[]'}
+		});
 };
 var _elam03$elam03_github_io$RandomQuotes$NewQuoteOnDesign = function (a) {
 	return {ctor: 'NewQuoteOnDesign', _0: a};
@@ -22139,7 +22202,7 @@ var _elam03$elam03_github_io$RandomQuotes$update = F2(
 					_0: model,
 					_1: _elam03$elam03_github_io$RandomQuotes$getAnotherQuoteOnDesign(_p0._0)
 				};
-			default:
+			case 'NewQuoteOnDesign':
 				if (_p0._0.ctor === 'Ok') {
 					var newParsedQuotes = A2(
 						_elm_lang$core$List$map,
@@ -22160,6 +22223,23 @@ var _elam03$elam03_github_io$RandomQuotes$update = F2(
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							quotes: A2(
+								_elm_lang$core$Basics_ops['++'],
+								model.quotes,
+								{
+									ctor: '::',
+									_0: _p0._0.title,
+									_1: {ctor: '[]'}
+								})
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _elam03$elam03_github_io$RandomQuotes$GetAnotherQuoteOnDesign = function (a) {

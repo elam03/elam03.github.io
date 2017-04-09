@@ -12,6 +12,8 @@ import String exposing (..)
 import Task
 import Time exposing (Time)
 
+import NewsApi exposing (..)
+
 type alias Model =
     { numQuotesToDisplay : Int
     , quotes : List String
@@ -29,6 +31,7 @@ type Msg
     | GetAnotherQuoteOnDesign Int
     | NewQuoteRonSwanson (Result Http.Error (List String))
     | NewQuoteOnDesign (Result Http.Error (List String))
+    | NewNewsData (NewsData)
     | Tick Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -69,6 +72,11 @@ update action model =
         NewQuoteOnDesign (Err _) ->
             ( model, Cmd.none )
 
+        NewNewsData newData ->
+            ( { model | quotes = model.quotes ++ [ newData.title ] }
+            , Cmd.none
+            )
+
 view : Model -> Html Msg
 view model =
     let
@@ -91,8 +99,10 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ AnimationFrame.times Tick
-        ]
+        [ newNewsData NewNewsData ]
+        -- [ AnimationFrame.times Tick
+        -- , newNewsData NewNewsData
+        -- ]
 
 -- HTTP
 ------------------------------------------------------------
