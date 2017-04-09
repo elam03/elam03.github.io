@@ -169,7 +169,8 @@ view model =
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
 update action model =
-    case Debug.log "action" action of
+    -- case Debug.log "action" action of
+    case action of
         CityscapeMsgs act ->
             let
                 (cityscape, cmds) = Cityscape.update act model.cityscape

@@ -22052,6 +22052,10 @@ var _jinjor$elm_html_parser$HtmlParser_Util$getElementById = F2(
 var _elam03$elam03_github_io$RandomQuotes$decodeQuoteOnDesignUrl = _elm_lang$core$Json_Decode$list(
 	A2(_elm_lang$core$Json_Decode$field, 'content', _elm_lang$core$Json_Decode$string));
 var _elam03$elam03_github_io$RandomQuotes$decodeRonSwansonUrl = _elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string);
+var _elam03$elam03_github_io$RandomQuotes$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{ctor: '[]'});
+};
 var _elam03$elam03_github_io$RandomQuotes$Model = F3(
 	function (a, b, c) {
 		return {numQuotesToDisplay: a, quotes: b, timeForNextQuote: c};
@@ -22069,14 +22073,6 @@ var _elam03$elam03_github_io$RandomQuotes$init = function (numQuotesToDisplay) {
 };
 var _elam03$elam03_github_io$RandomQuotes$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
-};
-var _elam03$elam03_github_io$RandomQuotes$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		{
-			ctor: '::',
-			_0: _elm_lang$animation_frame$AnimationFrame$times(_elam03$elam03_github_io$RandomQuotes$Tick),
-			_1: {ctor: '[]'}
-		});
 };
 var _elam03$elam03_github_io$RandomQuotes$NewQuoteOnDesign = function (a) {
 	return {ctor: 'NewQuoteOnDesign', _0: a};
@@ -22329,7 +22325,7 @@ var _elam03$elam03_github_io$Main$CityscapeMsgs = function (a) {
 };
 var _elam03$elam03_github_io$Main$update = F2(
 	function (action, model) {
-		var _p3 = A2(_elm_lang$core$Debug$log, 'action', action);
+		var _p3 = action;
 		switch (_p3.ctor) {
 			case 'CityscapeMsgs':
 				var _p4 = A2(_elam03$elam03_github_io$Cityscape$update, _p3._0, model.cityscape);
