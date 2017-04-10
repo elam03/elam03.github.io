@@ -22049,75 +22049,39 @@ var _jinjor$elm_html_parser$HtmlParser_Util$getElementById = F2(
 			nodes);
 	});
 
-var _elam03$elam03_github_io$NewsApi$newNewsData = _elm_lang$core$Native_Platform.incomingPort(
-	'newNewsData',
-	A2(
-		_elm_lang$core$Json_Decode$andThen,
-		function (author) {
-			return A2(
-				_elm_lang$core$Json_Decode$andThen,
-				function (title) {
-					return A2(
-						_elm_lang$core$Json_Decode$andThen,
-						function (description) {
-							return A2(
-								_elm_lang$core$Json_Decode$andThen,
-								function (url) {
-									return A2(
-										_elm_lang$core$Json_Decode$andThen,
-										function (urlToImage) {
-											return A2(
-												_elm_lang$core$Json_Decode$andThen,
-												function (publishedAt) {
-													return A2(
-														_elm_lang$core$Json_Decode$andThen,
-														function (channel) {
-															return _elm_lang$core$Json_Decode$succeed(
-																{author: author, title: title, description: description, url: url, urlToImage: urlToImage, publishedAt: publishedAt, channel: channel});
-														},
-														A2(_elm_lang$core$Json_Decode$field, 'channel', _elm_lang$core$Json_Decode$string));
-												},
-												A2(_elm_lang$core$Json_Decode$field, 'publishedAt', _elm_lang$core$Json_Decode$string));
-										},
-										A2(_elm_lang$core$Json_Decode$field, 'urlToImage', _elm_lang$core$Json_Decode$string));
-								},
-								A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string));
-						},
-						A2(_elm_lang$core$Json_Decode$field, 'description', _elm_lang$core$Json_Decode$string));
-				},
-				A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string));
-		},
-		A2(
-			_elm_lang$core$Json_Decode$field,
-			'author',
-			_elm_lang$core$Json_Decode$oneOf(
-				{
-					ctor: '::',
-					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
-					_1: {
-						ctor: '::',
-						_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
-						_1: {ctor: '[]'}
-					}
-				}))));
+var _elam03$elam03_github_io$NewsApi$newNewsData = _elm_lang$core$Native_Platform.incomingPort('newNewsData', _elm_lang$core$Json_Decode$value);
 var _elam03$elam03_github_io$NewsApi$NewsData = F7(
 	function (a, b, c, d, e, f, g) {
 		return {author: a, title: b, description: c, url: d, urlToImage: e, publishedAt: f, channel: g};
 	});
 
+var _elam03$elam03_github_io$RandomQuotes$decodeSatoriNewsApi = A8(
+	_elm_lang$core$Json_Decode$map7,
+	_elam03$elam03_github_io$NewsApi$NewsData,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'author',
+		_elm_lang$core$Json_Decode$maybe(_elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'description', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'urlToImage', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'publishedAt', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'channel', _elm_lang$core$Json_Decode$string));
 var _elam03$elam03_github_io$RandomQuotes$decodeQuoteOnDesignUrl = _elm_lang$core$Json_Decode$list(
 	A2(_elm_lang$core$Json_Decode$field, 'content', _elm_lang$core$Json_Decode$string));
 var _elam03$elam03_github_io$RandomQuotes$decodeRonSwansonUrl = _elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string);
-var _elam03$elam03_github_io$RandomQuotes$Model = F3(
-	function (a, b, c) {
-		return {numQuotesToDisplay: a, quotes: b, timeForNextQuote: c};
+var _elam03$elam03_github_io$RandomQuotes$Model = F4(
+	function (a, b, c, d) {
+		return {numQuotesToDisplay: a, quotes: b, newsDataList: c, timeForNextQuote: d};
 	});
 var _elam03$elam03_github_io$RandomQuotes$init = function (numQuotesToDisplay) {
 	return {
 		ctor: '_Tuple2',
-		_0: A3(
+		_0: A4(
 			_elam03$elam03_github_io$RandomQuotes$Model,
 			10,
+			{ctor: '[]'},
 			{ctor: '[]'},
 			0),
 		_1: _elm_lang$core$Platform_Cmd$none
@@ -22133,8 +22097,16 @@ var _elam03$elam03_github_io$RandomQuotes$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: _elam03$elam03_github_io$NewsApi$newNewsData(_elam03$elam03_github_io$RandomQuotes$NewNewsData),
-			_1: {ctor: '[]'}
+			_0: _elm_lang$animation_frame$AnimationFrame$times(_elam03$elam03_github_io$RandomQuotes$Tick),
+			_1: {
+				ctor: '::',
+				_0: _elam03$elam03_github_io$NewsApi$newNewsData(
+					function (_p0) {
+						return _elam03$elam03_github_io$RandomQuotes$NewNewsData(
+							A2(_elm_lang$core$Json_Decode$decodeValue, _elam03$elam03_github_io$RandomQuotes$decodeSatoriNewsApi, _p0));
+					}),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _elam03$elam03_github_io$RandomQuotes$NewQuoteOnDesign = function (a) {
@@ -22165,31 +22137,37 @@ var _elam03$elam03_github_io$RandomQuotes$getAnotherRonSwansonQuote = function (
 };
 var _elam03$elam03_github_io$RandomQuotes$update = F2(
 	function (action, model) {
-		var _p0 = action;
-		switch (_p0.ctor) {
+		var _p1 = action;
+		switch (_p1.ctor) {
 			case 'Tick':
-				var _p1 = _p0._0;
-				return (_elm_lang$core$Native_Utils.cmp(_p1, model.timeForNextQuote) > 0) ? {
+				var _p2 = _p1._0;
+				return (_elm_lang$core$Native_Utils.cmp(_p2, model.timeForNextQuote) > 0) ? {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{timeForNextQuote: _p1 + 5000}),
+						{timeForNextQuote: _p2 + 5000}),
 					_1: _elam03$elam03_github_io$RandomQuotes$getAnotherRonSwansonQuote(1)
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'GetAnotherRonSwansonQuote':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _elam03$elam03_github_io$RandomQuotes$getAnotherRonSwansonQuote(_p0._0)
+					_1: _elam03$elam03_github_io$RandomQuotes$getAnotherRonSwansonQuote(_p1._0)
 				};
 			case 'NewQuoteRonSwanson':
-				if (_p0._0.ctor === 'Ok') {
+				if (_p1._0.ctor === 'Ok') {
+					var newQuotesAppended = A2(
+						_elm_lang$core$List$map,
+						function (quote) {
+							return A2(_elm_lang$core$Basics_ops['++'], quote, ' - Ron Swanson');
+						},
+						_p1._0._0);
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								quotes: A2(_elm_lang$core$Basics_ops['++'], model.quotes, _p0._0._0)
+								quotes: A2(_elm_lang$core$Basics_ops['++'], model.quotes, newQuotesAppended)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -22200,17 +22178,17 @@ var _elam03$elam03_github_io$RandomQuotes$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _elam03$elam03_github_io$RandomQuotes$getAnotherQuoteOnDesign(_p0._0)
+					_1: _elam03$elam03_github_io$RandomQuotes$getAnotherQuoteOnDesign(_p1._0)
 				};
 			case 'NewQuoteOnDesign':
-				if (_p0._0.ctor === 'Ok') {
+				if (_p1._0.ctor === 'Ok') {
 					var newParsedQuotes = A2(
 						_elm_lang$core$List$map,
 						function (quote) {
 							return _jinjor$elm_html_parser$HtmlParser_Util$textContent(
 								_jinjor$elm_html_parser$HtmlParser$parse(quote));
 						},
-						_p0._0._0);
+						_p1._0._0);
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -22224,22 +22202,26 @@ var _elam03$elam03_github_io$RandomQuotes$update = F2(
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							quotes: A2(
-								_elm_lang$core$Basics_ops['++'],
-								model.quotes,
-								{
-									ctor: '::',
-									_0: _p0._0.title,
-									_1: {ctor: '[]'}
-								})
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+				if (_p1._0.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								newsDataList: A2(
+									_elm_lang$core$Basics_ops['++'],
+									model.newsDataList,
+									{
+										ctor: '::',
+										_0: _p1._0._0,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
 		}
 	});
 var _elam03$elam03_github_io$RandomQuotes$GetAnotherQuoteOnDesign = function (a) {
@@ -22249,6 +22231,30 @@ var _elam03$elam03_github_io$RandomQuotes$GetAnotherRonSwansonQuote = function (
 	return {ctor: 'GetAnotherRonSwansonQuote', _0: a};
 };
 var _elam03$elam03_github_io$RandomQuotes$view = function (model) {
+	var newsFeed = function () {
+		var newsDataToDiv = function (newsData) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							newsData.title,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								' - ',
+								A2(_elm_lang$core$Maybe$withDefault, 'source unknown', newsData.author)))),
+					_1: {ctor: '[]'}
+				});
+		};
+		return A2(
+			_elm_lang$core$List$take,
+			model.numQuotesToDisplay,
+			_elm_lang$core$List$reverse(
+				A2(_elm_lang$core$List$map, newsDataToDiv, model.newsDataList)));
+	}();
 	var quotes = A2(
 		_elm_lang$core$List$take,
 		model.numQuotesToDisplay,
@@ -22266,63 +22272,81 @@ var _elam03$elam03_github_io$RandomQuotes$view = function (model) {
 						});
 				},
 				model.quotes)));
-	var allThings = A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
+	var allThings = {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$button,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(
+					_elam03$elam03_github_io$RandomQuotes$GetAnotherRonSwansonQuote(1)),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Manual Quote Add (RS)'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$button,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_elam03$elam03_github_io$RandomQuotes$GetAnotherRonSwansonQuote(1)),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Manual Quote Add (RS)'),
-					_1: {ctor: '[]'}
-				}),
+				_elm_lang$html$Html$hr,
+				{ctor: '[]'},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$hr,
-					{ctor: '[]'},
-					{ctor: '[]'}),
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_elam03$elam03_github_io$RandomQuotes$GetAnotherQuoteOnDesign(1)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Manual Quote Add (QoD)'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$button,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_elam03$elam03_github_io$RandomQuotes$GetAnotherQuoteOnDesign(1)),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Manual Quote Add (QoD)'),
-							_1: {ctor: '[]'}
-						}),
+						_elm_lang$html$Html$hr,
+						{ctor: '[]'},
+						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$hr,
+							_elm_lang$html$Html$div,
 							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
+							quotes),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$hr,
+								{ctor: '[]'},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									newsFeed),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$hr,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
 					}
 				}
 			}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				quotes),
-			_1: {ctor: '[]'}
-		});
+		}
+	};
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},

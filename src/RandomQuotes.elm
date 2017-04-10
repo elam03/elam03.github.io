@@ -17,12 +17,13 @@ import NewsApi exposing (..)
 type alias Model =
     { numQuotesToDisplay : Int
     , quotes : List String
+    , newsDataList : List NewsData
     , timeForNextQuote : Float
     }
 
 init : Int -> (Model, Cmd Msg)
 init numQuotesToDisplay =
-    ( Model 10 [] 0
+    ( Model 10 [] [] 0
     , Cmd.none
     )
 
@@ -31,7 +32,7 @@ type Msg
     | GetAnotherQuoteOnDesign Int
     | NewQuoteRonSwanson (Result Http.Error (List String))
     | NewQuoteOnDesign (Result Http.Error (List String))
-    | NewNewsData (NewsData)
+    | NewNewsData (Result String NewsData)
     | Tick Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -49,9 +50,14 @@ update action model =
             ( model, getAnotherRonSwansonQuote numQuotesToGet )
 
         NewQuoteRonSwanson (Ok newQuotes) ->
-            ( { model | quotes = model.quotes ++ newQuotes }
-            , Cmd.none
-            )
+            let
+                newQuotesAppended =
+                    newQuotes
+                        |> List.map (\quote -> quote ++ " - Ron Swanson")
+            in
+                ( { model | quotes = model.quotes ++ newQuotesAppended }
+                , Cmd.none
+                )
 
         NewQuoteRonSwanson (Err _) ->
             ( model, Cmd.none )
@@ -72,10 +78,14 @@ update action model =
         NewQuoteOnDesign (Err _) ->
             ( model, Cmd.none )
 
-        NewNewsData newData ->
-            ( { model | quotes = model.quotes ++ [ newData.title ] }
+        NewNewsData (Ok newData) ->
+            -- ( model, Cmd.none )
+            ( { model | newsDataList = model.newsDataList ++ [ newData ] }
             , Cmd.none
             )
+
+        NewNewsData (Err error) ->
+            ( model, Cmd.none )
 
 view : Model -> Html Msg
 view model =
@@ -86,12 +96,27 @@ view model =
                 |> List.reverse
                 |> List.take model.numQuotesToDisplay
 
+        newsFeed =
+            let
+                newsDataToDiv newsData =
+                    div []
+                        [ text <| newsData.title ++ " - " ++ (Maybe.withDefault "source unknown" newsData.author) ]
+            in
+                model.newsDataList
+                    |> List.map newsDataToDiv
+                    |> List.reverse
+                    |> List.take model.numQuotesToDisplay
+
         allThings =
             [ Html.button [ onClick (GetAnotherRonSwansonQuote 1) ] [ text "Manual Quote Add (RS)" ]
             , Html.hr [] []
             , Html.button [ onClick (GetAnotherQuoteOnDesign 1) ] [ text "Manual Quote Add (QoD)" ]
             , Html.hr [] []
-            ] ++ [ div [] quotes ]
+            , div [] quotes
+            , Html.hr [] []
+            , div [] newsFeed
+            , Html.hr [] []
+            ]
     in
         div []
             allThings
@@ -99,10 +124,10 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ newNewsData NewNewsData ]
-        -- [ AnimationFrame.times Tick
-        -- , newNewsData NewNewsData
-        -- ]
+        -- [ newNewsData ( decodeValue decodeSatoriNewsApi >> NewNewsData ) ]
+        [ AnimationFrame.times Tick
+        , newNewsData ( decodeValue decodeSatoriNewsApi >> NewNewsData )
+        ]
 
 -- HTTP
 ------------------------------------------------------------
@@ -141,3 +166,17 @@ decodeQuoteOnDesignUrl =
         --     (field "ID" string)
         --     (field "title" string)
         --     (field "content" string)
+
+------------------------------------------------------------
+-- Satori's NewsApi
+
+decodeSatoriNewsApi : Decoder NewsData
+decodeSatoriNewsApi =
+    map7 NewsData
+        (field "author" (maybe string))
+        (field "title" string)
+        (field "description" string)
+        (field "url" string)
+        (field "urlToImage" string)
+        (field "publishedAt" string)
+        (field "channel" string)
