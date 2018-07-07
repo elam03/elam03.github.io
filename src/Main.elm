@@ -65,7 +65,7 @@ init location =
             , blogList = blogList
             , randomQuotes = randomQuotes
             , debug = ""
-            , page = Home
+            , page = Projects
             }
 
         -- (model_, cmds) = (model, cmds)

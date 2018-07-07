@@ -56,6 +56,7 @@ nav a, button {
 
     /*position: fixed;*/
     /*top: 0;*/
+    border-radius: 15px;
 }
 
 .navbar > a {
@@ -129,30 +130,63 @@ nav a, button {
 
 .projectlist {
     border-style: solid;
-    border-color: #000000;
+    border-color: #3b3b3b;
     border-width: 2px;
     border-radius: 15px;
 }
 
 .projectlist-container  {
     display: flex;
-    flex-flow: row wrap;
-    justify-content: space-around;
+    flex-flow: column wrap;
+    /* flex-direction: column;
+    flex-wrap: nowrap; */
+    justify-content: center;
     align-items: baseline;
     align-content: center;
 
-    background:#b5cfd2;
-    padding: 2px;
+    background: #aaaaaa;
+    padding: 4px;
+    margin: 5px;
 }
 
 .projectlist-item {
-    flex: auto;
+    flex: 1;
     margin: auto;
 
     padding: 4px;
-	background:#8296dd;
+    background: #f0ebeb;
     font-family: "Comic Sans MS";
     font-size: 14px;
+
+    border: 5px solid red; /* DEBUG */
+}
+
+.inner-container {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.inner-item {
+}
+
+.project-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+}
+
+.project-item {
+    flex: 1;
+    margin: 20px;
+    text-align: center;
+}
+
+.project-preview {
+    width: 256px;
+    height: 256px;
+    padding: 4px;
+
+    justify-content: flex-start;
 }
 
 /*************************************/

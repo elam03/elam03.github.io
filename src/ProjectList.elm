@@ -130,7 +130,13 @@ viewProject project =
             [ Html.Attributes.classList
                 [ ("projectlist", True)
                 , ("projectlist-item", True)
+                , ("inner-container", True)
                 ]
+            ]
+
+        contentAttributes =
+            [ Html.Attributes.classList
+                [ ("project-item", True) ]
             ]
 
         titleContent =
@@ -138,48 +144,55 @@ viewProject project =
 
         categoryContent =
             case project.category of
-                Just category -> [ p [] [ text category ] ]
+                Just category -> [ p contentAttributes [ text category ] ]
                 Nothing -> []
 
         keywordsContent =
             project.keywords
                 |> Maybe.withDefault []
-                |> List.map (\keyword -> p [ style [ ("font-weight", "bold") ] ] [ text keyword ])
+                |> List.map (\keyword -> p contentAttributes [ text keyword ])
 
         descriptionContent =
             case project.description of
-                Just description -> [ p [ style [ ("text-align", "left") ] ] [ text description ] ]
+                Just description -> [ p contentAttributes [ text description ] ]
                 Nothing -> []
 
         sourceUrlContent =
             case project.sourceUrl of
-                Just sourceUrl -> [ a [ href sourceUrl ] [ text "Source Link" ] ]
+                Just sourceUrl -> [ a ([ href sourceUrl ] ++ contentAttributes) [ text "Source Link" ] ]
                 Nothing -> []
 
         downloadUrlContent =
             case project.downloadUrl of
-                Just downloadUrl -> [ a [ href downloadUrl ] [ text "Download Link" ] ]
+                Just downloadUrl -> [ a ([ href downloadUrl ] ++ contentAttributes) [ text "Download Link" ] ]
                 Nothing -> []
 
         previewsContent =
             project.previews
                 |> Maybe.withDefault []
-                |> List.map (\path -> img [ src path, style [ ("width", "32px") ] ] [])
+                |> List.map (\path -> img [ src path, class "project-preview", class "inner-item"] [])
 
         break = [ br [] [] ]
 
+        contentDiv =
+            div [ class "project-container", class "inner-item" ]
+                (titleContent
+                ++ descriptionContent
+                ++ downloadUrlContent)
+
         content =
-            titleContent
-            ++ categoryContent
-            ++ keywordsContent
-            ++ break
-            ++ descriptionContent
-            ++ break
-            ++ sourceUrlContent
-            ++ break
-            ++ downloadUrlContent
-            ++ break
-            ++ previewsContent
+            previewsContent ++ [ contentDiv ]
+            -- ++ titleContent
+            -- ++ previewsContent
+            -- ++ categoryContent
+            -- ++ keywordsContent
+            -- ++ break
+            -- ++ descriptionContent
+            -- ++ break
+            -- ++ sourceUrlContent
+            -- ++ break
+            -- ++ downloadUrlContent
+
     in
         div attributes content
 

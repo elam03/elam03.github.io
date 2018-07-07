@@ -3,21 +3,21 @@ This is the repository for my personal site, [](http://elam03.github.io). I upda
 
 ## Get Started
 
-### Install Elm 0.17.1+ ###
+### Install Elm 0.17.1+
 This site was created with Elm 0.17.1+. You can follow the instructions to download and install Elm from their main site here:
 
 [Elm Install Instructions](http://elm-lang.org/install)
 
 ##### *The current version of elm as of this writing is 0.18.0 and that should work as well.*
 
-### Download/Clone the Repo ###
+### Download/Clone the Repo
 You can clone or download this repo from this:
 
 ```
 git clone https://github.com/elam03/elam03.github.io.git
 ```
 
-### Install Package Dependencies ###
+### Install Package Dependencies
 The full list of dependencies can be found in elm-package.json, but with a clean repo, you can just run:
 
 ```
@@ -38,5 +38,6 @@ Finally to run locally on your machine, you can use `http-server`, `elm reactor`
 
 *Note that `elm reactor` is not currently serving html at the moment in 0.17.0, so make sure you are at elm 0.17.1.*
 
-
-##
+#### Watch for code changes and automatically build
+1. `npm install -g chokidar-cli`
+2. `npm run watch`
